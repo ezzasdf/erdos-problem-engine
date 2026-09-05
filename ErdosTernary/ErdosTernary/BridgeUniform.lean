@@ -108,20 +108,19 @@ private theorem checkBridgeCantorPow2_imp_not_cantor (K : Nat)
     (hcheck : checkBridgeCantorPow2 K = true) (r : Nat)
     (hr : r ∈ computeNKFast K) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
     ¬(memCantorNat (2 ^ r)) := by
-  have hcheck' := List.all_eq_true.mp hcheck r hr
-  have hb : (r == 0 || r == 2 || r == 8 || hasDigit2UpTo (pow2Mod r (3 ^ 50)) 50) = true :=
-    hcheck' hr
   intro hc
-  have hd : hasDigit2UpTo (pow2Mod r (3^50)) 50 = true := by
-    simp only [Bool.or_eq_true, beq_iff_eq] at hb
-    rcases hb with h0 | h2 | h8 | hd
-    · exact absurd (by omega : r = 0) hSpecial.1
-    · exact absurd (by omega : r = 2) hSpecial.2.1
-    · exact absurd (by omega : r = 8) hSpecial.2.2
-    · exact hd
-  unfold ErdosTernary.BridgeCompute.hasDigit2UpTo ErdosTernary.BridgeCompute.hasDigit2InRange at hd
-  rw [List.any_eq_true] at hd
-  obtain ⟨i, hi_mem, hi_eq⟩ := hd
+  have hcheck' := List.all_eq_true.mp hcheck r hr
+  have hb := hcheck' hr
+  have h_dig : hasDigit2UpTo (pow2Mod r (3^50)) 50 = true := by
+    by_contra hn
+    have h0 : r ≠ 0 := hSpecial.1
+    have h2 : r ≠ 2 := hSpecial.2.1
+    have h8 : r ≠ 8 := hSpecial.2.2
+    simp only [Bool.or_eq_true, beq_iff_eq, h0, h2, h8, false_or] at hb
+    exact hn hb
+  unfold ErdosTernary.BridgeCompute.hasDigit2UpTo ErdosTernary.BridgeCompute.hasDigit2InRange at h_dig
+  rw [List.any_eq_true] at h_dig
+  obtain ⟨i, hi_mem, hi_eq⟩ := h_dig
   rw [List.mem_range] at hi_mem
   simp only [beq_iff_eq] at hi_eq
   have hmod := pow2Mod_eq r (3^50)
