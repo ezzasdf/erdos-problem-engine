@@ -93,7 +93,7 @@ private theorem checkMiddleBridgeListMod_append {nK1 nK2 : List Nat} {K : Nat}
     (h2 : checkMiddleBridgeListMod nK2 K = true) :
     checkMiddleBridgeListMod (nK1 ++ nK2) K = true := by
   unfold checkMiddleBridgeListMod at *
-  rw [List.all_append, h1, h2]
+  simp only [List.all_append, h1, h2]
 
 private theorem s0 : checkMiddleBridgeListMod NK_16_s0 16 = true := by native_decide
 private theorem s1 : checkMiddleBridgeListMod NK_16_s1 16 = true := by native_decide
@@ -198,7 +198,7 @@ theorem bridge_middle_not_cantor_K16
     ¬(memCantorNat (2 ^ r)) := by
   have hcheck := bridge_middle_K16
   unfold checkMiddleBridgeListMod at hcheck
-  unfold NK_16 NK_16_aux at hcheck hr
+  unfold NK_16 NK_16_all at hcheck hr
   have hprop := List.all_eq_true.mp hcheck r hr
   simp only [Bool.or_eq_true, beq_iff_eq] at hprop
   rcases hprop with h_special | h_digit2
