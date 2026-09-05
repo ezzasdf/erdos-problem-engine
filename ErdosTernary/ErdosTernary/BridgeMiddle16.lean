@@ -92,8 +92,7 @@ private theorem checkMiddleBridgeListMod_append {nK1 nK2 : List Nat} {K : Nat}
     (h1 : checkMiddleBridgeListMod nK1 K = true)
     (h2 : checkMiddleBridgeListMod nK2 K = true) :
     checkMiddleBridgeListMod (nK1 ++ nK2) K = true := by
-  unfold checkMiddleBridgeListMod at *
-  simp only [List.all_append, h1, h2]
+  simp only [checkMiddleBridgeListMod, List.all_append, h1, h2]
 
 private theorem s0 : checkMiddleBridgeListMod NK_16_s0 16 = true := by native_decide
 private theorem s1 : checkMiddleBridgeListMod NK_16_s1 16 = true := by native_decide
