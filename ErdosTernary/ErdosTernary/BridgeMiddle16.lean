@@ -40,7 +40,50 @@ NK_16_c0 ++   NK_16_c1 ++   NK_16_c2 ++   NK_16_c3 ++   NK_16_c4 ++   NK_16_c5 +
 
 def NK_16 : List Nat := NK_16_aux
 
-theorem bridge_middle_K16 : checkMiddleBridgeListMod NK_16 16 = true := by native_decide
+private theorem checkMiddleBridgeListMod_append {nK1 nK2 : List Nat} {K : Nat}
+    (h1 : checkMiddleBridgeListMod nK1 K = true)
+    (h2 : checkMiddleBridgeListMod nK2 K = true) :
+    checkMiddleBridgeListMod (nK1 ++ nK2) K = true := by
+  simp only [checkMiddleBridgeListMod, List.all_append, h1, h2, Bool.and_true, Bool.true_and]
+
+private theorem checkMiddleBridgeListMod_nil {K : Nat} :
+    checkMiddleBridgeListMod [] K = true := by
+  simp [checkMiddleBridgeListMod]
+
+private theorem c0 : checkMiddleBridgeListMod NK_16_c0 16 = true := by native_decide
+private theorem c1 : checkMiddleBridgeListMod NK_16_c1 16 = true := by native_decide
+private theorem c2 : checkMiddleBridgeListMod NK_16_c2 16 = true := by native_decide
+private theorem c3 : checkMiddleBridgeListMod NK_16_c3 16 = true := by native_decide
+private theorem c4 : checkMiddleBridgeListMod NK_16_c4 16 = true := by native_decide
+private theorem c5 : checkMiddleBridgeListMod NK_16_c5 16 = true := by native_decide
+private theorem c6 : checkMiddleBridgeListMod NK_16_c6 16 = true := by native_decide
+private theorem c7 : checkMiddleBridgeListMod NK_16_c7 16 = true := by native_decide
+private theorem c8 : checkMiddleBridgeListMod NK_16_c8 16 = true := by native_decide
+private theorem c9 : checkMiddleBridgeListMod NK_16_c9 16 = true := by native_decide
+private theorem c10 : checkMiddleBridgeListMod NK_16_c10 16 = true := by native_decide
+private theorem c11 : checkMiddleBridgeListMod NK_16_c11 16 = true := by native_decide
+private theorem c12 : checkMiddleBridgeListMod NK_16_c12 16 = true := by native_decide
+private theorem c13 : checkMiddleBridgeListMod NK_16_c13 16 = true := by native_decide
+private theorem c14 : checkMiddleBridgeListMod NK_16_c14 16 = true := by native_decide
+private theorem c15 : checkMiddleBridgeListMod NK_16_c15 16 = true := by native_decide
+
+theorem bridge_middle_K16 : checkMiddleBridgeListMod NK_16 16 = true := by
+  show checkMiddleBridgeListMod (NK_16_c0 ++ NK_16_c1 ++ NK_16_c2 ++ NK_16_c3 ++ NK_16_c4 ++ NK_16_c5 ++ NK_16_c6 ++ NK_16_c7 ++ NK_16_c8 ++ NK_16_c9 ++ NK_16_c10 ++ NK_16_c11 ++ NK_16_c12 ++ NK_16_c13 ++ NK_16_c14 ++ NK_16_c15) 16 = true
+  exact checkMiddleBridgeListMod_append c0 <|
+    checkMiddleBridgeListMod_append c1 <|
+    checkMiddleBridgeListMod_append c2 <|
+    checkMiddleBridgeListMod_append c3 <|
+    checkMiddleBridgeListMod_append c4 <|
+    checkMiddleBridgeListMod_append c5 <|
+    checkMiddleBridgeListMod_append c6 <|
+    checkMiddleBridgeListMod_append c7 <|
+    checkMiddleBridgeListMod_append c8 <|
+    checkMiddleBridgeListMod_append c9 <|
+    checkMiddleBridgeListMod_append c10 <|
+    checkMiddleBridgeListMod_append c11 <|
+    checkMiddleBridgeListMod_append c12 <|
+    checkMiddleBridgeListMod_append c13 <|
+    checkMiddleBridgeListMod_append c14 c15
 
 theorem modM_hasDigit2_not_cantor (r lo hi M : Nat) (hhi : hi <= M)
     (h : hasDigit2InRange (2 ^ r % 3 ^ M) lo hi = true) :
