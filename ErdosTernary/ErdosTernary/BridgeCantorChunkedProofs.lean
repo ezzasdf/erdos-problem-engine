@@ -44,6 +44,7 @@ set_option maxHeartbeats 20000000 in
 theorem checkBridgeCantorPow2_K15 :
     checkBridgeCantorPow2 15 = true := by
   apply checkBridgeCantorPow2_of_chunked 15 1594323 6
+  · exact (by norm_num : 0 < 1594323)
   · native_decide
   · intro j hj; interval_cases j
     · exact rc_K15_0
@@ -149,6 +150,7 @@ set_option maxHeartbeats 20000000 in
 theorem checkBridgeCantorPow2_K16 :
     checkBridgeCantorPow2 16 = true := by
   apply checkBridgeCantorPow2_of_chunked 16 1594323 18
+  · exact (by norm_num : 0 < 1594323)
   · native_decide
   · intro j hj; interval_cases j
     · exact rc_K16_0
@@ -446,6 +448,7 @@ set_option maxHeartbeats 20000000 in
 theorem checkBridgeCantorPow2_K17 :
     checkBridgeCantorPow2 17 = true := by
   apply checkBridgeCantorPow2_of_chunked 17 1594323 54
+  · exact (by norm_num : 0 < 1594323)
   · native_decide
   · intro j hj; interval_cases j
     · exact rc_K17_0
