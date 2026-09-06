@@ -24,7 +24,8 @@ private theorem computeNK_not2 {K r : Nat}
   cases h_val : hasTrailingDigit2 (pow2Mod r (3^K)) K <;> simp_all [Bool.not]
 
 private theorem rmod_div_cancel (r n : Nat) : r % n + r / n * n = r := by
-  rw [Nat.add_comm]; exact (Nat.div_add_mod r n).symm
+  rw [Nat.add_comm, Nat.mul_comm]
+  exact (Nat.div_add_mod r n)
 
 theorem checkBridgeCantorPow2_of_chunked (K chunk_size num_chunks : Nat)
     (hchunk_pos : 0 < chunk_size)
