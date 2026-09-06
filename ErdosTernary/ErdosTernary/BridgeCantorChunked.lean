@@ -24,9 +24,8 @@ private theorem computeNK_not2 {K r : Nat}
     hasTrailingDigit2 (pow2Mod r (3^K)) K = false := by
   unfold computeNKFast at hr
   rw [List.mem_filter] at hr
-  have := hr.2
-  simp only [Bool.not_eq_true] at this
-  exact this
+  have h := hr.2
+  cases h_val : hasTrailingDigit2 (pow2Mod r (3^K)) K <;> simp_all [Bool.not]
 
 theorem rangeCheck_imp {K lo hi r : Nat}
     (hlo : lo ≤ r) (hhi : r < hi)
@@ -43,11 +42,9 @@ theorem rangeCheck_imp {K lo hi r : Nat}
       (List.range (hi - lo)) := by
     rw [List.mem_filter]
     exact ⟨List.mem_range.mpr hs, by
-      show !hasTrailingDigit2 (pow2Mod ((r - lo) + lo) (3^K)) K = true
-      simp only [show (r - lo) + lo = r from Nat.sub_add_cancel hlo, Bool.not_eq_true]
-      exact hr_false⟩
+      rw [show (r - lo) + lo = r from Nat.sub_add_cancel hlo, hr_false]⟩
   have hresult := hall _ hmem
-  simp only [show (r - lo) + lo = r from Nat.sub_add_cancel hlo] at hresult
+  rw [show (r - lo) + lo = r from Nat.sub_add_cancel hlo] at hresult
   exact hresult
 
 theorem checkBridgeCantorPow2_of_chunked (K chunk_size num_chunks : Nat)
@@ -65,13 +62,18 @@ theorem checkBridgeCantorPow2_of_chunked (K chunk_size num_chunks : Nat)
   obtain ⟨r_lt, _⟩ := hr
   rw [List.mem_range] at r_lt
   have hmul : r < chunk_size * num_chunks := by omega
+  have hdiv_comm : uK K = num_chunks * chunk_size := by omega
   have hj : r / chunk_size < num_chunks := by
-    rw [Nat.div_lt_iff_lt_mul hchunk_pos]
+    rw [Nat.div_lt_iff_lt_mul hchunk_pos, Nat.mul_comm]
     exact hmul
   have hcheck := hchunks (r / chunk_size) hj
   unfold rangeCheck at hcheck
   have hall := List.all_eq_true.mp hcheck
   have hlo : r / chunk_size * chunk_size ≤ r := Nat.div_mul_le_self r chunk_size
+  have hhi : r < (r / chunk_size + 1) * chunk_size := by
+    rw [Nat.mul_comm (r / chunk_size + 1) chunk_size, Nat.mul_comm (r / chunk_size) chunk_size]
+    exact Nat.add_mul_div_right (r / chunk_size * chunk_size) (by omega : 0 < chunk_size) ▸
+      (Nat.lt_succ_of_le (Nat.div_mul_le_self r chunk_size))
   have hs : r - r / chunk_size * chunk_size < chunk_size := by omega
   have hr_eq : (r - r / chunk_size * chunk_size) + r / chunk_size * chunk_size = r := by omega
   have hmem : (r - r / chunk_size * chunk_size) ∈ List.filter
@@ -79,11 +81,9 @@ theorem checkBridgeCantorPow2_of_chunked (K chunk_size num_chunks : Nat)
       (List.range ((r / chunk_size + 1) * chunk_size - r / chunk_size * chunk_size)) := by
     rw [List.mem_filter]
     exact ⟨List.mem_range.mpr hs, by
-      show !hasTrailingDigit2 (pow2Mod ((r - r / chunk_size * chunk_size) + r / chunk_size * chunk_size) (3^K)) K = true
-      simp only [hr_eq, Bool.not_eq_true]
-      exact hr_false⟩
+      rw [hr_eq, hr_false]⟩
   have hresult := hall _ hmem
-  simp only [hr_eq] at hresult
+  rw [hr_eq] at hresult
   exact hresult
 
 end ErdosTernary.BridgeCantorChunked
