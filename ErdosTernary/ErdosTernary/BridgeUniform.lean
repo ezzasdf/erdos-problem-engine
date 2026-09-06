@@ -107,23 +107,32 @@ private theorem checkBridgeCantorPow2_imp_not_cantor (K : Nat)
     (hcheck : checkBridgeCantorPow2 K = true) (r : Nat)
     (hr : r ∈ computeNKFast K) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
     ¬(memCantorNat (2 ^ r)) := by
+  intro hc
   have hcheck' := List.all_eq_true.mp hcheck r hr
-  simp only [Bool.or_eq_true, beq_iff_eq] at hcheck'
-  rcases hcheck' with h0 | h2 | h8 | h_dig
-  · omega
-  · omega
-  · omega
-  · unfold ErdosTernary.BridgeCompute.hasDigit2UpTo ErdosTernary.BridgeCompute.hasDigit2InRange at h_dig
-    rw [List.any_eq_true] at h_dig
-    obtain ⟨i, hi_mem, hi_eq⟩ := h_dig
-    rw [List.mem_range] at hi_mem
-    simp only [beq_iff_eq] at hi_eq
-    have hmod := pow2Mod_eq r (3^50)
-    rw [hmod] at hi_eq
-    intro hc
-    have h_i : (2^r / 3^i) % 3 = (2^r % 3^50 / 3^i) % 3 := digit_mod3pow50_eq r i hi_mem
-    have h_digit2 : (2^r / 3^i) % 3 = 2 := h_i ▸ hi_eq
-    exact hc i h_digit2
+  have h0f : (r == 0) = false := by
+    cases h : r == 0
+    · rfl
+    · exfalso; simp only [beq_iff_eq] at h; exact hSpecial.1 h
+  have h2f : (r == 2) = false := by
+    cases h : r == 2
+    · rfl
+    · exfalso; simp only [beq_iff_eq] at h; exact hSpecial.2.1 h
+  have h8f : (r == 8) = false := by
+    cases h : r == 8
+    · rfl
+    · exfalso; simp only [beq_iff_eq] at h; exact hSpecial.2.2 h
+  simp only [h0f, h2f, h8f] at hcheck'
+  simp only [Bool.false_or] at hcheck'
+  unfold ErdosTernary.BridgeCompute.hasDigit2UpTo ErdosTernary.BridgeCompute.hasDigit2InRange at hcheck'
+  rw [List.any_eq_true] at hcheck'
+  obtain ⟨i, hi_mem, hi_eq⟩ := hcheck'
+  rw [List.mem_range] at hi_mem
+  simp only [beq_iff_eq] at hi_eq
+  have hmod := pow2Mod_eq r (3^50)
+  rw [hmod] at hi_eq
+  have h_i : (2^r / 3^i) % 3 = (2^r % 3^50 / 3^i) % 3 := digit_mod3pow50_eq r i hi_mem
+  have h_digit2 : (2^r / 3^i) % 3 = 2 := h_i ▸ hi_eq
+  exact hc i h_digit2
 
 private theorem bridge_K13_not_cantor (r : Nat)
     (hr : r ∈ computeNKFast 13) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
@@ -138,12 +147,12 @@ private theorem bridge_K14_not_cantor (r : Nat)
 private theorem bridge_K15_not_cantor (r : Nat)
     (hr : r ∈ computeNKFast 15) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
     ¬(memCantorNat (2 ^ r)) :=
-  checkBridgeCantorPow2_imp_not_cantor 15 checkBridgeCantorPow2_15 r hr hSpecial
+  ErdosTernary.BridgeK15.bridge_K15_not_cantor r hr hSpecial
 
 private theorem bridge_K16_not_cantor (r : Nat)
     (hr : r ∈ computeNKFast 16) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
     ¬(memCantorNat (2 ^ r)) :=
-  checkBridgeCantorPow2_imp_not_cantor 16 checkBridgeCantorPow2_16 r hr hSpecial
+  ErdosTernary.BridgeK16.bridge_K16_not_cantor r hr hSpecial
 
 private theorem bridge_K17_not_cantor (r : Nat)
     (hr : r ∈ computeNKFast 17) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
