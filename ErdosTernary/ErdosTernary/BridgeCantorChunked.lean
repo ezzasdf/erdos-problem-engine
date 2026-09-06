@@ -66,7 +66,7 @@ theorem rangeCheck_all_of_computeNK (K chunk_size num_chunks : Nat)
     rw [Nat.div_lt_iff_lt_mul hchunk_pos, Nat.mul_comm]
     exact hmul
   have hcheck := hchunks (r / chunk_size) hj
-  exact rangeCheck_imp _ _ r (Nat.div_mul_le_self r chunk_size)
+  exact rangeCheck_imp (Nat.div_mul_le_self r chunk_size)
     (by
       have h1 : r = (r / chunk_size) * chunk_size + r % chunk_size := (Nat.div_add_mod r chunk_size).symm
       have h2 : r % chunk_size < chunk_size := Nat.mod_lt r hchunk_pos
