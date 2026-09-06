@@ -162,20 +162,6 @@ theorem bridge_middle_K15 : checkMiddleBridgeListMod NK_15 15 = true := by
   exact checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append s0 s1) s2) s3) s4) s5) s6) s7) s8) s9) s10) s11) s12) s13) s14) s15) s16) s17) s18) s19) s20) s21) s22) s23) s24) s25) s26) s27) s28) s29) s30) s31
 
 
-axiom NK_15_eq : NK_15 = computeNKFast 15
 
-theorem bridge_K15_not_cantor
-    (r : Nat) (hr : r ∈ computeNKFast 15) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
-    ¬(memCantorNat (2 ^ r)) := by
-  have hr15 : r ∈ NK_15 := by rwa [NK_15_eq]
-  have hcheck := bridge_middle_K15
-  unfold checkMiddleBridgeListMod at hcheck
-  unfold NK_15 NK_15_all at hcheck hr15
-  have hprop := List.all_eq_true.mp hcheck r hr15
-  simp only [Bool.or_eq_true, beq_iff_eq] at hprop
-  rcases hprop with h_special | h_digit2
-  · omega
-  · rw [hasDigit2InRange_pow2Mod r 15 50 50] at h_digit2
-    exact BridgeMiddle16.modM_hasDigit2_not_cantor r 15 50 50 (by omega) h_digit2
 
 end ErdosTernary.BridgeK15

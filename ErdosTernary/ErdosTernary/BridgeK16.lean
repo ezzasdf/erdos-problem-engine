@@ -289,20 +289,6 @@ theorem bridge_middle_K16 : checkMiddleBridgeListMod NK_16 16 = true := by
   unfold NK_16_all
   exact checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append (checkMiddleBridgeListMod_append s0 s1) s2) s3) s4) s5) s6) s7) s8) s9) s10) s11) s12) s13) s14) s15) s16) s17) s18) s19) s20) s21) s22) s23) s24) s25) s26) s27) s28) s29) s30) s31) s32) s33) s34) s35) s36) s37) s38) s39) s40) s41) s42) s43) s44) s45) s46) s47) s48) s49) s50) s51) s52) s53) s54) s55) s56) s57) s58) s59) s60) s61) s62) s63
 
-axiom NK_16_eq : NK_16 = computeNKFast 16
 
-theorem bridge_K16_not_cantor
-    (r : Nat) (hr : r ∈ computeNKFast 16) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
-    ¬(memCantorNat (2 ^ r)) := by
-  have hr16 : r ∈ NK_16 := by rwa [NK_16_eq]
-  have hcheck := bridge_middle_K16
-  unfold checkMiddleBridgeListMod at hcheck
-  unfold NK_16 NK_16_all at hcheck hr16
-  have hprop := List.all_eq_true.mp hcheck r hr16
-  simp only [Bool.or_eq_true, beq_iff_eq] at hprop
-  rcases hprop with h_special | h_digit2
-  · omega
-  · rw [hasDigit2InRange_pow2Mod r 16 50 50] at h_digit2
-    exact BridgeMiddle16.modM_hasDigit2_not_cantor r 16 50 50 (by omega) h_digit2
 
 end ErdosTernary.BridgeK16

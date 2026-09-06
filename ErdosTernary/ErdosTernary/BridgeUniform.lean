@@ -16,6 +16,7 @@ import ErdosTernary.BridgeK14
 import ErdosTernary.BridgeK15
 import ErdosTernary.BridgeK16
 import ErdosTernary.BridgeK17
+import ErdosTernary.BridgeCantorChunkedProofs
 
 open ErdosTernary.SayeLemma
 open ErdosTernary.MiddleDigits
@@ -148,17 +149,17 @@ private theorem bridge_K14_not_cantor (r : Nat)
 private theorem bridge_K15_not_cantor (r : Nat)
     (hr : r ∈ computeNKFast 15) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
     ¬(memCantorNat (2 ^ r)) :=
-  ErdosTernary.BridgeK15.bridge_K15_not_cantor r hr hSpecial
+  checkBridgeCantorPow2_imp_not_cantor 15 checkBridgeCantorPow2_K15 r hr hSpecial
 
 private theorem bridge_K16_not_cantor (r : Nat)
     (hr : r ∈ computeNKFast 16) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
     ¬(memCantorNat (2 ^ r)) :=
-  ErdosTernary.BridgeK16.bridge_K16_not_cantor r hr hSpecial
+  checkBridgeCantorPow2_imp_not_cantor 16 checkBridgeCantorPow2_K16 r hr hSpecial
 
 private theorem bridge_K17_not_cantor (r : Nat)
     (hr : r ∈ computeNKFast 17) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
     ¬(memCantorNat (2 ^ r)) :=
-  ErdosTernary.BridgeK17.bridge_K17_not_cantor r hr hSpecial
+  checkBridgeCantorPow2_imp_not_cantor 17 checkBridgeCantorPow2_K17 r hr hSpecial
 
 axiom ostrowski_invariant :
   ∀ K, K ≥ 18 →
