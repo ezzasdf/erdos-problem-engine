@@ -50,10 +50,8 @@ theorem checkBridgeCantorPow2_of_chunked (K chunk_size num_chunks : Nat)
       (fun s => !hasTrailingDigit2 (pow2Mod (s + r / chunk_size * chunk_size) (3^K)) K)
       (List.range chunk_size) := by
     rw [List.mem_filter]
-    constructor
-    · exact List.mem_range.mpr hmod
-    · show !hasTrailingDigit2 (pow2Mod (r % chunk_size + r / chunk_size * chunk_size) (3^K)) K = true
-      rw [mod_div_cancel r chunk_size]; exact hr_false
+    exact ⟨List.mem_range.mpr hmod, by
+      rw [mod_div_cancel r chunk_size, hr_false]; decide⟩
   have hresult := hall _ hmem
   rw [mod_div_cancel r chunk_size] at hresult
   exact hresult
