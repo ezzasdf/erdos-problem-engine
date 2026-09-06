@@ -42,7 +42,7 @@ theorem rangeCheck_imp {K lo hi r : Nat}
       (List.range (hi - lo)) := by
     rw [List.mem_filter]
     exact ⟨List.mem_range.mpr hs, by
-      rw [show (r - lo) + lo = r from Nat.sub_add_cancel hlo, hr_false]⟩
+      rw [show (r - lo) + lo = r from Nat.sub_add_cancel hlo, hr_false]; decide⟩
   have hresult := hall _ hmem
   rw [show (r - lo) + lo = r from Nat.sub_add_cancel hlo] at hresult
   exact hresult
@@ -70,18 +70,16 @@ theorem checkBridgeCantorPow2_of_chunked (K chunk_size num_chunks : Nat)
   unfold rangeCheck at hcheck
   have hall := List.all_eq_true.mp hcheck
   have hlo : r / chunk_size * chunk_size ≤ r := Nat.div_mul_le_self r chunk_size
-  have hhi : r < (r / chunk_size + 1) * chunk_size := by
-    rw [Nat.mul_comm (r / chunk_size + 1) chunk_size, Nat.mul_comm (r / chunk_size) chunk_size]
-    exact Nat.add_mul_div_right (r / chunk_size * chunk_size) (by omega : 0 < chunk_size) ▸
-      (Nat.lt_succ_of_le (Nat.div_mul_le_self r chunk_size))
-  have hs : r - r / chunk_size * chunk_size < chunk_size := by omega
+  have hs : r % chunk_size < chunk_size := Nat.mod_lt r hchunk_pos
+  have hs' : r - r / chunk_size * chunk_size = r % chunk_size := by omega
+  have hs'' : r - r / chunk_size * chunk_size < chunk_size := hs' ▸ hs
   have hr_eq : (r - r / chunk_size * chunk_size) + r / chunk_size * chunk_size = r := by omega
   have hmem : (r - r / chunk_size * chunk_size) ∈ List.filter
       (fun s => !hasTrailingDigit2 (pow2Mod (s + r / chunk_size * chunk_size) (3^K)) K)
       (List.range ((r / chunk_size + 1) * chunk_size - r / chunk_size * chunk_size)) := by
     rw [List.mem_filter]
     exact ⟨List.mem_range.mpr hs, by
-      rw [hr_eq, hr_false]⟩
+      rw [hr_eq, hr_false]; decide⟩
   have hresult := hall _ hmem
   rw [hr_eq] at hresult
   exact hresult
