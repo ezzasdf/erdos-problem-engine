@@ -37,6 +37,7 @@ theorem bridge_first_period_all_ostrowski :
     ∀ K, K ≥ 5 →
     ∀ r, r ∈ computeNK K → r ≠ 0 → r ≠ 2 → r ≠ 8 →
     ¬(memCantorNat (2 ^ r)) :=
-  fun K hK r hr hn0 hn2 hn8 => bridge_first_period_all K hK r hr ⟨hn0, hn2, hn8⟩
+  fun K hK r hr hn0 hn2 hn8 =>
+    bridge_first_period_all K hK r (by rwa [computeNKFast_eq]) ⟨hn0, hn2, hn8⟩
 
 end ErdosTernary.BridgeOstrowskiInvariant
