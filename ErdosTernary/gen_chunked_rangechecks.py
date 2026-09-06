@@ -25,6 +25,7 @@ def generate_lean_file():
     output.append("import ErdosTernary.BridgeCantorChunked")
     output.append("")
     output.append("open ErdosTernary.BridgeCantorChunked")
+    output.append("open ErdosTernary.BridgeCompute")
     output.append("")
 
     total_chunks = 0

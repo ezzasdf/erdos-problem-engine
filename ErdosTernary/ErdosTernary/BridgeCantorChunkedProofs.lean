@@ -7,6 +7,7 @@
 import ErdosTernary.BridgeCantorChunked
 
 open ErdosTernary.BridgeCantorChunked
+open ErdosTernary.BridgeCompute
 
 -- K=15: uK K = 9565938, chunk_size = 1594323, num_chunks = 6
 
