@@ -51,6 +51,7 @@ def generate_lean_file():
 
         # Combined theorem using interval_cases
         output.append(f"set_option maxHeartbeats 20000000 in")
+        output.append(f"set_option maxRecDepth 1000000 in")
         output.append(f"theorem checkBridgeCantorPow2_K{K} :")
         output.append(f"    checkBridgeCantorPow2 {K} = true := by")
         output.append(f"  apply checkBridgeCantorPow2_of_chunked "

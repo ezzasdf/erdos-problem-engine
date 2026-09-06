@@ -41,6 +41,7 @@ private theorem rc_K15_5 :
   native_decide
 
 set_option maxHeartbeats 20000000 in
+set_option maxRecDepth 1000000 in
 theorem checkBridgeCantorPow2_K15 :
     checkBridgeCantorPow2 15 = true := by
   apply checkBridgeCantorPow2_of_chunked 15 1594323 6
@@ -147,6 +148,7 @@ private theorem rc_K16_17 :
   native_decide
 
 set_option maxHeartbeats 20000000 in
+set_option maxRecDepth 1000000 in
 theorem checkBridgeCantorPow2_K16 :
     checkBridgeCantorPow2 16 = true := by
   apply checkBridgeCantorPow2_of_chunked 16 1594323 18
@@ -445,6 +447,7 @@ private theorem rc_K17_53 :
   native_decide
 
 set_option maxHeartbeats 20000000 in
+set_option maxRecDepth 1000000 in
 theorem checkBridgeCantorPow2_K17 :
     checkBridgeCantorPow2 17 = true := by
   apply checkBridgeCantorPow2_of_chunked 17 1594323 54
