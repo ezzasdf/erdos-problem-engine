@@ -19,6 +19,15 @@ def rangeCheck (K lo hi : Nat) : Bool :=
     (s + lo) == 0 || (s + lo) == 2 || (s + lo) == 8 ||
     hasDigit2UpTo (pow2Mod (s + lo) (3^50)) 50
 
+private theorem computeNK_not2 {K r : Nat}
+    (hr : r ∈ computeNKFast K) :
+    hasTrailingDigit2 (pow2Mod r (3^K)) K = false := by
+  unfold computeNKFast at hr
+  rw [List.mem_filter] at hr
+  have := hr.2
+  simp only [Bool.not_eq_true] at this
+  exact this
+
 theorem rangeCheck_imp {K lo hi r : Nat}
     (hlo : lo ≤ r) (hhi : r < hi)
     (hr_nk : r ∈ computeNKFast K)
@@ -28,17 +37,18 @@ theorem rangeCheck_imp {K lo hi r : Nat}
   unfold rangeCheck at hcheck
   have hall := List.all_eq_true.mp hcheck
   have hs : r - lo < hi - lo := by omega
-  show ((r - lo) + lo == 0 || (r - lo) + lo == 2 ||
-    (r - lo) + lo == 8 ||
-    hasDigit2UpTo (pow2Mod ((r - lo) + lo) (3^50)) 50) = true
-  apply hall
-  rw [List.mem_filter]
-  refine ⟨List.mem_range.mpr hs, ?_⟩
-  show !hasTrailingDigit2 (pow2Mod ((r - lo) + lo) (3^K)) K = true
-  rw [show (r - lo) + lo = r by omega]
-  unfold computeNKFast at hr_nk
-  rw [List.mem_filter] at hr_nk
-  exact hr_nk.2
+  have hr_false := computeNK_not2 hr_nk
+  have hmem : (r - lo) ∈ List.filter
+      (fun s => !hasTrailingDigit2 (pow2Mod (s + lo) (3^K)) K)
+      (List.range (hi - lo)) := by
+    rw [List.mem_filter]
+    exact ⟨List.mem_range.mpr hs, by
+      show !hasTrailingDigit2 (pow2Mod ((r - lo) + lo) (3^K)) K = true
+      simp only [show (r - lo) + lo = r from Nat.sub_add_cancel hlo, Bool.not_eq_true]
+      exact hr_false⟩
+  have hresult := hall _ hmem
+  simp only [show (r - lo) + lo = r from Nat.sub_add_cancel hlo] at hresult
+  exact hresult
 
 theorem checkBridgeCantorPow2_of_chunked (K chunk_size num_chunks : Nat)
     (hchunk_pos : 0 < chunk_size)
@@ -49,9 +59,10 @@ theorem checkBridgeCantorPow2_of_chunked (K chunk_size num_chunks : Nat)
   unfold checkBridgeCantorPow2
   rw [List.all_eq_true]
   intro r hr
+  have hr_false := computeNK_not2 hr
   unfold computeNKFast at hr
   rw [List.mem_filter] at hr
-  obtain ⟨r_lt, r_no2⟩ := hr
+  obtain ⟨r_lt, _⟩ := hr
   rw [List.mem_range] at r_lt
   have hmul : r < chunk_size * num_chunks := by omega
   have hj : r / chunk_size < num_chunks := by
@@ -60,15 +71,19 @@ theorem checkBridgeCantorPow2_of_chunked (K chunk_size num_chunks : Nat)
   have hcheck := hchunks (r / chunk_size) hj
   unfold rangeCheck at hcheck
   have hall := List.all_eq_true.mp hcheck
-  show ((r - r / chunk_size * chunk_size) + r / chunk_size * chunk_size == 0 ||
-    (r - r / chunk_size * chunk_size) + r / chunk_size * chunk_size == 2 ||
-    (r - r / chunk_size * chunk_size) + r / chunk_size * chunk_size == 8 ||
-    hasDigit2UpTo (pow2Mod ((r - r / chunk_size * chunk_size) + r / chunk_size * chunk_size) (3^50)) 50) = true
-  apply hall
-  rw [List.mem_filter]
-  refine ⟨List.mem_range.mpr (by omega), ?_⟩
-  show !hasTrailingDigit2 (pow2Mod ((r - r / chunk_size * chunk_size) + r / chunk_size * chunk_size) (3^K)) K = true
-  rw [show (r - r / chunk_size * chunk_size) + r / chunk_size * chunk_size = r by omega]
-  exact r_no2
+  have hlo : r / chunk_size * chunk_size ≤ r := Nat.div_mul_le_self r chunk_size
+  have hs : r - r / chunk_size * chunk_size < chunk_size := by omega
+  have hr_eq : (r - r / chunk_size * chunk_size) + r / chunk_size * chunk_size = r := by omega
+  have hmem : (r - r / chunk_size * chunk_size) ∈ List.filter
+      (fun s => !hasTrailingDigit2 (pow2Mod (s + r / chunk_size * chunk_size) (3^K)) K)
+      (List.range ((r / chunk_size + 1) * chunk_size - r / chunk_size * chunk_size)) := by
+    rw [List.mem_filter]
+    exact ⟨List.mem_range.mpr hs, by
+      show !hasTrailingDigit2 (pow2Mod ((r - r / chunk_size * chunk_size) + r / chunk_size * chunk_size) (3^K)) K = true
+      simp only [hr_eq, Bool.not_eq_true]
+      exact hr_false⟩
+  have hresult := hall _ hmem
+  simp only [hr_eq] at hresult
+  exact hresult
 
 end ErdosTernary.BridgeCantorChunked
