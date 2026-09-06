@@ -2,7 +2,7 @@
 """Generate range-check chunk proofs for BridgeCantorChunked.lean.
 
 For K in {15, 16, 17}, generates:
-1. Per-chunk theorems: rangeCheck K lo hi = true (proved by native_decide)
+1. Per-chunk theorems: rangeCheck K lo size = true (proved by native_decide)
 2. Combined theorem: checkBridgeCantorPow2 K = true
 """
 
@@ -43,10 +43,9 @@ def generate_lean_file():
         # Per-chunk theorems
         for i in range(num_chunks):
             lo = i * CHUNK_SIZE
-            hi = (i + 1) * CHUNK_SIZE
             output.append(f"set_option maxHeartbeats 20000000 in")
             output.append(f"private theorem rc_K{K}_{i} :")
-            output.append(f"    rangeCheck {K} {lo} {hi} = true := by")
+            output.append(f"    rangeCheck {K} {lo} {CHUNK_SIZE} = true := by")
             output.append(f"  native_decide")
             output.append("")
 
@@ -56,6 +55,7 @@ def generate_lean_file():
         output.append(f"    checkBridgeCantorPow2 {K} = true := by")
         output.append(f"  apply checkBridgeCantorPow2_of_chunked "
                       f"{K} {CHUNK_SIZE} {num_chunks}")
+        output.append(f"  · exact (by norm_num : 0 < {CHUNK_SIZE})")
         output.append(f"  · native_decide")
         output.append(f"  · intro j hj; interval_cases j")
         for i in range(num_chunks):
