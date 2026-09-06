@@ -83,6 +83,7 @@ private theorem NK_mono_core {K₁ K₂ r : Nat} (hK : K₁ ≤ K₂) (hbound : 
 
 theorem NK_mono {K₁ K₂ r : Nat} (hK : K₁ ≤ K₂) (hbound : r < uK K₁) :
     r ∈ computeNKFast K₂ → r ∈ computeNKFast K₁ := by
+  intro h
   rw [computeNKFast_eq] at h ⊢
   exact NK_mono_core hK hbound h
 
@@ -127,7 +128,7 @@ private theorem checkBridgeCantorPow2_imp_not_cantor (K : Nat)
   rw [List.any_eq_true] at hcheck'
   obtain ⟨i, hi_mem, hi_eq⟩ := hcheck'
   rw [List.mem_range] at hi_mem
-  simp only [beq_iff_eq] at hi_eq
+  simp only [beq_iff_eq, Nat.zero_add] at hi_eq
   have hmod := pow2Mod_eq r (3^50)
   rw [hmod] at hi_eq
   have h_i : (2^r / 3^i) % 3 = (2^r % 3^50 / 3^i) % 3 := digit_mod3pow50_eq r i hi_mem
