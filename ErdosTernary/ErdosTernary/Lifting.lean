@@ -42,14 +42,30 @@ theorem v3_pow3 (K : Nat) : v3 (3 ^ K) = K := by
 theorem v3_three : v3 3 = 1 := by
   simp [v3, Nat.one_lt_iff_ne_zero, Nat.mod_self]
 
+/-- Helper: if a ≡ b mod m then a^n ≡ b^n mod m^n -/
+-- (Not used directly, but captures the key idea)
+
 /-- Key identity: 2^(uK K) ≡ 1 + 3^K mod 3^(K+1) -/
--- Proof strategy: induction on K using LTE
+-- Proof by induction on K.
+-- Base: K=1, uK 1 = 2, 2^2 = 4 = 1 + 3.
+-- Step: uK (K+1) = 3·uK K, so 2^{uK(K+1)} = (2^{uK K})^3.
+-- If 2^{uK K} = 1 + 3^K·m (m odd), then (1 + 3^K·m)^3
+-- = 1 + 3·3^K·m + 3·3^{2K}·m^2 + 3^{3K}·m^3
+-- ≡ 1 + 3^{K+1}·m (mod 3^{K+2})  [since 2K+1 ≥ K+2 and 3K ≥ K+2 for K≥1]
+-- ≡ 1 + 3^{K+1} (mod 3^{K+2})  [since m ≡ 1 (mod 2), but actually we need m ≡ 1 (mod 3)]
+-- Wait -- we need the stronger fact that the quotient (2^{uK K} - 1)/3^K ≡ 1 (mod 3).
+-- Equivalently: 2^{uK K} ≡ 1 + 3^K (mod 3^{K+1}).
+-- Inductive step: (1+3^K)^3 ≡ 1+3^{K+1} (mod 3^{K+2}).
+-- This works because all cross terms have ≥ 3^{K+2}.
 theorem pow2_uK_mod (K : Nat) (hK : K ≥ 1) :
     2 ^ uK K % 3 ^ (K + 1) = 1 + 3 ^ K := by
-  -- The proof uses the lifting-the-exponent lemma:
-  -- v_3(2^{2·3^{K-1}} - 1) = v_3(2^2 - 1) + v_3(3^{K-1}) = 1 + (K-1) = K
-  -- So 2^{uK K} = 1 + 3^K (mod 3^{K+1})
-  sorry
+  induction K with
+  | zero => contradiction
+  | succ K ih =>
+    rw [uK] at *
+    -- ih: 2 ^ uK K % 3 ^ (K + 1) = 1 + 3 ^ K
+    -- Goal: 2 ^ (uK K * 3) % 3 ^ (K + 2) = 1 + 3 ^ (K + 1)
+    sorry
 
 -- ============================================================
 -- Phase 2: Exactly-Two-Lifts (from Phase 1)
