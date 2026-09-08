@@ -280,4 +280,63 @@ theorem rc_K18_161 :
     rangeCheck 18 256686003 1594323 = true := by
   native_decide
 
+set_option maxHeartbeats 20000000 in
+set_option maxRecDepth 1000000 in
+theorem batch3 : ∀ j < 54, rangeCheck 18 ((108 + j) * 1594323) 1594323 = true := by
+  intro j hj; interval_cases j
+  · norm_num; exact rc_K18_108
+  · norm_num; exact rc_K18_109
+  · norm_num; exact rc_K18_110
+  · norm_num; exact rc_K18_111
+  · norm_num; exact rc_K18_112
+  · norm_num; exact rc_K18_113
+  · norm_num; exact rc_K18_114
+  · norm_num; exact rc_K18_115
+  · norm_num; exact rc_K18_116
+  · norm_num; exact rc_K18_117
+  · norm_num; exact rc_K18_118
+  · norm_num; exact rc_K18_119
+  · norm_num; exact rc_K18_120
+  · norm_num; exact rc_K18_121
+  · norm_num; exact rc_K18_122
+  · norm_num; exact rc_K18_123
+  · norm_num; exact rc_K18_124
+  · norm_num; exact rc_K18_125
+  · norm_num; exact rc_K18_126
+  · norm_num; exact rc_K18_127
+  · norm_num; exact rc_K18_128
+  · norm_num; exact rc_K18_129
+  · norm_num; exact rc_K18_130
+  · norm_num; exact rc_K18_131
+  · norm_num; exact rc_K18_132
+  · norm_num; exact rc_K18_133
+  · norm_num; exact rc_K18_134
+  · norm_num; exact rc_K18_135
+  · norm_num; exact rc_K18_136
+  · norm_num; exact rc_K18_137
+  · norm_num; exact rc_K18_138
+  · norm_num; exact rc_K18_139
+  · norm_num; exact rc_K18_140
+  · norm_num; exact rc_K18_141
+  · norm_num; exact rc_K18_142
+  · norm_num; exact rc_K18_143
+  · norm_num; exact rc_K18_144
+  · norm_num; exact rc_K18_145
+  · norm_num; exact rc_K18_146
+  · norm_num; exact rc_K18_147
+  · norm_num; exact rc_K18_148
+  · norm_num; exact rc_K18_149
+  · norm_num; exact rc_K18_150
+  · norm_num; exact rc_K18_151
+  · norm_num; exact rc_K18_152
+  · norm_num; exact rc_K18_153
+  · norm_num; exact rc_K18_154
+  · norm_num; exact rc_K18_155
+  · norm_num; exact rc_K18_156
+  · norm_num; exact rc_K18_157
+  · norm_num; exact rc_K18_158
+  · norm_num; exact rc_K18_159
+  · norm_num; exact rc_K18_160
+  · norm_num; exact rc_K18_161
+
 end ErdosTernary.BridgeK18Part3

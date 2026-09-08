@@ -280,4 +280,63 @@ theorem rc_K18_107 :
     rangeCheck 18 170592561 1594323 = true := by
   native_decide
 
+set_option maxHeartbeats 20000000 in
+set_option maxRecDepth 1000000 in
+theorem batch2 : ∀ j < 54, rangeCheck 18 ((54 + j) * 1594323) 1594323 = true := by
+  intro j hj; interval_cases j
+  · norm_num; exact rc_K18_54
+  · norm_num; exact rc_K18_55
+  · norm_num; exact rc_K18_56
+  · norm_num; exact rc_K18_57
+  · norm_num; exact rc_K18_58
+  · norm_num; exact rc_K18_59
+  · norm_num; exact rc_K18_60
+  · norm_num; exact rc_K18_61
+  · norm_num; exact rc_K18_62
+  · norm_num; exact rc_K18_63
+  · norm_num; exact rc_K18_64
+  · norm_num; exact rc_K18_65
+  · norm_num; exact rc_K18_66
+  · norm_num; exact rc_K18_67
+  · norm_num; exact rc_K18_68
+  · norm_num; exact rc_K18_69
+  · norm_num; exact rc_K18_70
+  · norm_num; exact rc_K18_71
+  · norm_num; exact rc_K18_72
+  · norm_num; exact rc_K18_73
+  · norm_num; exact rc_K18_74
+  · norm_num; exact rc_K18_75
+  · norm_num; exact rc_K18_76
+  · norm_num; exact rc_K18_77
+  · norm_num; exact rc_K18_78
+  · norm_num; exact rc_K18_79
+  · norm_num; exact rc_K18_80
+  · norm_num; exact rc_K18_81
+  · norm_num; exact rc_K18_82
+  · norm_num; exact rc_K18_83
+  · norm_num; exact rc_K18_84
+  · norm_num; exact rc_K18_85
+  · norm_num; exact rc_K18_86
+  · norm_num; exact rc_K18_87
+  · norm_num; exact rc_K18_88
+  · norm_num; exact rc_K18_89
+  · norm_num; exact rc_K18_90
+  · norm_num; exact rc_K18_91
+  · norm_num; exact rc_K18_92
+  · norm_num; exact rc_K18_93
+  · norm_num; exact rc_K18_94
+  · norm_num; exact rc_K18_95
+  · norm_num; exact rc_K18_96
+  · norm_num; exact rc_K18_97
+  · norm_num; exact rc_K18_98
+  · norm_num; exact rc_K18_99
+  · norm_num; exact rc_K18_100
+  · norm_num; exact rc_K18_101
+  · norm_num; exact rc_K18_102
+  · norm_num; exact rc_K18_103
+  · norm_num; exact rc_K18_104
+  · norm_num; exact rc_K18_105
+  · norm_num; exact rc_K18_106
+  · norm_num; exact rc_K18_107
+
 end ErdosTernary.BridgeK18Part2
