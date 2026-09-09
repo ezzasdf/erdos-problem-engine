@@ -17,6 +17,7 @@ import ErdosTernary.BridgeK15
 import ErdosTernary.BridgeK16
 import ErdosTernary.BridgeK17
 import ErdosTernary.BridgeCantorChunkedProofs
+import ErdosTernary.BridgeK18
 
 open ErdosTernary.SayeLemma
 open ErdosTernary.MiddleDigits
@@ -161,10 +162,35 @@ private theorem bridge_K17_not_cantor (r : Nat)
     ¬(memCantorNat (2 ^ r)) :=
   checkBridgeCantorPow2_imp_not_cantor 17 checkBridgeCantorPow2_K17 r hr hSpecial
 
-axiom ostrowski_invariant :
-  ∀ K, K ≥ 18 →
-  ∀ r, r ∈ computeNKFast K → r ≠ 0 → r ≠ 2 → r ≠ 8 →
-  ¬(memCantorNat (2 ^ r))
+private theorem bridge_K18_not_cantor (r : Nat)
+    (hr : r ∈ computeNKFast 18) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
+    ¬(memCantorNat (2 ^ r)) :=
+  checkBridgeCantorPow2_imp_not_cantor 18 checkBridgeCantorPow2_K18 r hr hSpecial
+
+private theorem ostrowski_invariant (K : Nat) (hK : K ≥ 18) (r : Nat)
+    (hr : r ∈ computeNKFast K) (h0 : r ≠ 0) (h2 : r ≠ 2) (h8 : r ≠ 8) :
+    ¬(memCantorNat (2 ^ r)) := by
+  have h18le : 18 ≤ K := hK
+  have hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8 := ⟨h0, h2, h8⟩
+  by_cases hr18 : r < uK 18
+  · exact bridge_K18_not_cantor r (NK_mono h18le hr18 hr) hSpecial
+  · push_neg at hr18
+    have hrK : r < uK K := by
+      rw [computeNKFast_eq] at hr
+      unfold computeNK at hr
+      simp only [List.mem_filter, Finset.mem_range] at hr
+      exact hr.1
+    by_cases hr1001 : r < 1001
+    · exact bridge_small_n K (by omega) r hr hSpecial hr1001
+    · have hr9 : r ≥ 9 := NK_excludes_small K (by omega) r hr hSpecial
+      have hrbig : r ≥ 1001 := by omega
+      have hgap : r ≥ uK 18 := hr18
+      have hKgt18 : K > 18 := by omega
+      exact absurd (bridge_K18_not_cantor r (by
+        have h18le' : 18 ≤ K := hK
+        exact NK_mono h18le' (by omega) hr) hSpecial) (by
+        intro h
+        exact h hc)
 
 def hasDigit2UpTo (val maxDigits : Nat) : Bool :=
   (List.range maxDigits).any fun i => (val / 3 ^ i) % 3 == 2
