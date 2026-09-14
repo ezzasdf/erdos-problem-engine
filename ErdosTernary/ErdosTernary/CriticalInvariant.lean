@@ -432,30 +432,22 @@ private theorem n5_small_range_covers (r : Nat) (hr48 : r ≥ 48) (hr68 : r ≤ 
     (hr_even : r % 2 = 0)
     (hN5 : ∀ j < 5, digit₃ (2^r) j ∈ ({0, 1} : Finset Nat)) :
     ∃ j, 5 ≤ j ∧ j < K_star r ∧ digit₃ (2^r) j = 2 := by
-  -- N5 residues in [48, 68] are {54, 56, 62}
-  -- For each, prove digit_j(2^r) = 2 for some j < K_star r
-  have hs_mem : r % 162 ∈ N5_even := by
+  have hmem : r % 162 ∈ N5_even := by
     apply N5_even_finite (r % 162) (Nat.mod_lt r (by omega)) (by omega)
     intro j hj
     exact (digit₃_pow_periodic r (r % 162) rfl j hj).symm ▸ hN5 j hj
-  -- Since r ≤ 68 < 162, r % 162 = r
   have hr_mod : r % 162 = r := Nat.mod_eq_of_lt (by omega)
-  rw [hr_mod] at hs_mem
-  -- r ∈ N5_even ∩ [48, 68] means r ∈ {54, 56, 62}
-  simp [N5_even] at hs_mem
-  obtain ⟨r54 | r56 | r62⟩ := hs_mem
-  · -- r = 54
-    subst r54
-    exact ⟨5, by omega, K_star_gt_j 54 4 (by norm_num), by
-      unfold digit₃; norm_num [Nat.pow, Nat.div]⟩
-  · -- r = 56
-    subst r56
-    exact ⟨7, by omega, K_star_gt_j 56 6 (by norm_num), by
-      unfold digit₃; norm_num [Nat.pow, Nat.div]⟩
-  · -- r = 62
-    subst r62
-    exact ⟨6, by omega, K_star_gt_j 62 5 (by norm_num), by
-      unfold digit₃; norm_num [Nat.pow, Nat.div]⟩
+  rw [hr_mod] at hmem
+  have hr162 : r < 162 := by omega
+  simp only [N5_even, List.mem_cons, List.mem_nil_iff, ite_false, ite_true, or_self,
+    Bool.or_eq_true, beq_true, beq_false, false_or, or_false, false_or_iff] at hmem
+  rcases hmem with (rfl | rfl | rfl)
+  · refine ⟨5, by omega, K_star_gt_j 54 4 (by norm_num), ?_⟩
+    unfold digit₃; norm_num [Nat.pow, Nat.div]
+  · refine ⟨7, by omega, K_star_gt_j 56 6 (by norm_num), ?_⟩
+    unfold digit₃; norm_num [Nat.pow, Nat.div]
+  · refine ⟨6, by omega, K_star_gt_j 62 5 (by norm_num), ?_⟩
+    unfold digit₃; norm_num [Nat.pow, Nat.div]
 
 /-! ## Part G4: Main theorem -/
 
@@ -497,7 +489,7 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hr : r > 8) :
       · -- r is N5
         rcases le_or_lt r 68 with hr68 | hr69
         · -- 48 ≤ r ≤ 68: N5 residues are {54, 56, 62}, handle directly
-          obtain ⟨j, hjK, hj2⟩ := n5_small_range_covers r hr48' hr68 hr_even hN5
+          obtain ⟨j, hj5, hjK, hj2⟩ := n5_small_range_covers r hr48' hr68 hr_even hN5
           exact ⟨j, by rw [digit₃_criticalGap_eq r j hjK]; exact hj2⟩
         · -- r ≥ 69: use native_decide certificate
           obtain ⟨j, hj5, hjK, hj2⟩ := n5_covers_transfer r hr69 hr_even hN5
