@@ -460,16 +460,9 @@ private theorem n5_small_range_covers (r : Nat) (hr48 : r ≥ 48) (hr68 : r ≤ 
   · refine ⟨6, by omega, K_star_gt_j 62 6 (by norm_num), ?_⟩
     unfold digit₃; norm_num [Nat.pow, Nat.div]
 
-/-! ## Part G4.6: Large-r certificate covering positions 15-49 -/
-
-private theorem n5_large_r_covers :
-    ∀ r' ∈ N5_even_set, ∀ q ∈ Finset.range 59049, q ≥ 1 →
-      ∃ j ∈ Finset.range 35, digitMod (r' + 162 * 59049 * q) (j + 15) = 2 := by
-  native_decide
-
-/-! ## Part G4.7: Low-position certificate for N5 values at positions 5-11
-    Used for huge-r (r ≥ 162*59049*59049) where periodicity from r' to r
-    only works for j ≤ 11 (since 3^(j+1) | 162*59049 = 2*3^12). -/
+/-! ## Part G4.6: Low-position certificate for N5 values at positions 5-11
+    For r ≥ 162*59049, periodicity from r' = r mod (162*59049) to r works
+    for j ≤ 11 since 3^(j+1) | 162*59049 = 2*3^12. -/
 
 private theorem n5_low_digit_covers :
     ∀ r' ∈ N5_even_set, ∃ j ∈ Finset.range 7, digitMod r' (j + 5) = 2 := by
@@ -521,31 +514,7 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hr : r > 8) :
           rcases le_or_lt r (162 * 59049 - 1) with hr_small | hr_large
           · obtain ⟨j, hj5, hjK, hj2⟩ := n5_covers_transfer r hr69 hr_small hr_even hN5
             exact ⟨j, by rw [digit₃_criticalGap_eq r j hjK]; exact hj2⟩
-          · -- r ≥ 162*59049
-            rcases le_or_lt r (162 * 59049 * 59049 - 1) with hr_medium | hr_huge
-            · -- Medium: 162*59049 ≤ r < 162*59049*59049, so q < 59049
-              have hs_mem' : r % (162 * 59049) ∈ N5_even_set := by
-                apply N5_even_finite (r % (162 * 59049))
-                  (Nat.mod_lt r (by norm_num : 0 < 162 * 59049)) (by omega)
-                intro j hj
-                exact (digit₃_pow_periodic r _ rfl j hj).symm ▸ hN5 j hj
-              have hk_ge1 : r / (162 * 59049) ≥ 1 := by omega
-              obtain ⟨dj, hdj_range, hdj2⟩ :=
-                n5_large_r_covers (r % (162 * 59049)) hs_mem'
-                  (r / (162 * 59049)) (by omega) hk_ge1
-              have hdj35 : dj < 35 := by simp [Finset.mem_range] at hdj_range; exact hdj_range
-              have hdj2' : digitMod r (dj + 15) = 2 := by
-                rw [Nat.mod_add_div r (162 * 59049)] at hdj2; exact hdj2
-              have hdj3 : digit₃ (2^r) (dj + 15) = 2 := by
-                rw [digitMod_eq_digit₃] at hdj2'; exact hdj2'
-              exact ⟨dj + 15, by omega, by
-                have h3_50 : (3^50 : Nat) ≤ 2^80 := by norm_num
-                have h80_r : 2^80 ≤ 2^r :=
-                  Nat.pow_le_pow_right (by omega) (by omega : 80 ≤ r)
-                have h3_50_r : 3^50 ≤ 2^r := le_trans h3_50 h80_r
-                have h49 : 49 < K_star r := K_star_gt_j r 49 h3_50_r
-                omega, hdj3⟩
-            · -- Huge: r ≥ 162*59049*59049, use low-position certificate
+          · -- r ≥ 162*59049: use low-position certificate + periodicity
               have hs_mem' : r % (162 * 59049) ∈ N5_even_set := by
                 apply N5_even_finite (r % (162 * 59049))
                   (Nat.mod_lt r (by norm_num : 0 < 162 * 59049)) (by omega)
@@ -553,12 +522,9 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hr : r > 8) :
                 exact (digit₃_pow_periodic r _ rfl j hj).symm ▸ hN5 j hj
               obtain ⟨dj, hdj_range, hdj2⟩ := n5_low_digit_covers (r % (162 * 59049)) hs_mem'
               have hdj7 : dj < 7 := by simp [Finset.mem_range] at hdj_range; exact hdj_range
-              -- Transfer: for dj < 7, dj+5 < 12, and 2^162 ≡ 1 (mod 3^(dj+6))
               have hperiod : 2^162 % 3^(dj+6) = 1 := two_pow_162_mod_ext (dj+5) (by omega)
-              -- So 2^(162*59049) ≡ 1 (mod 3^(dj+6))
               have h162k : 2^(162*59049) % 3^(dj+6) = 1 := by
-                rw [show 162*59049 = 162 * 59049 from by omega, pow_mul, Nat.pow_mod]
-                rw [hperiod, one_pow]
+                rw [pow_mul, Nat.pow_mod, hperiod, one_pow]
               have hdj_transfer : digitMod r (dj + 5) = 2 := by
                 rw [Nat.mod_add_div r (162 * 59049)] at hdj2
                 unfold digitMod at hdj2 ⊢
@@ -573,16 +539,15 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hr : r > 8) :
                 | succ k ih =>
                   rw [show (r%(162*59049)) + 162*59049*(k+1) =
                        ((r%(162*59049)) + 162*59049*k) + 162*59049 from by omega,
-                      pow_add, Nat.mul_mod, ih, h162k, Nat.one_mul]
+                      pow_add, Nat.mul_mod, ih, h162k, Nat.one_mul,
+                      Nat.mod_mod_of_dvd _ (by omega : 2 ∣ 162 * 59049)]
               have hdj3 : digit₃ (2^r) (dj + 5) = 2 := by
                 rw [digitMod_eq_digit₃] at hdj_transfer; exact hdj_transfer
               exact ⟨dj + 5, by omega, by
                 have h3j : 3^((dj+5)+1) ≤ 3^12 := Nat.pow_le_pow_right (by omega) (by omega)
                 have h2r : 3^12 ≤ 2^r := by
-                  have hbig : 162 * 59049 * 59049 ≤ r := by omega
-                  have h2big : 2^(162*59049*59049) ≥ 3^12 := by norm_num
-                  have h2r : 2^(162*59049*59049) ≤ 2^r :=
-                    Nat.pow_le_pow_right (by omega) hbig
+                  have h48 : 2^48 ≤ 2^r := Nat.pow_le_pow_right (by omega) hr48'
+                  have : (2^48 : Nat) ≥ 3^12 := by norm_num
                   omega
                 exact K_star_gt_j r (dj+5) (le_trans h3j h2r), hdj3⟩
       · -- r not N5: low-digit obstruction
