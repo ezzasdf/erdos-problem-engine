@@ -446,7 +446,7 @@ private theorem n5_small_range_covers (r : Nat) (hr48 : r ≥ 48) (hr68 : r ≤ 
   all_goals (try omega)
   -- Even r not in {54,56,62}: hmem gives contradiction after simp
   all_goals (simp only [N5_even, List.mem_cons, List.mem_nil_iff,
-    false_or, or_false] at hmem; try decide)
+    false_or, or_false] at hmem; try exact absurd hmem (by decide))
   -- r = 54
   · refine ⟨5, by omega, K_star_gt_j 54 5 (by norm_num), ?_⟩
     unfold digit₃; norm_num [Nat.pow, Nat.div]
