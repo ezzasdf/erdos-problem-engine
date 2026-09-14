@@ -399,6 +399,15 @@ private theorem n5_digitMod_covers :
       ∃ j ∈ Finset.range 38, digitMod (s + 162 * k) (j + 5) = 2 := by
   native_decide
 
+-- Stronger certificate: witness at j < 9 (digit positions 5-13).
+-- Period of digitMod in k for position j+5 is 3^(j+2) ≤ 3^10 = 59049 for j ≤ 8.
+-- So reducing k mod 59049 preserves the digit for j ≤ 8.
+private theorem n5_digitMod_covers_small :
+    ∀ s ∈ N5_even_set, ∀ k ∈ Finset.range 59049,
+      s + 162 * k ≥ 69 →
+      ∃ j ∈ Finset.range 9, digitMod (s + 162 * k) (j + 5) = 2 := by
+  native_decide
+
 private theorem n5_covers_transfer (r : Nat) (hr69 : r ≥ 69)
     (hr_even : r % 2 = 0)
     (hN5 : ∀ j < 5, digit₃ (2^r) j ∈ ({0, 1} : Finset Nat)) :
@@ -408,12 +417,46 @@ private theorem n5_covers_transfer (r : Nat) (hr69 : r ≥ 69)
     intro j hj
     exact (digit₃_pow_periodic r (r % 162) rfl j hj).symm ▸ hN5 j hj
   have hs_mem' : r % 162 ∈ N5_even_set := hs_mem
-  obtain ⟨dj, hdj_range, hjdM⟩ := n5_digitMod_covers (r % 162) hs_mem' (r / 162)
-    (by simp [Finset.mem_range]; exact Nat.div_lt_self (Nat.pos_of_ne_zero (by omega : r ≠ 0)) (by omega : 162 > 1))
-    (by omega)
+  set s := r % 162 with hs_def
+  set k := r / 162 with hk_def
+  have hr_eq : r = s + 162 * k := by rw [hs_def, hk_def]; exact (Nat.mod_add_div r 162).symm
+  -- Reduce k mod 59049 to get k' < 59049
+  set k' := k % 59049 with hk'_def
+  have hk'_lt : k' < 59049 := Nat.mod_lt _ (by norm_num)
+  have hk'_eq : k = k' + 59049 * (k / 59049) := by rw [hk'_def]; exact (Nat.mod_add_div k 59049).symm
+  -- s + 162 * k' ≥ 69 since s ≥ 48 (smallest N5_even) or k' ≥ 1
+  have hs_ge : s + 162 * k' ≥ 69 := by
+    have hs_even : s ∈ N5_even := hs_mem
+    have hs_pos : s ≥ 48 := by
+      unfold N5_even at hs_even; simp only [List.mem_cons, List.mem_nil_iff, false_or, or_false] at hs_even
+      interval_cases s <;> omega
+    by_cases hk'0 : k' = 0
+    · omega
+    · have : k' ≥ 1 := Nat.pos_of_ne_zero hk'0; omega
+  obtain ⟨dj, hdj_range, hjdM⟩ := n5_digitMod_covers_small s hs_mem' k'
+    (by omega) (by omega)
+  have hdj9 : dj < 9 := by simp [Finset.mem_range] at hdj_range; exact hdj_range
+  -- Key: for dj ≤ 8 (i.e. dj < 9), digitMod(r, dj+5) = digitMod(s + 162*k', dj+5) by periodicity
+  -- period of digitMod in k is 3^(dj+2), and 3^(dj+2) | 59049 = 3^10 for dj ≤ 8
   have hjdM' : digitMod r (dj + 5) = 2 := by
-    rw [Nat.mod_add_div] at hjdM; exact hjdM
-  have hdj38 : dj < 38 := by simp [Finset.mem_range] at hdj_range; exact hdj_range
+    -- r = s + 162*k = s + 162*(k' + 59049*(k/59049))
+    --   = (s + 162*k') + 162*59049*(k/59049)
+    --   = (s + 162*k') + 2*3^14*(k/59049)
+    -- For dj ≤ 8: 3^(dj+6) | 3^14 | 2*3^14, so r ≡ s+162*k' (mod 3^(dj+6))
+    have hperiod : r % 3 ^ (dj + 6) = (s + 162 * k') % 3 ^ (dj + 6) := by
+      rw [hr_eq, hk'_eq, add_assoc, ← mul_assoc, ← Nat.add_mul_mod_self_right]
+      -- (s + 162*k' + 162*59049*(k/59049)) % 3^(dj+6) = (s + 162*k') % 3^(dj+6)
+      -- since 3^(dj+6) | 162*59049 = 2*3^14 for dj ≤ 8
+      have hdiv : 3 ^ (dj + 6) ∣ 162 * 59049 := by
+        have : dj + 6 ≤ 14 := by omega
+        have h1 : 3 ^ (dj + 6) ∣ 3 ^ 14 := Nat.pow_dvd_pow _ this
+        have h2 : (3 ^ 14 : Nat) ∣ 2 * 3 ^ 14 := ⟨2, by ring⟩
+        exact dvd_trans h1 (dvd_trans h2 ⟨1, by ring⟩)
+      rw [Nat.add_mul_mod_self_right _ _ hdiv]
+    rw [digitMod_eq_digit₃, digitMod_eq_digit₃]
+    -- Now both sides compute digitMod; they agree because r and s+162*k' agree mod 3^(dj+6)
+    unfold digitMod
+    rw [hperiod]
   have hjdM'' : digit₃ (2^r) (dj + 5) = 2 := by
     rw [digitMod_eq_digit₃] at hjdM'; exact hjdM'
   exact ⟨dj + 5, by omega, by
