@@ -413,21 +413,15 @@ private theorem n5_covers_transfer (r : Nat) (hr69 : r ≥ 69)
     (by omega)
   have hjdM' : digitMod r (dj + 5) = 2 := by
     rw [digitMod_eq_digit₃] at hjdM; rw [Nat.mod_add_div] at hjdM; exact hjdM
-  have j := dj + 5
-  have hj5 : 5 ≤ j := by omega
-  have hj42 : j ≤ 42 := by simp [Finset.mem_range] at hdj_range; omega
-  have hj2 : digit₃ (2^r) j = 2 := by
-    show digit₃ (2^r) (dj + 5) = 2
-    rw [digitMod_eq_digit₃] at hjdM'
-    exact hjdM'
-  have hjK : j < K_star r := by
-    have h3j : 3^(j+1) ≤ 3^43 := Nat.pow_le_pow_right (by omega) (by omega)
+  have hjdM'' : digit₃ (2^r) (dj + 5) = 2 := by
+    rw [digitMod_eq_digit₃] at hjdM'; exact hjdM'
+  exact ⟨dj + 5, by omega, by
+    have h3j : 3^((dj+5)+1) ≤ 3^43 := Nat.pow_le_pow_right (by omega) (by omega)
     have h2r : 3^43 ≤ 2^r := by
       have h69 : 2^69 ≤ 2^r := Nat.pow_le_pow_right (by omega) hr69
       have : (2^69 : Nat) ≥ 3^43 := by norm_num
       omega
-    exact K_star_gt_j r j (le_trans h3j h2r)
-  exact ⟨j, hj5, hjK, hj2⟩
+    exact K_star_gt_j r (dj+5) (le_trans h3j h2r), hjdM''⟩
 
 /-! ## Part G4.5: Small-N5 certificate for r ∈ [48, 68] -/
 
