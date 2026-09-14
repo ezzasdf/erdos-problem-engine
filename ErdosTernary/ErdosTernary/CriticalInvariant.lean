@@ -413,6 +413,7 @@ private theorem n5_covers_transfer (r : Nat) (hr69 : r ≥ 69)
     (by omega)
   have hjdM' : digitMod r (dj + 5) = 2 := by
     rw [digitMod_eq_digit₃] at hjdM; rw [Nat.mod_add_div] at hjdM; exact hjdM
+  have hdj38 : dj < 38 := by simp [Finset.mem_range] at hdj_range; exact hdj_range
   have hjdM'' : digit₃ (2^r) (dj + 5) = 2 := by
     rw [digitMod_eq_digit₃] at hjdM'; exact hjdM'
   exact ⟨dj + 5, by omega, by
