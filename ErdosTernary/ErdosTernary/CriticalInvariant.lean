@@ -416,7 +416,8 @@ private theorem n5_covers_transfer (r : Nat) (hr69 : r ≥ 69)
   have j := dj + 5
   have hj5 : 5 ≤ j := by omega
   have hj42 : j ≤ 42 := by simp [Finset.mem_range] at hdj_range; omega
-  have hj2 : digit₃ (2^r) j = 2 := by unfold j; exact hjdM'
+  have hj2 : digit₃ (2^r) j = 2 := by
+    change digit₃ (2^r) (dj + 5) = 2; exact hjdM'
   have hjK : j < K_star r := by
     have h3j : 3^(j+1) ≤ 3^43 := Nat.pow_le_pow_right (by omega) (by omega)
     have h2r : 3^43 ≤ 2^r := by
