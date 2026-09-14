@@ -438,9 +438,10 @@ private theorem n5_small_range_covers (r : Nat) (hr48 : r ≥ 48) (hr68 : r ≤ 
     exact (digit₃_pow_periodic r (r % 162) rfl j hj).symm ▸ hN5 j hj
   have hr_mod : r % 162 = r := Nat.mod_eq_of_lt (by omega)
   rw [hr_mod] at hmem
-  interval_cases r
-  all_goals (simp only [N5_even, List.mem_cons, List.mem_nil_iff, false_or, or_false] at hmem;
-    try omega)
+  interval_cases r <;> simp only [N5_even, List.mem_cons, List.mem_nil_iff,
+    false_or, or_false] at hmem
+  all_goals try omega
+  all_goals try decide
   · refine ⟨5, by omega, K_star_gt_j 54 4 (by norm_num), ?_⟩
     unfold digit₃; norm_num [Nat.pow, Nat.div]
   · refine ⟨7, by omega, K_star_gt_j 56 6 (by norm_num), ?_⟩
