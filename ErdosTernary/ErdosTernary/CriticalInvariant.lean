@@ -442,9 +442,9 @@ private theorem n5_small_range_covers (r : Nat) (hr48 : r ≥ 48) (hr68 : r ≤ 
     false_or, or_false] at hmem
   all_goals try omega
   all_goals try decide
-  · refine ⟨5, by omega, K_star_gt_j 54 4 (by norm_num), ?_⟩
+  ·     refine ⟨5, by omega, K_star_gt_j 54 5 (by norm_num : 3^(5+1) ≤ 2^54), ?_⟩
     unfold digit₃; norm_num [Nat.pow, Nat.div]
-  · refine ⟨7, by omega, K_star_gt_j 56 6 (by norm_num), ?_⟩
+  ·     refine ⟨7, by omega, K_star_gt_j 56 7 (by norm_num : 3^(7+1) ≤ 2^56), ?_⟩
     unfold digit₃; norm_num [Nat.pow, Nat.div]
   · refine ⟨6, by omega, K_star_gt_j 62 6 (by norm_num : 3^(6+1) ≤ 2^62), ?_⟩
     unfold digit₃; norm_num [Nat.pow, Nat.div]
