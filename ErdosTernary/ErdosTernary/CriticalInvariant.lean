@@ -438,15 +438,23 @@ private theorem n5_small_range_covers (r : Nat) (hr48 : r ≥ 48) (hr68 : r ≤ 
     exact (digit₃_pow_periodic r (r % 162) rfl j hj).symm ▸ hN5 j hj
   have hr_mod : r % 162 = r := Nat.mod_eq_of_lt (by omega)
   rw [hr_mod] at hmem
-  interval_cases r <;> simp only [N5_even, List.mem_cons, List.mem_nil_iff,
-    false_or, or_false] at hmem
-  all_goals try omega
-  all_goals try decide
-  ·     refine ⟨5, by omega, K_star_gt_j 54 5 (by norm_num : 3^(5+1) ≤ 2^54), ?_⟩
+  have hr162 : r < 162 := by omega
+  -- r is even, in [48,68], and in N5_even → r ∈ {54, 56, 62}
+  -- Extract this by noting N5_even ∩ [48,68] = {54, 56, 62}
+  interval_cases r
+  -- Odd r cases: contradiction with hr_even
+  all_goals (try omega)
+  -- Even r not in {54,56,62}: hmem gives contradiction after simp
+  all_goals (simp only [N5_even, List.mem_cons, List.mem_nil_iff,
+    false_or, or_false] at hmem; try decide)
+  -- r = 54
+  · refine ⟨5, by omega, K_star_gt_j 54 5 (by norm_num), ?_⟩
     unfold digit₃; norm_num [Nat.pow, Nat.div]
-  ·     refine ⟨7, by omega, K_star_gt_j 56 7 (by norm_num : 3^(7+1) ≤ 2^56), ?_⟩
+  -- r = 56
+  · refine ⟨7, by omega, K_star_gt_j 56 7 (by norm_num), ?_⟩
     unfold digit₃; norm_num [Nat.pow, Nat.div]
-  · refine ⟨6, by omega, K_star_gt_j 62 6 (by norm_num : 3^(6+1) ≤ 2^62), ?_⟩
+  -- r = 62
+  · refine ⟨6, by omega, K_star_gt_j 62 6 (by norm_num), ?_⟩
     unfold digit₃; norm_num [Nat.pow, Nat.div]
 
 /-! ## Part G4: Main theorem -/
