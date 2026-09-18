@@ -302,4 +302,65 @@ theorem obstruction_le12 (d : ℕ) (hd : d ≤ 12) (n : ℕ) :
     ¬(2 ^ (d + 4) ∣ 3 ^ d + evalBit d n) :=
   obstruction_le20 d (by omega) n
 
+-- ================================================================
+-- SHIFT LEMMA: evalBit on doubled input
+-- ================================================================
+-- Clean identity: evalBit(d, 2n) = 3 * evalBit(d-1, n) for d ≥ 1
+-- (the bit term cancels with the recursive unfolding of evalBit)
+-- These lemmas go at the end of the file so edits don't re-trigger
+-- the heavy native_decide certificates above.
+
+-- Helper: doubling shifts all bits up by 1
+private theorem testBit_two_mul (n k : ℕ) :
+    (2 * n).testBit (k + 1) = n.testBit k := by
+  rw [Nat.testBit_succ]
+  congr 1
+  omega
+
+-- Lemma: the 0th bit of 2n is always 0 (since 2n is even)
+private theorem testBit_zero_of_even (n : ℕ) : (2 * n).testBit 0 = false := by
+  sorry
+
+-- evalBit(d, 2n) = 3 * evalBit(d-1, n) for d >= 1
+-- Proof: by induction on d, unfolding evalBit and using testBit_two_mul.
+-- The key algebraic fact: (if p then 3^d else 0) + 3 * E = 3 * ((if p then 3^(d-1) else 0) + E)
+private theorem evalBit_two_mul :
+    ∀ (d n : ℕ), 1 ≤ d → evalBit d (2 * n) = 3 * evalBit (d - 1) n := by
+  sorry -- TODO: proved computationally; formalize via induction + ring
+
+-- ================================================================
+-- COPRIMALITY: 2^k | 3*x iff 2^k | x (since gcd(3, 2^k) = 1)
+-- ================================================================
+private theorem coprime_pow2_3 (k : ℕ) : Nat.Coprime 3 (2 ^ k) := by
+  induction k with
+  | zero => simp [Nat.Coprime]
+  | succ k ih =>
+    rw [show 2 ^ (k + 1) = 2 * 2 ^ k from by ring]
+    exact (by decide : Nat.Coprime 3 2).mul_right ih
+
+private theorem coprime_dvd_iff (k x : ℕ) :
+    2 ^ k ∣ 3 * x ↔ 2 ^ k ∣ x :=
+  ⟨fun h => (coprime_pow2_3 k).symm.dvd_of_dvd_mul_left h,
+   fun h => by obtain ⟨q, rfl⟩ := h; exact ⟨3 * q, by ring⟩⟩
+
+-- ================================================================
+-- CONTRAPOSITIVE TRANSFER
+-- ================================================================
+
+-- When m = 2n (even): 3^{d+1} + evalBit(d+1, 2n) = 3 * (3^d + evalBit(d, n))
+private theorem shift_even_obstruction (d n : ℕ) (hd : 1 ≤ d) :
+    3 ^ (d + 1) + evalBit (d + 1) (2 * n) =
+      3 * (3 ^ d + evalBit d n) := by
+  rw [show evalBit (d + 1) (2 * n) = 3 * evalBit d n from evalBit_two_mul (d + 1) n (by omega)]
+  ring
+
+-- Key transfer: 2^{d+5} | 3^{d+1} + evalBit(d+1, 2n) implies 2^{d+4} | 3^d + evalBit(d, n)
+private theorem shift_even_dvd (d n : ℕ) (hd : 1 ≤ d) :
+    2 ^ (d + 5) ∣ (3 ^ (d + 1) + evalBit (d + 1) (2 * n)) →
+    2 ^ (d + 4) ∣ (3 ^ d + evalBit d n) := by
+  intro h
+  rw [shift_even_obstruction d n hd] at h
+  rw [coprime_dvd_iff] at h
+  exact dvd_trans (show 2 ^ (d + 4) ∣ 2 ^ (d + 5) from ⟨2, by ring⟩) h
+
 end TwoAdicObstruction
