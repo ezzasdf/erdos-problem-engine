@@ -319,14 +319,38 @@ private theorem testBit_two_mul (n k : ℕ) :
 
 -- Lemma: the 0th bit of 2n is always 0 (since 2n is even)
 private theorem testBit_zero_of_even (n : ℕ) : (2 * n).testBit 0 = false := by
-  sorry
+  rw [Nat.testBit_zero]
+  simp [show (2 * n) % 2 = 0 from by omega]
 
 -- evalBit(d, 2n) = 3 * evalBit(d-1, n) for d >= 1
 -- Proof: by induction on d, unfolding evalBit and using testBit_two_mul.
 -- The key algebraic fact: (if p then 3^d else 0) + 3 * E = 3 * ((if p then 3^(d-1) else 0) + E)
+private theorem pow3_eq (d : ℕ) (hd : 1 ≤ d) : 3 ^ d = 3 * 3 ^ (d - 1) := by
+  conv in (3 ^ d) => rw [show d = (d - 1) + 1 from by omega]
+  rw [pow_succ]; ring
+
 private theorem evalBit_two_mul :
     ∀ (d n : ℕ), 1 ≤ d → evalBit d (2 * n) = 3 * evalBit (d - 1) n := by
-  sorry -- TODO: proved computationally; formalize via induction + ring
+  intro d
+  induction d with
+  | zero => intro; omega
+  | succ d ih =>
+    intro n hd
+    simp only [evalBit]
+    by_cases hd0 : d = 0
+    · subst hd0; simp [evalBit, testBit_zero_of_even]
+    · have htest : (2 * n).testBit d = n.testBit (d - 1) := by
+        rw [show d = (d - 1) + 1 from by omega]; exact testBit_two_mul n (d - 1)
+      rw [htest]
+      have ih' := ih n (by omega); rw [ih']
+      simp only [show d + 1 - 1 = d from by omega]
+      by_cases hp : n.testBit (d - 1) = true
+      · rw [if_pos hp, pow3_eq d (by omega)]
+        conv in (evalBit d n) => rw [show d = (d - 1) + 1 from by omega]
+        simp only [evalBit]; rw [if_pos hp]; ring
+      · rw [if_neg hp]
+        conv in (evalBit d n) => rw [show d = (d - 1) + 1 from by omega]
+        simp only [evalBit]; rw [if_neg hp]; ring
 
 -- ================================================================
 -- COPRIMALITY: 2^k | 3*x iff 2^k | x (since gcd(3, 2^k) = 1)
