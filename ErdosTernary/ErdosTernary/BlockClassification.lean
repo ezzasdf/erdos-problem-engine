@@ -445,9 +445,23 @@ private theorem d2f_card_aux :
       ∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2).card = 2 ^ k
   | 0 => by simp [Finset.range, List.range]
   | k + 1 => by
-    simp only [List.range_succ, List.all, List.all_append, List.all_cons,
-      List.all_nil, Bool.and_true, Bool.and_eq_true, decide_eq_true_eq,
-      List.all_eq_true, List.mem_range]
+    -- Split the quantifier at t = k
+    have hsplit : ∀ n, (∀ t, t < k + 1 → (n / 3 ^ t) % 3 ≠ 2) ↔
+        ((n / 3 ^ k) % 3 ≠ 2) ∧ ∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2 := by
+      intro n
+      constructor
+      · intro h
+        exact ⟨h k (by omega), fun t ht => h t (by omega)⟩
+      · intro ⟨hk, hall⟩ t ht
+        by_cases htk : t < k
+        · exact hall t htk
+        · have : t = k := by omega
+          rw [this]; exact hk
+    have hpred : (fun n => ∀ t, t < k + 1 → (n / 3 ^ t) % 3 ≠ 2) =
+        (fun n => ((n / 3 ^ k) % 3 ≠ 2) ∧ ∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2) := by
+      funext n
+      exact hsplit n
+    rw [hpred]
     -- S_{k+1} = {n < 3^{k+1} | digit k ≠ 2 ∧ noDigit2 in lower k digits}
     -- Split by MSB: digit k = 0 or digit k = 1
     have hpart :
@@ -661,8 +675,11 @@ theorem block1_exceptional_le (s : Nat) :
         (Finset.range (3 ^ 15)).filter (fun n => ∀ t, t < 15 → (n / 3 ^ t) % 3 ≠ 2) := by
       ext r
       simp only [Finset.mem_filter, Finset.mem_range]
-      rw [show noDigit2 r = true ↔ ∀ t, t < 15 → (r / 3 ^ t) % 3 ≠ 2 from by
+      have hiff : noDigit2 r = true ↔ ∀ t, t < 15 → (r / 3 ^ t) % 3 ≠ 2 := by
         simp [noDigit2, List.all_eq_true, List.mem_range, decide_eq_true_eq]
+      constructor
+      · intro ⟨hr, h1⟩; exact ⟨hr, hiff.mp h1⟩
+      · intro ⟨hr, h1⟩; exact ⟨hr, hiff.mpr h1⟩
     rw [heq]
     exact h
   omega
