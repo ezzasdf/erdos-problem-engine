@@ -879,11 +879,11 @@ theorem block3_catches_all (s : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8) :
     · set_option maxRecDepth 10000000 in native_decide
     · set_option maxRecDepth 10000000 in native_decide
   unfold checkBlock3All at hc
-  have hv1 : iterVal s (3 ^ 30) 1 = (2 ^ s % 3 ^ 30) * pow2Pmod30 % 3 ^ 30 := by
+  have hv1 : (2 ^ s % 3 ^ 30) * pow2Pmod30 % 3 ^ 30 = iterVal s (3 ^ 30) 1 := by
     rw [iterVal_succ, iterVal_zero, pow2Pmod30_eq]
-  have hv45 : iterVal s (3 ^ 45) 1 = (2 ^ s % 3 ^ 45) * pow2Pmod45 % 3 ^ 45 := by
+  have hv45 : (2 ^ s % 3 ^ 45) * pow2Pmod45 % 3 ^ 45 = iterVal s (3 ^ 45) 1 := by
     rw [iterVal_succ, iterVal_zero, pow2Pmod45_eq]
-  have hv60 : iterVal s (3 ^ 60) 1 = (2 ^ s % 3 ^ 60) * pow2Pmod60 % 3 ^ 60 := by
+  have hv60 : (2 ^ s % 3 ^ 60) * pow2Pmod60 % 3 ^ 60 = iterVal s (3 ^ 60) 1 := by
     rw [iterVal_succ, iterVal_zero, pow2Pmod60_eq]
   exact h0 (3 ^ 15 - 1) 1 ((2 ^ s % 3 ^ 30) * pow2Pmod30 % 3 ^ 30)
     ((2 ^ s % 3 ^ 45) * pow2Pmod45 % 3 ^ 45)
