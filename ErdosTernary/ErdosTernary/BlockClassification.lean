@@ -428,7 +428,9 @@ private theorem d2f_card_aux :
       (List.range k).all fun t => (n / 3 ^ t) % 3 ≠ 2).card = 2 ^ k
   | 0 => by simp [List.range, List.all]
   | k + 1 => by
-    simp only [List.range_succ, List.all, Bool.and_eq_true, decide_eq_true_eq]
+    simp only [List.range_succ, List.all, List.all_append, List.all_cons,
+      List.all_nil, Bool.and_true, Bool.and_eq_true, decide_eq_true_eq,
+      List.all_eq_true, List.mem_range]
     -- S_{k+1} = {n < 3^{k+1} | digit k ≠ 2 ∧ noDigit2 in lower k digits}
     -- Split by MSB: digit k = 0 or digit k = 1
     have hpart :
@@ -458,7 +460,7 @@ private theorem d2f_card_aux :
         clear hq hr
         rcases hd with hd0 | hd1
         · have hq0 : q = 0 := digit0_eq_zero hq3 hd0
-          rw [hq0, Nat.mul_zero, Nat.add_zero] at h
+          rw [hq0, Nat.mul_zero, Nat.zero_add] at h
           -- h : r = n
           left
           refine ⟨hlt, ?_, ?_⟩
@@ -504,7 +506,7 @@ private theorem d2f_card_aux :
           have hge' : 1 ≤ q := by
             by_contra h0
             push_neg at h0
-            rw [h0, Nat.mul_zero, Nat.add_zero] at h
+            rw [h0, Nat.mul_zero, Nat.zero_add] at h
             -- h : r = n
             rw [← h] at hge
             exact absurd hge (not_le.mpr hr')
@@ -531,12 +533,71 @@ private theorem d2f_card_aux :
       intro n hL hR
       omega
 
+/-- Low 15 bits of 2^(s+P·r) mod 3^30 are constant in r (Euler: 2^P ≡ 1 mod 3^15). -/
+private theorem low15_const (s : Nat) : ∀ r, 2 ^ (s + P * r) % 3 ^ 15 = 2 ^ s % 3 ^ 15 := by
+  intro r
+  have hpow : ∀ r, (2 ^ P) ^ r % 3 ^ 15 = 1 := by
+    intro r
+    induction r with
+    | zero => norm_num [Nat.pow_zero]
+    | succ r ih =>
+      rw [show (2 ^ P) ^ (r + 1) = (2 ^ P) ^ r * 2 ^ P from by
+        rw [show r + 1 = Nat.succ r from rfl, Nat.pow_succ],
+        Nat.mul_mod, ih, two_pow_P_mod_3_15_eq_1, Nat.mul_one]
+      exact Nat.mod_eq_of_lt (by norm_num : 1 < 3 ^ 15)
+  have hsplit : 2 ^ (s + P * r) = 2 ^ s * (2 ^ P) ^ r := by
+    rw [Nat.pow_add, Nat.pow_mul]
+  rw [hsplit, Nat.mul_mod, hpow r, Nat.mul_one]
+  exact Nat.mod_eq_of_lt (Nat.mod_lt _ (by omega : (0:Nat) < 3 ^ 15))
+
+/-- block1Val is injective on r < 3^15: the window (bits 15..29) together with
+    the constant low bits (mod 3^15) determines 2^(s+P·r) mod 3^30 fully, so
+    equal block1Val implies equal full residues and full_injective applies.
+    (This replaces the original direct appeal to full_injective, whose
+    hypothesis is equality of the full residues, not of the window.) -/
+theorem block1Val_injective (s : Nat) {r₁ r₂ : Nat}
+    (h₁ : r₁ < 3 ^ 15) (h₂ : r₂ < 3 ^ 15) :
+    block1Val s r₁ = block1Val s r₂ → r₁ = r₂ := by
+  intro h
+  have hv1 : 2 ^ (s + P * r₁) % 3 ^ 30 < 3 ^ 30 := Nat.mod_lt _ (by omega)
+  have hv2 : 2 ^ (s + P * r₂) % 3 ^ 30 < 3 ^ 30 := Nat.mod_lt _ (by omega)
+  simp only [block1Val] at h
+  have hq : 2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15 = 2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15 := by
+    have e1 : 2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15 < 3 ^ 15 :=
+      Nat.div_lt_of_lt_mul (by
+        rw [show 3 ^ 15 * 3 ^ 15 = 3 ^ 30 from by rw [← Nat.pow_add]; norm_num]
+        exact hv1)
+    have e2 : 2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15 < 3 ^ 15 :=
+      Nat.div_lt_of_lt_mul (by
+        rw [show 3 ^ 15 * 3 ^ 15 = 3 ^ 30 from by rw [← Nat.pow_add]; norm_num]
+        exact hv2)
+    rw [← Nat.mod_eq_of_lt e1, ← Nat.mod_eq_of_lt e2]
+    exact h
+  have hv1' : 2 ^ (s + P * r₁) % 3 ^ 30 =
+      2 ^ s % 3 ^ 15 + 3 ^ 15 * (2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15) := by
+    have hd := Nat.div_add_mod (2 ^ (s + P * r₁) % 3 ^ 30) (3 ^ 15)
+    calc 2 ^ (s + P * r₁) % 3 ^ 30
+        = 3 ^ 15 * (2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15) + 2 ^ (s + P * r₁) % 3 ^ 15 := by
+          rw [Nat.add_comm]; exact hd.symm
+      _ = 2 ^ s % 3 ^ 15 + 3 ^ 15 * (2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15) := by
+          rw [low15_const s r₁, Nat.add_comm]
+  have hv2' : 2 ^ (s + P * r₂) % 3 ^ 30 =
+      2 ^ s % 3 ^ 15 + 3 ^ 15 * (2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15) := by
+    have hd := Nat.div_add_mod (2 ^ (s + P * r₂) % 3 ^ 30) (3 ^ 15)
+    calc 2 ^ (s + P * r₂) % 3 ^ 30
+        = 3 ^ 15 * (2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15) + 2 ^ (s + P * r₂) % 3 ^ 15 := by
+          rw [Nat.add_comm]; exact hd.symm
+      _ = 2 ^ s % 3 ^ 15 + 3 ^ 15 * (2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15) := by
+          rw [low15_const s r₂, Nat.add_comm]
+  apply full_injective s r₁ r₂ h₁ h₂
+  rw [hv1', hv2', hq]
+
 /-- Block-1 exceptional count ≤ 2^15 for each s. -/
 theorem block1_exceptional_le (s : Nat) :
     ((Finset.range (3 ^ 15)).filter fun r => noDigit2 (block1Val s r)).card ≤ 2 ^ 15 := by
   have hinj : ∀ r₁ r₂, r₁ < 3 ^ 15 → r₂ < 3 ^ 15 →
       block1Val s r₁ = block1Val s r₂ → r₁ = r₂ :=
-    fun r₁ r₂ h₁ h₂ h => full_injective s r₁ r₂ h₁ h₂ h
+    fun r₁ r₂ h₁ h₂ heq => block1Val_injective s h₁ h₂ heq
   have hpre := filter_preimage_le_of_injOn hinj (fun r _ => block1_val_lt s r) noDigit2
   have hcard : ((Finset.range (3 ^ 15)).filter noDigit2).card = 2 ^ 15 := by
     unfold noDigit2; exact d2f_card_aux 15
