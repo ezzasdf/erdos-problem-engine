@@ -381,6 +381,27 @@ theorem filter_preimage_le_of_injOn {N : Nat} {f : Nat → Nat}
     exact hf r₁ r₂ hr₁.1 hr₂.1 hfeq
   rw [← hcard]; exact Finset.card_le_card key
 
+/-- Subtracting 3^k does not change digits at positions t < k. -/
+private theorem digit_below_k_eq {n k t : Nat} (hge : 3 ^ k ≤ n) (ht : t < k) :
+    (n / 3 ^ t) % 3 = ((n - 3 ^ k) / 3 ^ t) % 3 := by
+  have hnk : n = 3 ^ k + (n - 3 ^ k) := (Nat.add_sub_of_le hge).symm
+  have hdvd : 3 ^ t ∣ 3 ^ k := by
+    have h1 : k = t + (k - t) := by omega
+    rw [h1]
+    exact ⟨3 ^ (k - t), Nat.pow_add 3 t (k - t)⟩
+  conv_lhs => rw [hnk]
+  rw [Nat.add_div_of_dvd_left hdvd]
+  have hdiv : 3 ^ k / 3 ^ t = 3 ^ (k - t) := by
+    conv_lhs => rw [show k = t + (k - t) from by omega]
+    rw [Nat.pow_add, Nat.mul_comm]
+    exact Nat.mul_div_cancel (3 ^ (k - t)) (by omega : (3:ℕ) ^ t ≠ 0)
+  rw [hdiv]
+  have hmod : 3 ^ (k - t) % 3 = 0 := by
+    rw [show k - t = (k - t - 1) + 1 from by omega, Nat.pow_succ]
+    exact Nat.mul_mod_left _ _
+  rw [Nat.add_mod, hmod, Nat.zero_add]
+  exact Nat.mod_eq_of_lt (Nat.mod_lt _ (by omega : (0:Nat) < 3))
+
 /-- Digit-2-free counting: exactly 2^k values in [0, 3^k) have no digit 2
     in their k-digit ternary representation.
     Proof: induction on k. Each step doubles the count (MSB ∈ {0,1}). -/
@@ -401,70 +422,93 @@ private theorem d2f_card_aux :
         ((Finset.range (3 ^ (k + 1))).filter fun n =>
             3 ^ k ≤ n ∧ n < 2 * 3 ^ k ∧
             ∀ t, t < k → ((n - 3 ^ k) / 3 ^ t) % 3 ≠ 2) := by
-      ext n; simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_union]
+      ext n
+      simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_union]
       constructor
       · rintro ⟨hlt, hdne, hall⟩
-        have hd : (n / 3 ^ k) % 3 = 0 ∨ (n / 3 ^ k) % 3 = 1 := by omega
+        -- Make digit and remainder variables so omega can reason about them
+        set q := n / 3 ^ k with hq
+        set r := n % 3 ^ k with hr
+        have hd : q % 3 = 0 ∨ q % 3 = 1 := by omega
+        have hq3 : q < 3 := by
+          rw [hq]
+          exact Nat.div_lt_of_lt_mul (by rw [← Nat.pow_succ]; exact hlt)
+        have h := Nat.div_add_mod n (3 ^ k)
+        rw [hq, hr] at h
+        -- h : 3 ^ k * q + r = n, hr' : r < 3 ^ k
+        have hr' : r < 3 ^ k := by rw [hr]; exact Nat.mod_lt n (Nat.pow_pos (by omega) k)
         rcases hd with hd0 | hd1
-        · left; exact ⟨hlt, hd0, by
-            intro t ht; have := hall t ht
-            -- For t < k, (n/3^t)%3 is determined by lower digits
-            have hle : 3 ^ t < 3 ^ k := Nat.pow_lt_pow_right (by omega : 1 < 3) ht
-            have hn0 : n / 3 ^ t % 3 = n % 3 ^ k / 3 ^ t % 3 := by
-              rw [Nat.mod_mul_right_div_self n (3 ^ t) (3 ^ (k - t))]
-              ring_nf; rw [Nat.add_sub_cancel' (Nat.le_of_lt hle)]
-              rw [show 3 ^ t * 3 ^ (k - t) = 3 ^ k from by rw [← Nat.pow_add]; omega]
-            rwa [hn0]⟩
-        · right; have hn1 : n / 3 ^ k % 3 = 1 := hd1
-          have hge : 3 ^ k ≤ n := by
-            have h := Nat.div_add_mod n (3 ^ k)
+        · have hq0 : q = 0 := by omega
+          rw [hq0, Nat.zero_mul, Nat.add_zero] at h
+          -- h : r = n
+          left
+          refine ⟨hlt, ?_, ?_⟩
+          · rw [← h]; exact hr'
+          · exact fun t ht => hall t ht
+        · have hq1 : q = 1 := by omega
+          rw [hq1, Nat.mul_one] at h
+          -- h : 3 ^ k + r = n
+          right
+          have hge : 3 ^ k ≤ n := by rw [← h]; exact Nat.le_add_right (3 ^ k) r
+          refine ⟨hlt, hge, ?_, ?_⟩
+          · rw [← h]; omega
+          · intro t ht
+            rw [← digit_below_k_eq hge ht]
+            exact hall t ht
+      · rintro (⟨hlt, hlt3, hall⟩ | ⟨hlt, hge, hlt2, hall'⟩)
+        · refine ⟨hlt, ?_, ?_⟩
+          · set q := n / 3 ^ k with hq
+            have hq1 : q < 1 := by
+              rw [hq]
+              exact Nat.div_lt_of_lt_mul (by rw [Nat.mul_one]; exact hlt3)
+            have hq0 : q = 0 := Nat.lt_one_iff.mp hq1
+            rw [hq0]
+            norm_num
+          · exact fun t ht => hall t ht
+        · have hlt1 : n < 3 ^ (k + 1) := by
+            have h23 : 2 * 3 ^ k ≤ 3 * 3 ^ k := Nat.mul_le_mul_right (3 ^ k) (by omega)
+            calc n < 2 * 3 ^ k := hlt2
+              _ ≤ 3 * 3 ^ k := h23
+              _ = 3 ^ (k + 1) := by
+                rw [Nat.mul_comm 3 (3 ^ k)]
+                exact (Nat.pow_succ 3 k).symm
+          set q := n / 3 ^ k with hq
+          set r := n % 3 ^ k with hr
+          have h := Nat.div_add_mod n (3 ^ k)
+          rw [hq, hr] at h
+          -- h : 3 ^ k * q + r = n
+          have hq3 : q < 3 := by
+            rw [hq]
+            exact Nat.div_lt_of_lt_mul (by rw [← Nat.pow_succ]; exact hlt1)
+          have hge' : 1 ≤ q := by
+            by_contra h0
+            push_neg at h0
+            rw [h0, Nat.zero_mul, Nat.add_zero] at h
+            -- h : r = n
+            rw [← h, ← hr] at hge
+            exact absurd hge (not_le.mpr (Nat.mod_lt n (Nat.pow_pos (by omega) k)))
+          have hne2 : q ≠ 2 := by
+            intro heq
+            rw [heq, Nat.mul_comm] at h
+            -- h : 2 * 3 ^ k + r = n
+            have hle : 2 * 3 ^ k ≤ n := by
+              rw [← h]
+              exact Nat.le_add_right (2 * 3 ^ k) r
             omega
-          have hlt2 : n < 2 * 3 ^ k := by
-            have h := Nat.div_add_mod n (3 ^ k)
-            omega
-          exact ⟨hge, hlt2, by
-            intro t ht; have := hall t ht
-            have hle : 3 ^ t < 3 ^ k := Nat.pow_lt_pow_right (by omega : 1 < 3) ht
-            have hn0 : n / 3 ^ t % 3 = (n - 3 ^ k) / 3 ^ t % 3 := by
-              have hnk : n = 3 ^ k + (n - 3 ^ k) := by omega
-              rw [hnk, Nat.add_div_of_dvd_left (Dvd.dvd rfl : 3 ^ k ∣ 3 ^ k)]
-              rw [show (3 ^ k + (n - 3 ^ k)) / 3 ^ k = 1 + (n - 3 ^ k) / 3 ^ k from by
-                rw [Nat.add_div_of_dvd_left (Dvd.dvd rfl : 3 ^ k ∣ 3 ^ k)]; omega]
-              rw [show (1 + (n - 3 ^ k) / 3 ^ k) % 3 = (n - 3 ^ k) / 3 ^ k % 3 from by
-                have := Nat.div_lt_self (by omega : 0 < n - 3 ^ k) (by omega : 1 < 3)
-                omega]
-            rwa [hn0]⟩
-      · rintro (⟨hlt, hd0, hall⟩ | ⟨hge, hlt2, hall⟩)
-        · constructor
-          · exact hlt
-          · constructor
-            · have h1 : n / 3 ^ k < 1 :=
-                Nat.div_lt_of_lt_mul (by rw [← Nat.mul_one (3 ^ k)]; exact hlt)
-              have : n / 3 ^ k = 0 := by omega
-              omega
-            · intro t ht; exact hall t ht
-        · constructor
-          · omega
-          · constructor
-            · have h := Nat.div_add_mod n (3 ^ k)
-              omega
-            · intro t ht; have := hall t ht
-              have hle : 3 ^ t < 3 ^ k := Nat.pow_lt_pow_right (by omega : 1 < 3) ht
-              have hn0 : (n - 3 ^ k) / 3 ^ t % 3 = n / 3 ^ t % 3 := by
-                have hnk : n = 3 ^ k + (n - 3 ^ k) := by omega
-                rw [hnk] at this ⊢
-                rw [Nat.add_div_of_dvd_left (Dvd.dvd rfl : 3 ^ k ∣ 3 ^ k)] at *
-                rw [show (3 ^ k + (n - 3 ^ k)) / 3 ^ t = 3 ^ (k - t) + (n - 3 ^ k) / 3 ^ t from by
-                  rw [Nat.add_div_of_dvd_left (by rw [show k = t + (k - t) from by omega]; rw [Nat.pow_add]; exact ⟨3 ^ (k - t), by ring⟩ : 3 ^ t ∣ 3 ^ k)]
-                  omega]
-                omega
-              omega
+          have hq1 : q = 1 := by omega
+          refine ⟨hlt, ?_, ?_⟩
+          · rw [hq1]
+            norm_num
+          · intro t ht
+            rw [digit_below_k_eq hge ht]
+            exact hall' t ht
     -- Now count each half
     rw [hpart, Finset.card_union_eq, d2f_card_aux k, d2f_card_aux k]
     · ring
     · -- Disjoint: left half has all elements < 3^k, right half has all ≥ 3^k
       apply Finset.disjoint_left.mpr
-      intro n ⟨hlt, _⟩ ⟨hge, _, _⟩; omega
+      intro n hL hR
+      omega
 
 /-- Block-1 exceptional count ≤ 2^15 for each s. -/
 theorem block1_exceptional_le (s : Nat) :
