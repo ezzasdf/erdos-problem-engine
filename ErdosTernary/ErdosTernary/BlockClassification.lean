@@ -774,16 +774,19 @@ def checkBlock3All (s : Nat) : Bool :=
     (2 ^ s % 3 ^ 30) (2 ^ s % 3 ^ 45) (2 ^ s % 3 ^ 60)
 
 /-- Verify: for s=0, no residue has noDigit2 in all three blocks. -/
-set_option maxRecDepth 10000000 in
-theorem block3_caught_0 : checkBlock3All 0 = true := by native_decide
+theorem block3_caught_0 : checkBlock3All 0 = true := by
+  set_option maxRecDepth 10000000 in
+  native_decide
 
 /-- Verify: for s=2, no residue has noDigit2 in all three blocks. -/
-set_option maxRecDepth 10000000 in
-theorem block3_caught_2 : checkBlock3All 2 = true := by native_decide
+theorem block3_caught_2 : checkBlock3All 2 = true := by
+  set_option maxRecDepth 10000000 in
+  native_decide
 
 /-- Verify: for s=8, no residue has noDigit2 in all three blocks. -/
-set_option maxRecDepth 10000000 in
-theorem block3_caught_8 : checkBlock3All 8 = true := by native_decide
+theorem block3_caught_8 : checkBlock3All 8 = true := by
+  set_option maxRecDepth 10000000 in
+  native_decide
 
 /-! ### Soundness: checkBlock3All = true implies no all-clean residue -/
 
@@ -841,7 +844,10 @@ private theorem checkBlock3LoopSD_sound (pow30 pow45 pow60 s : Nat)
         rw [block1_eq_loop s i v30 hv30] at hb1
         rw [block2_eq_loop s i v45 hv45] at hb2
         rw [block3_eq_loop s i v60 hv60] at hb3
-        exact bool_clean_not hcond ⟨hb1, hb2, hb3⟩
+        have hb1' : noDigit2 ((v30 / 3 ^ 15) % 3 ^ 15) = true := hb1
+        have hb2' : noDigit2 ((v45 / 3 ^ 30) % 3 ^ 15) = true := hb2
+        have hb3' : noDigit2 ((v60 / 3 ^ 45) % 3 ^ 15) = true := hb3
+        exact bool_clean_not hcond ⟨hb1', hb2', hb3'⟩
       · have hri : r < i := by omega
         have hv30' : (v30 * pow30) % (3 ^ 30) = iterVal s (3 ^ 30) (r + 1) := by
           simp only [iterVal_succ, hv30, hp30]
@@ -854,14 +860,17 @@ private theorem checkBlock3LoopSD_sound (pow30 pow45 pow60 s : Nat)
 
 /-- Block-3 catches everything: for every s ∈ {0,2,8} and every r < 3^15,
     if block1 and block2 have no digit 2, then block3 does have digit 2. -/
-set_option maxRecDepth 10000000 in
 theorem block3_catches_all (s : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8) :
     ∀ r < 3 ^ 15, noDigit2 (block1Val s r) → noDigit2 (block2Val s r) →
     ¬noDigit2 (block3Val s r) := by
   have h0 := checkBlock3LoopSD_sound pow2Pmod30 pow2Pmod45 pow2Pmod60 s
     pow2Pmod30_eq pow2Pmod45_eq pow2Pmod60_eq
   intro r hr h1 h2 h3
-  have hc : checkBlock3All s = true := by rcases hs with rfl | rfl | rfl <;> native_decide
+  have hc : checkBlock3All s = true := by
+    rcases hs with rfl | rfl | rfl
+    · set_option maxRecDepth 10000000 in native_decide
+    · set_option maxRecDepth 10000000 in native_decide
+    · set_option maxRecDepth 10000000 in native_decide
   unfold checkBlock3All at hc
   exact h0 (3 ^ 15) 0 (2^s%3^30) (2^s%3^45) (2^s%3^60) (by omega) rfl rfl rfl hc r (by omega) hr ⟨h1, h2, h3⟩
 
@@ -872,13 +881,22 @@ theorem block3_catches_all (s : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8) :
     avoiding the general lifting lemma that causes elaborator issues.
 -/
 
+/-- Generic pow-mod bridge: (2^P)^e mod 3^45 = ((2^P) mod 3^45)^e mod 3^45.
+    Stated with a generic exponent: concrete exponents force numeral-folding
+    reconciliation against 2^P during elaboration (maxRecDepth). -/
+private theorem pow_mod_bridge45 (e : Nat) :
+    (2 ^ P) ^ e % 3 ^ 45 = ((2 ^ P) % 3 ^ 45) ^ e % 3 ^ 45 := Nat.pow_mod ..
+
+private theorem pow_mod_bridge60 (e : Nat) :
+    (2 ^ P) ^ e % 3 ^ 60 = ((2 ^ P) % 3 ^ 60) ^ e % 3 ^ 60 := Nat.pow_mod ..
+
 /-- Period of block1: (2^P)^(3^15) ≡ 1 (mod 3^30). Restates euler_result. -/
 theorem powP_period_block1 : (2 ^ P) ^ (3 ^ 15) % 3 ^ 30 = 1 := euler_result
 
 /-- Period of block2: (2^P)^(3^30) ≡ 1 (mod 3^45).
     Proof: reduce to pow2ModAux + native_decide (term-level composition). -/
 theorem powP_period_block2 : (2 ^ P) ^ (3 ^ 30) % 3 ^ 45 = 1 := by
-  have h1 : (2 ^ P) ^ (3 ^ 30) % 3 ^ 45 = ((2 ^ P) % 3 ^ 45) ^ (3 ^ 30) % 3 ^ 45 := Nat.pow_mod (2 ^ P) (3 ^ 30) (3 ^ 45)
+  have h1 := pow_mod_bridge45 (3 ^ 30)
   have h1b : ((2 ^ P) % 3 ^ 45) ^ (3 ^ 30) % 3 ^ 45 = pow2Pmod45 ^ (3 ^ 30) % 3 ^ 45 := by
     rw [← pow2Pmod45_eq]
   have h2 : pow2Pmod45 ^ (3 ^ 30) % 3 ^ 45 = pow2ModAux (3 ^ 30) pow2Pmod45 (3 ^ 45) :=
@@ -889,7 +907,7 @@ theorem powP_period_block2 : (2 ^ P) ^ (3 ^ 30) % 3 ^ 45 = 1 := by
 /-- Period of block3: (2^P)^(3^45) ≡ 1 (mod 3^60).
     Proof: reduce to pow2ModAux + native_decide (term-level composition). -/
 theorem powP_period_block3 : (2 ^ P) ^ (3 ^ 45) % 3 ^ 60 = 1 := by
-  have h1 : (2 ^ P) ^ (3 ^ 45) % 3 ^ 60 = ((2 ^ P) % 3 ^ 60) ^ (3 ^ 45) % 3 ^ 60 := Nat.pow_mod (2 ^ P) (3 ^ 45) (3 ^ 60)
+  have h1 := pow_mod_bridge60 (3 ^ 45)
   have h1b : ((2 ^ P) % 3 ^ 60) ^ (3 ^ 45) % 3 ^ 60 = pow2Pmod60 ^ (3 ^ 45) % 3 ^ 60 := by
     rw [← pow2Pmod60_eq]
   have h2 : pow2Pmod60 ^ (3 ^ 45) % 3 ^ 60 = pow2ModAux (3 ^ 45) pow2Pmod60 (3 ^ 60) :=
