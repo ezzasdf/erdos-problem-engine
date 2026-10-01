@@ -21,7 +21,8 @@ theorem P_pos : 0 < P := by unfold P; norm_num
 
 /-! ## Part 1: Cubing chain proving (2^P)^(3^14) ≢ 1 and (2^P)^(3^15) ≡ 1 mod 3^30 -/
 
-private theorem v0 : 2 ^ P % 3 ^ 30 = 82792762922791 := by norm_num
+private theorem v0 : 2 ^ P % 3 ^ 30 = 82792762922791 := by
+  rw [← pow2Mod_eq]; native_decide
 private theorem v1 : (82792762922791 : Nat) ^ 3 % 3 ^ 30 = 42487156673722 := by norm_num
 private theorem v2 : (42487156673722 : Nat) ^ 3 % 3 ^ 30 = 127461470021164 := by norm_num
 private theorem v3 : (127461470021164 : Nat) ^ 3 % 3 ^ 30 = 176493277968841 := by norm_num
@@ -48,45 +49,57 @@ private theorem totient_3_30 : Nat.totient (3 ^ 30) = P * 3 ^ 15 := by
   rw [show P = 2 * 3 ^ 14 from rfl]; norm_num
 
 private theorem euler_result : (2 ^ P) ^ (3 ^ 15) % 3 ^ 30 = 1 := by
-  have hmod := Nat.ModEq.pow_totient coprime_2_3_30
-  have key : (2 ^ P) ^ (3 ^ 15) = 2 ^ (Nat.totient (3 ^ 30)) := by
-    rw [totient_3_30]; show (2 ^ (2 * 3 ^ 14)) ^ (3 ^ 15) = 2 ^ (2 * 3 ^ 14 * 3 ^ 15)
-    rw [show 2 * 3 ^ 14 * 3 ^ 15 = (2 * 3 ^ 14) * 3 ^ 15 from by ring,
-        Nat.pow_mul]; ring_nf
-  rw [key] at hmod; exact_mod_cast hmod
+  have h := Nat.ModEq.pow_totient coprime_2_3_30
+  rw [totient_3_30] at h
+  rw [(Nat.pow_mul 2 P (3 ^ 15)).symm]
+  exact_mod_cast h
 
 /-! The cubing chain: (2^P)^(3^k) mod 3^30 = v_k for k = 0..14 -/
 
 private theorem pow_P_3_0 : (2 ^ P) ^ (3 ^ 0) % 3 ^ 30 = 82792762922791 := by
-  simp [Nat.pow_zero, Nat.one_mul]; exact v0
+  rw [Nat.pow_zero, Nat.pow_one]; exact v0
 private theorem pow_P_3_1 : (2 ^ P) ^ (3 ^ 1) % 3 ^ 30 = 42487156673722 := by
-  simp [Nat.pow_succ]; rw [v0, v1]
+  rw [show 3 ^ 1 = 3 ^ 0 * 3 from Nat.pow_succ 3 0, Nat.pow_mul, Nat.pow_mod, pow_P_3_0]
+  exact v1
 private theorem pow_P_3_2 : (2 ^ P) ^ (3 ^ 2) % 3 ^ 30 = 127461470021164 := by
-  simp [show 3 ^ 2 = 3 * 3 from by norm_num, Nat.pow_succ]; rw [pow_P_3_1, v2]
+  rw [show 3 ^ 2 = 3 ^ 1 * 3 from Nat.pow_succ 3 1, Nat.pow_mul, Nat.pow_mod, pow_P_3_1]
+  exact v2
 private theorem pow_P_3_3 : (2 ^ P) ^ (3 ^ 3) % 3 ^ 30 = 176493277968841 := by
-  simp [show 3 ^ 3 = 3 * 3 * 3 from by norm_num, Nat.pow_succ]; rw [pow_P_3_2, v3]
+  rw [show 3 ^ 3 = 3 ^ 2 * 3 from Nat.pow_succ 3 2, Nat.pow_mul, Nat.pow_mod, pow_P_3_2]
+  exact v3
 private theorem pow_P_3_4 : (2 ^ P) ^ (3 ^ 4) % 3 ^ 30 = 117697569717223 := by
-  rw [show 3 ^ 4 = 3 * 3 ^ 3 from by norm_num, Nat.pow_succ]; rw [pow_P_3_3, v4]
+  rw [show 3 ^ 4 = 3 ^ 3 * 3 from Nat.pow_succ 3 3, Nat.pow_mul, Nat.pow_mod, pow_P_3_3]
+  exact v4
 private theorem pow_P_3_5 : (2 ^ P) ^ (3 ^ 5) % 3 ^ 30 = 147201577057018 := by
-  rw [show 3 ^ 5 = 3 * 3 ^ 4 from by norm_num, Nat.pow_succ]; rw [pow_P_3_4, v5]
+  rw [show 3 ^ 5 = 3 ^ 4 * 3 from Nat.pow_succ 3 4, Nat.pow_mul, Nat.pow_mod, pow_P_3_4]
+  exact v5
 private theorem pow_P_3_6 : (2 ^ P) ^ (3 ^ 6) % 3 ^ 30 = 29822466981754 := by
-  rw [show 3 ^ 6 = 3 * 3 ^ 5 from by norm_num, Nat.pow_succ]; rw [pow_P_3_5, v6]
+  rw [show 3 ^ 6 = 3 ^ 5 * 3 from Nat.pow_succ 3 5, Nat.pow_mul, Nat.pow_mod, pow_P_3_5]
+  exact v6
 private theorem pow_P_3_7 : (2 ^ P) ^ (3 ^ 7) % 3 ^ 30 = 89467400945260 := by
-  rw [show 3 ^ 7 = 3 * 3 ^ 6 from by norm_num, Nat.pow_succ]; rw [pow_P_3_6, v7]
+  rw [show 3 ^ 7 = 3 ^ 6 * 3 from Nat.pow_succ 3 6, Nat.pow_mul, Nat.pow_mod, pow_P_3_6]
+  exact v7
 private theorem pow_P_3_8 : (2 ^ P) ^ (3 ^ 8) % 3 ^ 30 = 62511070741129 := by
-  rw [show 3 ^ 8 = 3 * 3 ^ 7 from by norm_num, Nat.pow_succ]; rw [pow_P_3_7, v8]
+  rw [show 3 ^ 8 = 3 ^ 7 * 3 from Nat.pow_succ 3 7, Nat.pow_mul, Nat.pow_mod, pow_P_3_7]
+  exact v8
 private theorem pow_P_3_9 : (2 ^ P) ^ (3 ^ 9) % 3 ^ 30 = 187533212223385 := by
-  rw [show 3 ^ 9 = 3 * 3 ^ 8 from by norm_num, Nat.pow_succ]; rw [pow_P_3_8, v9]
+  rw [show 3 ^ 9 = 3 ^ 8 * 3 from Nat.pow_succ 3 8, Nat.pow_mul, Nat.pow_mod, pow_P_3_8]
+  exact v9
 private theorem pow_P_3_10 : (2 ^ P) ^ (3 ^ 10) % 3 ^ 30 = 150817372480855 := by
-  rw [show 3 ^ 10 = 3 * 3 ^ 9 from by norm_num, Nat.pow_succ]; rw [pow_P_3_9, v10]
+  rw [show 3 ^ 10 = 3 ^ 9 * 3 from Nat.pow_succ 3 9, Nat.pow_mul, Nat.pow_mod, pow_P_3_9]
+  exact v10
 private theorem pow_P_3_11 : (2 ^ P) ^ (3 ^ 11) % 3 ^ 30 = 40669853253265 := by
-  rw [show 3 ^ 11 = 3 * 3 ^ 10 from by norm_num, Nat.pow_succ]; rw [pow_P_3_10, v11]
+  rw [show 3 ^ 11 = 3 ^ 10 * 3 from Nat.pow_succ 3 10, Nat.pow_mul, Nat.pow_mod, pow_P_3_10]
+  exact v11
 private theorem pow_P_3_12 : (2 ^ P) ^ (3 ^ 12) % 3 ^ 30 = 122009559759793 := by
-  rw [show 3 ^ 12 = 3 * 3 ^ 11 from by norm_num, Nat.pow_succ]; rw [pow_P_3_11, v12]
+  rw [show 3 ^ 12 = 3 ^ 11 * 3 from Nat.pow_succ 3 11, Nat.pow_mul, Nat.pow_mod, pow_P_3_11]
+  exact v12
 private theorem pow_P_3_13 : (2 ^ P) ^ (3 ^ 13) % 3 ^ 30 = 160137547184728 := by
-  rw [show 3 ^ 13 = 3 * 3 ^ 12 from by norm_num, Nat.pow_succ]; rw [pow_P_3_12, v13]
+  rw [show 3 ^ 13 = 3 ^ 12 * 3 from Nat.pow_succ 3 12, Nat.pow_mul, Nat.pow_mod, pow_P_3_12]
+  exact v13
 private theorem pow_P_3_14 : (2 ^ P) ^ (3 ^ 14) % 3 ^ 30 = 68630377364884 := by
-  rw [show 3 ^ 14 = 3 * 3 ^ 13 from by norm_num, Nat.pow_succ]; rw [pow_P_3_13, v14]
+  rw [show 3 ^ 14 = 3 ^ 13 * 3 from Nat.pow_succ 3 13, Nat.pow_mul, Nat.pow_mod, pow_P_3_13]
+  exact v14
 
 private theorem pow_P_3_14_ne_1 : (2 ^ P) ^ (3 ^ 14) % 3 ^ 30 ≠ 1 := by
   rw [pow_P_3_14]; norm_num
@@ -351,7 +364,7 @@ theorem iterVal_eq (s m n : Nat) : iterVal s m n = 2 ^ (s + P * n) % m := by
   | succ n ih =>
     rw [iterVal_succ, ih]
     rw [show 2 ^ (s + P * (n + 1)) = 2 ^ (s + P * n) * 2 ^ P from by
-      rw [show s + P * (n + 1) = s + P * n + P from by omega, Nat.pow_add]
+      rw [show s + P * (n + 1) = s + P * n + P from by ring, Nat.pow_add]
     exact (Nat.mul_mod ..).symm
 
 /-- Block-2 value: positions 30..44 of 2^(s+P*r). -/
@@ -552,46 +565,69 @@ theorem powP_period_block3 : (2 ^ P) ^ (3 ^ 45) % 3 ^ 60 = 1 := by
 private theorem iterVal_period (s mod : Nat) (period : Nat)
     (hperiod : (2 ^ P) ^ period % mod = 1) :
     ∀ r, iterVal s mod (r + period) = iterVal s mod r := by
-  intro r; induction r with
-  | zero =>
-    simp only [iterVal]
-    rw [show 2 ^ s % mod * ((2 ^ P) ^ period % mod) % mod = 2 ^ s % mod * 1 % mod from by
-      rw [hperiod]; ring_nf]
-    simp
-  | succ r ih =>
-    simp only [iterVal_succ]
-    rw [ih]
-    have : iterVal s mod r * (2 ^ P % mod) * ((2 ^ P) ^ period % mod) % mod =
-      iterVal s mod r * (2 ^ P % mod) * 1 % mod := by rw [hperiod]; ring_nf
-    rw [this, Nat.mul_one]
+  intro r
+  rw [iterVal_eq, iterVal_eq]
+  rw [show s + P * (r + period) = s + P * r + P * period from by ring, Nat.pow_add]
+  have hper : 2 ^ (P * period) % mod = 1 := by rw [Nat.pow_mul]; exact hperiod
+  rw [← Nat.mul_mod_mod, hper, Nat.mul_one]
 
 private theorem iterVal_mod_period (s mod period : Nat)
     (hperiod : (2 ^ P) ^ period % mod = 1) :
     ∀ r, iterVal s mod r = iterVal s mod (r % period) := by
   intro r
-  obtain ⟨q, rfl⟩ := ⟨r / period, (Nat.div_add_mod r period).symm⟩
-  induction q with
+  suffices ∀ q, iterVal s mod (period * q + r % period) = iterVal s mod (r % period) by
+    have h := this (r / period)
+    have hr : r = period * (r / period) + r % period := (Nat.div_add_mod r period).symm
+    rw [← hr] at h; exact h
+  intro q; induction q with
   | zero => simp [Nat.zero_mul, Nat.add_zero]
   | succ q ih =>
-    rw [show period * (q + 1) = period * q + period from by ring]
-    rw [iterVal_period s mod period hperiod, ← ih]
+    rw [show period * (q + 1) + r % period = (period * q + r % period) + period from by ring]
+    rw [iterVal_period s mod period hperiod, ih]
 
 /-- block1Val is periodic in r with period 3^15. -/
 theorem block1Val_periodic (s m : Nat) :
     block1Val s m = block1Val s (m % 3 ^ 15) := by
   simp only [block1Val]
-  rw [iterVal_mod_period s (3 ^ 30) (3 ^ 15) powP_period_block1]
+  suffices 2 ^ (s + P * m) % 3 ^ 30 = 2 ^ (s + P * (m % 3 ^ 15)) % 3 ^ 30 by rw [this]
+  have hexp : s + P * m = s + P * (m % 3 ^ 15) + P * (3 ^ 15 * (m / 3 ^ 15)) := by
+    conv_lhs => rw [show m = 3 ^ 15 * (m / 3 ^ 15) + m % 3 ^ 15 from (Nat.div_add_mod m (3 ^ 15)).symm]
+    ring
+  rw [hexp, Nat.pow_add]
+  have hper : 2 ^ (P * (3 ^ 15 * (m / 3 ^ 15))) % 3 ^ 30 = 1 := by
+    rw [← Nat.mul_assoc P (3 ^ 15) (m / 3 ^ 15), Nat.pow_mul]
+    rw [show 2 ^ (P * 3 ^ 15) = (2 ^ P) ^ (3 ^ 15) from Nat.pow_mul 2 P (3 ^ 15)]
+    rw [Nat.pow_mod, powP_period_block1, Nat.one_pow]; norm_num
+  rw [← Nat.mul_mod_mod, hper, Nat.mul_one]
 
 /-- block2Val is periodic in r with period 3^30. -/
 theorem block2Val_periodic (s m : Nat) :
     block2Val s m = block2Val s (m % 3 ^ 30) := by
   simp only [block2Val]
-  rw [iterVal_mod_period s (3 ^ 45) (3 ^ 30) powP_period_block2]
+  rw [iterVal_eq, iterVal_eq]
+  have hexp : s + P * m = s + P * (m % 3 ^ 30) + P * (3 ^ 30 * (m / 3 ^ 30)) := by
+    conv_lhs => rw [show m = 3 ^ 30 * (m / 3 ^ 30) + m % 3 ^ 30 from (Nat.div_add_mod m (3 ^ 30)).symm]
+    ring
+  rw [hexp, Nat.pow_add]
+  have hper : 2 ^ (P * (3 ^ 30 * (m / 3 ^ 30))) % 3 ^ 45 = 1 := by
+    rw [← Nat.mul_assoc P (3 ^ 30) (m / 3 ^ 30), Nat.pow_mul]
+    rw [show 2 ^ (P * 3 ^ 30) = (2 ^ P) ^ (3 ^ 30) from Nat.pow_mul 2 P (3 ^ 30)]
+    rw [Nat.pow_mod, powP_period_block2, Nat.one_pow]; norm_num
+  rw [← Nat.mul_mod_mod, hper, Nat.mul_one]
 
 /-- block3Val is periodic in r with period 3^45. -/
 theorem block3Val_periodic (s m : Nat) :
     block3Val s m = block3Val s (m % 3 ^ 45) := by
   simp only [block3Val]
-  rw [iterVal_mod_period s (3 ^ 60) (3 ^ 45) powP_period_block3]
+  rw [iterVal_eq, iterVal_eq]
+  have hexp : s + P * m = s + P * (m % 3 ^ 45) + P * (3 ^ 45 * (m / 3 ^ 45)) := by
+    conv_lhs => rw [show m = 3 ^ 45 * (m / 3 ^ 45) + m % 3 ^ 45 from (Nat.div_add_mod m (3 ^ 45)).symm]
+    ring
+  rw [hexp, Nat.pow_add]
+  have hper : 2 ^ (P * (3 ^ 45 * (m / 3 ^ 45))) % 3 ^ 60 = 1 := by
+    rw [← Nat.mul_assoc P (3 ^ 45) (m / 3 ^ 45), Nat.pow_mul]
+    rw [show 2 ^ (P * 3 ^ 45) = (2 ^ P) ^ (3 ^ 45) from Nat.pow_mul 2 P (3 ^ 45)]
+    rw [Nat.pow_mod, powP_period_block3, Nat.one_pow]; norm_num
+  rw [← Nat.mul_mod_mod, hper, Nat.mul_one]
 
 end ErdosTernary.BlockClassification
