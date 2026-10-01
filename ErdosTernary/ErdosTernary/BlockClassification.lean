@@ -185,15 +185,28 @@ private theorem mod_eq_one_iff_cast {m : Nat} (hm : 2 ≤ m) {a : Nat} :
 private theorem pow_gcd_mod30 (a b : Nat)
     (ha : (2 ^ P) ^ a % 3 ^ 30 = 1) (hb : (2 ^ P) ^ b % 3 ^ 30 = 1) :
     (2 ^ P) ^ (Nat.gcd a b) % 3 ^ 30 = 1 := by
-  have h30 : 2 ≤ 3 ^ 30 := by norm_num
   have hza : (2 ^ P : ZMod (3 ^ 30)) ^ a = 1 := by
-    have h1 : ((2 ^ P) ^ a : ZMod (3 ^ 30)) = 1 := (mod_eq_one_iff_cast h30).mp ha
-    rwa [Nat.cast_pow] at h1
+    have hx : ((2 ^ P) ^ a) ≡ 1 [MOD 3 ^ 30] := by
+      show ((2 ^ P) ^ a) % 3 ^ 30 = 1 % 3 ^ 30
+      rw [ha, Nat.mod_eq_of_lt (by norm_num : 1 < 3 ^ 30)]
+    have hcast := (ZMod.natCast_eq_natCast_iff ((2 ^ P) ^ a) 1 (3 ^ 30)).mpr hx
+    rw [Nat.cast_one] at hcast
+    rwa [Nat.cast_pow] at hcast
   have hzb : (2 ^ P : ZMod (3 ^ 30)) ^ b = 1 := by
-    have h1 : ((2 ^ P) ^ b : ZMod (3 ^ 30)) = 1 := (mod_eq_one_iff_cast h30).mp hb
-    rwa [Nat.cast_pow] at h1
+    have hx : ((2 ^ P) ^ b) ≡ 1 [MOD 3 ^ 30] := by
+      show ((2 ^ P) ^ b) % 3 ^ 30 = 1 % 3 ^ 30
+      rw [hb, Nat.mod_eq_of_lt (by norm_num : 1 < 3 ^ 30)]
+    have hcast := (ZMod.natCast_eq_natCast_iff ((2 ^ P) ^ b) 1 (3 ^ 30)).mpr hx
+    rw [Nat.cast_one] at hcast
+    rwa [Nat.cast_pow] at hcast
   have hz := pow_gcd_eq_one (2 ^ P : ZMod (3 ^ 30)) hza hzb
-  exact (mod_eq_one_iff_cast h30).mpr (by rw [Nat.cast_pow]; exact hz)
+  have h1 : ((2 ^ P) ^ (Nat.gcd a b) : ZMod (3 ^ 30)) = 1 := by
+    rw [Nat.cast_pow]; exact hz
+  have hcast : ((2 ^ P) ^ (Nat.gcd a b) : ZMod (3 ^ 30)) = ((1 : Nat) : ZMod (3 ^ 30)) := by
+    rw [h1, Nat.cast_one]
+  have hm' := (ZMod.natCast_eq_natCast_iff ((2 ^ P) ^ (Nat.gcd a b)) 1 (3 ^ 30)).mp hcast
+  have hm'' : ((2 ^ P) ^ (Nat.gcd a b)) % 3 ^ 30 = 1 % 3 ^ 30 := hm'
+  rwa [Nat.mod_eq_of_lt (by norm_num : 1 < 3 ^ 30)] at hm''
 
 /-! The order of 2^P mod 3^30 is 3^15.
     Since (2^P)^(3^15) ≡ 1 and (2^P)^(3^14) ≢ 1, the only divisor of 3^15
