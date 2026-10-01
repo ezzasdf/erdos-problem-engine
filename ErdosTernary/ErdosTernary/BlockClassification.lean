@@ -447,12 +447,12 @@ private theorem d2f_card_aux :
   | k + 1 => by
     -- Split the quantifier at t = k
     have hsplit : ∀ n, (∀ t, t < k + 1 → (n / 3 ^ t) % 3 ≠ 2) ↔
-        ((n / 3 ^ k) % 3 ≠ 2) ∧ ∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2 := by
+        (∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2) ∧ ((n / 3 ^ k) % 3 ≠ 2) := by
       intro n
       constructor
       · intro h
-        exact ⟨h k (by omega), fun t ht => h t (by omega)⟩
-      · intro ⟨hk, hall⟩ t ht
+        exact ⟨fun t ht => h t (by omega), h k (by omega)⟩
+      · intro ⟨hall, hk⟩ t ht
         by_cases htk : t < k
         · exact hall t htk
         · have : t = k := by omega
@@ -460,7 +460,7 @@ private theorem d2f_card_aux :
     have hconv : (Finset.range (3 ^ (k + 1))).filter
         (fun n => ∀ t, t < k + 1 → (n / 3 ^ t) % 3 ≠ 2) =
         (Finset.range (3 ^ (k + 1))).filter
-        (fun n => ((n / 3 ^ k) % 3 ≠ 2) ∧ ∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2) := by
+        (fun n => (∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2) ∧ ((n / 3 ^ k) % 3 ≠ 2)) := by
       refine Finset.filter_congr ?_
       intro x _hx
       exact hsplit x
@@ -588,6 +588,7 @@ private theorem d2f_card_aux :
           exact hall t ht
       rw [heq, Finset.card_image_of_injOn, d2f_card_aux k]
       · intro a₁ _ a₂ _ heq'
+        simp only at heq'
         omega
     -- Now count each half
     rw [hpart, Finset.card_union_eq, filter_left_eq, d2f_card_aux k, cardR]
