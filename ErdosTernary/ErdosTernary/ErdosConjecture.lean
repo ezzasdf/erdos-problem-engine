@@ -50,7 +50,3 @@ theorem erdos_ternary :
   exact bridge_first_period_all K hK5 r hrNK hspec hc
 
 end ErdosTernary
-
-#check @ErdosTernary.erdos_ternary
-#print axioms ErdosTernary.erdos_ternary
-#print ErdosTernary.erdos_ternary

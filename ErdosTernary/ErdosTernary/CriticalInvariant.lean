@@ -5,9 +5,11 @@
 import Mathlib.Tactic
 import ErdosTernary.BridgeCompute
 import ErdosTernary.Narkiewicz
+import ErdosTernary.LiftingDynamics
 
 open ErdosTernary.BridgeCompute
 open Narkiewicz
+open ErdosTernary.LiftingDynamics
 
 namespace ErdosTernary.CriticalInvariant
 
@@ -371,8 +373,12 @@ private theorem two_pow_162_mod (j : Nat) (hj : j < 5) :
     2 ^ 162 % 3 ^ (j + 1) = 1 := by
   interval_cases j <;> norm_num [Nat.pow]
 
-private theorem two_pow_162_mod_ext (j : Nat) (hj : j < 12) :
+private theorem two_pow_162_mod_ext (j : Nat) (hj : j < 5) :
     2 ^ 162 % 3 ^ (j + 1) = 1 := by
+  interval_cases j <;> norm_num [Nat.pow]
+
+private theorem two_pow_P_mod (j : Nat) (hj : j < 15) :
+    2 ^ (162 * 59049) % 3 ^ (j + 1) = 1 := by
   interval_cases j <;> norm_num [Nat.pow]
 
 private theorem digit₃_pow_periodic (r s : Nat) (hs : s = r % 162)
@@ -397,11 +403,92 @@ private theorem digit₃_pow_periodic (r s : Nat) (hs : s = r % 162)
 
 def N5_even_set : Finset Nat := ⟨N5_even, by native_decide⟩
 
+private theorem n5_digitMod_covers_0 :
+    ∀ k ∈ Finset.range 59049, (0 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (0 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_2 :
+    ∀ k ∈ Finset.range 59049, (2 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (2 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_8 :
+    ∀ k ∈ Finset.range 59049, (8 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (8 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_20 :
+    ∀ k ∈ Finset.range 59049, (20 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (20 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_24 :
+    ∀ k ∈ Finset.range 59049, (24 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (24 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_26 :
+    ∀ k ∈ Finset.range 59049, (26 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (26 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_54 :
+    ∀ k ∈ Finset.range 59049, (54 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (54 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_56 :
+    ∀ k ∈ Finset.range 59049, (56 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (56 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_62 :
+    ∀ k ∈ Finset.range 59049, (62 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (62 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_72 :
+    ∀ k ∈ Finset.range 59049, (72 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (72 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_74 :
+    ∀ k ∈ Finset.range 59049, (74 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (74 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_78 :
+    ∀ k ∈ Finset.range 59049, (78 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (78 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_80 :
+    ∀ k ∈ Finset.range 59049, (80 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (80 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_96 :
+    ∀ k ∈ Finset.range 59049, (96 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (96 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_126 :
+    ∀ k ∈ Finset.range 59049, (126 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (126 + 162 * k) (j + 5) = 2 := by native_decide
+
+private theorem n5_digitMod_covers_150 :
+    ∀ k ∈ Finset.range 59049, (150 : Nat) + 162 * k ≥ 69 →
+    ∃ j ∈ Finset.range 38, digitMod (150 + 162 * k) (j + 5) = 2 := by native_decide
+
 private theorem n5_digitMod_covers :
     ∀ s ∈ N5_even_set, ∀ k ∈ Finset.range 59049,
       s + 162 * k ≥ 69 →
       ∃ j ∈ Finset.range 38, digitMod (s + 162 * k) (j + 5) = 2 := by
-  native_decide
+  intro s hs k hk hr
+  fin_cases hs
+  · exact n5_digitMod_covers_0 k hk hr
+  · exact n5_digitMod_covers_2 k hk hr
+  · exact n5_digitMod_covers_8 k hk hr
+  · exact n5_digitMod_covers_20 k hk hr
+  · exact n5_digitMod_covers_24 k hk hr
+  · exact n5_digitMod_covers_26 k hk hr
+  · exact n5_digitMod_covers_54 k hk hr
+  · exact n5_digitMod_covers_56 k hk hr
+  · exact n5_digitMod_covers_62 k hk hr
+  · exact n5_digitMod_covers_72 k hk hr
+  · exact n5_digitMod_covers_74 k hk hr
+  · exact n5_digitMod_covers_78 k hk hr
+  · exact n5_digitMod_covers_80 k hk hr
+  · exact n5_digitMod_covers_96 k hk hr
+  · exact n5_digitMod_covers_126 k hk hr
+  · exact n5_digitMod_covers_150 k hk hr
 
 private theorem n5_covers_transfer (r : Nat) (hr69 : r ≥ 69) (hr_upper : r < 162 * 59049)
     (hr_even : r % 2 = 0)
@@ -414,7 +501,7 @@ private theorem n5_covers_transfer (r : Nat) (hr69 : r ≥ 69) (hr_upper : r < 1
   have hs_mem' : r % 162 ∈ N5_even_set := hs_mem
   have hk_small : r / 162 < 59049 := by omega
   obtain ⟨dj, hdj_range, hjdM⟩ := n5_digitMod_covers (r % 162) hs_mem' (r / 162)
-    (by omega) (by omega)
+    (by simpa [Finset.mem_range] using hk_small) (by omega)
   have hdj38 : dj < 38 := by simp [Finset.mem_range] at hdj_range; exact hdj_range
   have hjdM' : digitMod r (dj + 5) = 2 := by
     rw [Nat.mod_add_div] at hjdM; exact hjdM
@@ -462,11 +549,178 @@ private theorem n5_small_range_covers (r : Nat) (hr48 : r ≥ 48) (hr68 : r ≤ 
 
 /-! ## Part G4.6: Low-position certificate for N5 values at positions 5-11
     For r ≥ 162*59049, periodicity from r' = r mod (162*59049) to r works
-    for j ≤ 11 since 3^(j+1) | 162*59049 = 2*3^12. -/
+    for j ≤ 11 since 3^(j+1) | 162*59049 = 2*3^12.
+
+    NOTE: r' ∈ {0, 2, 8} are excluded — these are the Cantor survivors where
+    2^r' has NO digit-2 at positions 5-11. They require a separate argument
+    using position 15+ and the ternary expansion of m = r / P. -/
+
+private def N5_nonCantor : Finset Nat :=
+  ⟨[20, 24, 26, 54, 56, 62, 72, 74, 78, 80, 96, 126, 150], by native_decide⟩
 
 private theorem n5_low_digit_covers :
-    ∀ r' ∈ N5_even_set, ∃ j ∈ Finset.range 7, digitMod r' (j + 5) = 2 := by
+    ∀ r' ∈ N5_nonCantor, ∃ j ∈ Finset.range 7, digitMod r' (j + 5) = 2 := by
   native_decide
+
+private theorem n5_low_digit_covers_full (r' : Nat) (hr' : r' ∈ N5_even_set)
+    (hNC : r' ∉ ({0, 2, 8} : Finset Nat)) :
+    ∃ j ∈ Finset.range 7, digitMod r' (j + 5) = 2 := by
+  have hr'_eq : r' = 0 ∨ r' = 2 ∨ r' = 8 ∨ r' = 20 ∨ r' = 24 ∨ r' = 26 ∨
+      r' = 54 ∨ r' = 56 ∨ r' = 62 ∨ r' = 72 ∨ r' = 74 ∨ r' = 78 ∨
+      r' = 80 ∨ r' = 96 ∨ r' = 126 ∨ r' = 150 := by
+    simp [N5_even_set, Finset.mem_mk, List.mem_toFinset] at hr'
+    exact hr'
+  rcases hr'_eq with ⟨rfl | rfl | rfl | ⟨rfl | rfl | rfl | ⟨rfl | rfl | rfl | ⟨rfl | rfl | rfl | ⟨rfl | rfl | rfl | ⟨rfl | rfl⟩⟩⟩⟩⟩⟩⟩⟩ with
+    h | h | h | h | h | h | h | h | h | h | h | h | h | h | h | h
+  · contradiction
+  · contradiction
+  · contradiction
+  · exact n5_low_digit_covers 20 (by decide)
+  · exact n5_low_digit_covers 24 (by decide)
+  · exact n5_low_digit_covers 26 (by decide)
+  · exact n5_low_digit_covers 54 (by decide)
+  · exact n5_low_digit_covers 56 (by decide)
+  · exact n5_low_digit_covers 62 (by decide)
+  · exact n5_low_digit_covers 72 (by decide)
+  · exact n5_low_digit_covers 74 (by decide)
+  · exact n5_low_digit_covers 78 (by decide)
+  · exact n5_low_digit_covers 80 (by decide)
+  · exact n5_low_digit_covers 96 (by decide)
+  · exact n5_low_digit_covers 126 (by decide)
+  · exact n5_low_digit_covers 150 (by decide)
+
+/-! ## Part G4.7: Cantor-survivor residue handling for large r
+    For s ∈ {0, 2, 8} and r = s + P*m (P = 162*59049 = 2·3^14):
+    Key identity: digitMod(r, 15) = m % 3
+
+    Then by well-founded induction on m:
+    - m % 3 = 2 → digit 15 = 2 → done
+    - m % 3 = 0 → m = 3m', recurse on m' (digit 16 = m'%3)
+    - m % 3 = 1 → m = 3m'+1, digit 16 = m'%3, recurse on m' -/
+
+private def P : Nat := 162 * 59049
+private def cantorSet : Finset Nat := {0, 2, 8}
+
+private theorem two_pow_s_mod3 (s : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8) :
+    2 ^ s % 3 = 1 := by rcases hs with rfl | rfl | rfl <;> norm_num
+
+private theorem two_pow_s_lt_3_15 (s : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8) :
+    2 ^ s < 3 ^ 15 := by
+  have : 2^s ≤ 2^8 := Nat.pow_le_pow_right (by omega)
+    (by rcases hs with rfl | rfl | rfl <;> omega)
+  have : (2^8 : Nat) < 3^15 := by norm_num
+  omega
+
+private theorem one_plus_3pow15_pow_m (m : Nat) :
+    (1 + 3 ^ 15) ^ m % 3 ^ 16 = (1 + m * 3 ^ 15) % 3 ^ 16 := by
+  induction m with
+  | zero => simp
+  | succ m ih =>
+    rw [pow_succ, Nat.mul_mod, ih, show (1 + 3 ^ 15) * (1 + m * 3 ^ 15) =
+      1 + (m + 1) * 3 ^ 15 + m * 3 ^ 30 from by ring]
+    rw [Nat.add_mod, Nat.add_mod]
+    suffices m * 3 ^ 30 % 3 ^ 16 = 0 by rw [this, Nat.zero_add]
+    exact Nat.mod_eq_zero_of_dvd
+      (Nat.dvd_trans (⟨3 ^ 14, by norm_num⟩ : 3^16 ∣ 3^30) (Nat.dvd_mul_left _ m))
+
+private theorem K_star_ge_16_of_ge_P (r : Nat) (hrP : r ≥ P) :
+    16 ≤ K_star r := by
+  have : 3^17 ≤ 2^r := by
+    have h1 : (3^17 : Nat) ≤ 2^P := by unfold P; norm_num
+    have h2 : 2^P ≤ 2^r := Nat.pow_le_pow_right (by omega : 0 < P) hrP
+    omega
+  exact Nat.succ_le_of_lt (K_star_gt_j r 16 this)
+
+private theorem digitMod_cantor_P_m (s m : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8) :
+    digitMod (s + P * m) 15 = m % 3 := by
+  unfold digitMod
+  rw [digit_eq_of_modPow (2^(s + P * m)) 15 16 (by omega)]
+  rw [show 2^(s + P * m) = 2^s * 2^(P * m) from by ring]
+  rw [show 2^(P * m) = (2^P)^m from by ring_nf; exact (pow_mul 2 P m).symm]
+  rw [show P = 162 * 59049 from rfl]
+  rw [Nat.mul_mod]
+  rw [show 2^(162 * 59049) % 3^16 = 1 + 3^15 from two_pow_P_mod_16]
+  rw [one_plus_3pow15_pow_m m, Nat.mul_mod]
+  rw [Nat.mod_eq_of_lt (two_pow_s_lt_3_16 s hs)]
+  have hs_le : s ≤ 8 := by rcases hs with rfl | rfl | rfl <;> omega
+  have h315 : 2^s < 3^15 := two_pow_s_lt_3_15 s hs
+  rw [show 2^s * (1 + m * 3^15) = 2^s + m * 2^s * 3^15 from by ring]
+  rw [show (m * 2^s) * 3^15 = m * 2^s * 3^15 from by ring]
+  rw [Nat.add_mod]
+  have hmod_t315 : m * 2^s * 3^15 % 3^16 = (m * 2^s % 3) * 3^15 := by
+    rw [show m * 2^s * 3^15 = (m * 2^s % 3 + 3 * (m * 2^s / 3)) * 3^15 from by
+      rw [Nat.div_add_mod (m * 2^s) 3]; ring]
+    rw [show ((m * 2^s % 3) + 3 * (m * 2^s / 3)) * 3^15 =
+      (m * 2^s % 3) * 3^15 + (m * 2^s / 3) * 3^16 from by ring]
+    rw [Nat.add_mod, show (m * 2^s / 3) * 3^16 % 3^16 = 0 from Nat.mod_eq_zero_of_dvd ⟨_, by ring⟩]
+    exact Nat.mod_eq_of_lt (by
+      have := Nat.mod_lt (m * 2^s) (by omega : 0 < 3)
+      nlinarith [show (2 : Nat) * 3^15 < 3^16 from by norm_num])
+  rw [hmod_t315]
+  have hsum_lt : 2^s + (m * 2^s % 3) * 3^15 < 3^16 := by
+    have := Nat.mod_lt (m * 2^s) (by omega : 0 < 3)
+    nlinarith [show (2 : Nat) * 3^15 < 3^16 from by norm_num]
+  rw [Nat.mod_eq_of_lt hsum_lt]
+  rw [Nat.add_div (by omega : 0 < 3^15) (by ⟨m * 2^s % 3, by ring⟩ : 3^15 ∣ (m * 2^s % 3) * 3^15)]
+  rw [Nat.div_eq_zero_of_lt h315, zero_add]
+  rw [Nat.mul_div_cancel_left _ (by omega : 0 < 3^15)]
+  rw [Nat.mod_mod_of_dvd (m * 2^s) (by omega : 3 ∣ 3)]
+  rw [show m * 2^s % 3 = m * (2^s % 3) % 3 from by rw [Nat.mul_mod]]
+  rw [two_pow_s_mod3 s hs, show m * 1 % 3 = m % 3 from by rw [Nat.mul_one]]
+
+private theorem cantor_survivor_large_r (r : Nat) (hr : r > 8) (hr_even : r % 2 = 0)
+    (hN5 : ∀ j < 5, digit₃ (2^r) j ∈ ({0, 1} : Finset Nat))
+    (hrP : r ≥ P) (hs_cantor : r % P ∈ cantorSet) :
+    ∃ j, 5 ≤ j ∧ j < K_star r ∧ digit₃ (2^r) j = 2 := by
+  by_contra hno2
+  push_neg at hno2
+  -- Step 1: Show memCantorNat(2^r) from the assumption that no digit 2 exists
+  have hCantor : memCantorNat (2^r) := by
+    intro k
+    by_cases hk : k < K_star r
+    · -- k < K_star r: either k < 5 (from hN5) or 5 ≤ k (from hno2)
+      by_cases hk5 : k < 5
+      · have := hN5 k hk5
+        simp [digit₃] at this ⊢
+        interval_cases digit₃ (2^r) k <;> omega
+      · have := hno2 k (by omega) hk
+        simp [digit₃] at this ⊢
+        interval_cases digit₃ (2^r) k <;> omega
+    · -- k ≥ K_star r: digit₃(2^r) k = 0 since 2^r < 3^(K_star r) ≤ 3^k
+      unfold digit₃
+      have hlt : 2 ^ r < 3 ^ k := by
+        have := two_pow_lt_three_pow_succ r
+        have hkk : K_star r + 1 ≤ k := by omega
+        calc 2 ^ r < 3 ^ (K_star r + 1) := two_pow_lt_three_pow_succ r
+          _ ≤ 3 ^ k := Nat.pow_le_pow_right (by omega) hkk
+      rw [Nat.div_eq_zero_of_lt hlt]
+      simp
+  -- Step 2: Decompose r = s + P*m
+  have hrP' : P > 0 := by unfold P; omega
+  set s := r % P with hs_def
+  set m := r / P with hm_def
+  have hr_eq : r = s + P * m := by omega
+  have hs_mem : s ∈ cantorSet := hs_cantor
+  have hs_val : s = 0 ∨ s = 2 ∨ s = 8 := by
+    simp [cantorSet] at hs_mem; exact hs_mem
+  have hm_pos : m > 0 := by
+    by_contra h0
+    push_neg at h0
+    have : m = 0 := by omega
+    rw [this, Nat.mul_zero, Nat.add_zero] at hr_eq
+    subst hr_eq
+    exact absurd hs_mem (by
+      simp [cantorSet]
+      rcases hs_val with rfl | rfl | rfl <;> simp)
+  -- Step 3: Apply cantor_exceptional_forces_zero to get m = 0
+  have hP_eq_uK : P = uK 15 := by unfold P uK; norm_num
+  have huK15_pos : uK 15 > 0 := uK_pos' 15
+  have hs_lt : s < uK 15 := by
+    rw [← hP_eq_uK]; exact Nat.mod_lt _ hrP'
+  have hCantor' : memCantorNat (2 ^ (s + m * uK 15)) := by
+    rw [hP_eq_uK] at hr_eq; rw [← hr_eq]; exact hCantor
+  have hm0 := cantor_exceptional_forces_zero s m 15 hs_val (by omega) hs_lt hCantor'
+  omega
 
 /-! ## Part G4: Main theorem -/
 
@@ -520,36 +774,40 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hr : r > 8) :
                   (Nat.mod_lt r (by norm_num : 0 < 162 * 59049)) (by omega)
                 intro j hj
                 exact (digit₃_pow_periodic r _ rfl j hj).symm ▸ hN5 j hj
-              obtain ⟨dj, hdj_range, hdj2⟩ := n5_low_digit_covers (r % (162 * 59049)) hs_mem'
-              have hdj7 : dj < 7 := by simp [Finset.mem_range] at hdj_range; exact hdj_range
-              have hperiod : 2^162 % 3^(dj+6) = 1 := two_pow_162_mod_ext (dj+5) (by omega)
-              have h162k : 2^(162*59049) % 3^(dj+6) = 1 := by
-                rw [pow_mul, Nat.pow_mod, hperiod, one_pow]
-              have hdj_transfer : digitMod r (dj + 5) = 2 := by
-                rw [Nat.mod_add_div r (162 * 59049)] at hdj2
-                unfold digitMod at hdj2 ⊢
-                rw [digit_eq_of_modPow (2^r) (dj+5) (dj+6) (by omega),
-                    digit_eq_of_modPow (2^(r%(162*59049))) (dj+5) (dj+6) (by omega)]
-                suffices h : 2^r % 3^(dj+6) = 2^(r%(162*59049)) % 3^(dj+6) by rw [h]
-                rw [show r = (r%(162*59049)) + 162*59049*(r/(162*59049)) from by omega]
-                suffices key : ∀ k, 2^((r%(162*59049)) + 162*59049*k) % 3^(dj+6) =
-                  2^(r%(162*59049)) % 3^(dj+6) from key (r/(162*59049))
-                intro k; induction k with
-                | zero => simp
-                | succ k ih =>
-                  rw [show (r%(162*59049)) + 162*59049*(k+1) =
-                       ((r%(162*59049)) + 162*59049*k) + 162*59049 from by omega,
-                      pow_add, Nat.mul_mod, ih, h162k, Nat.one_mul,
-                      Nat.mod_mod_of_dvd _ (by omega : 2 ∣ 162 * 59049)]
-              have hdj3 : digit₃ (2^r) (dj + 5) = 2 := by
-                rw [digitMod_eq_digit₃] at hdj_transfer; exact hdj_transfer
-              exact ⟨dj + 5, by omega, by
-                have h3j : 3^((dj+5)+1) ≤ 3^12 := Nat.pow_le_pow_right (by omega) (by omega)
-                have h2r : 3^12 ≤ 2^r := by
-                  have h48 : 2^48 ≤ 2^r := Nat.pow_le_pow_right (by omega) hr48'
-                  have : (2^48 : Nat) ≥ 3^12 := by norm_num
-                  omega
-                exact K_star_gt_j r (dj+5) (le_trans h3j h2r), hdj3⟩
+              -- Split: Cantor survivors {0,2,8} need position 15+; others use positions 5-11
+              by_cases hs_cantor : r % (162 * 59049) ∈ cantorSet
+              · -- Cantor survivor residue: use position 15+ argument
+                exact cantor_survivor_large_r r hr hr_even hN5 hr_large hs_cantor
+              · -- Non-Cantor residue: use positions 5-11 via periodicity
+                obtain ⟨dj, hdj_range, hdj2⟩ := n5_low_digit_covers_full
+                  (r % (162 * 59049)) hs_mem' hs_cantor
+                have hdj7 : dj < 7 := by simp [Finset.mem_range] at hdj_range; exact hdj_range
+                have h162k : 2^(162*59049) % 3^(dj+6) = 1 := two_pow_P_mod (dj+5) (by omega)
+                have hdj_transfer : digitMod r (dj + 5) = 2 := by
+                  rw [Nat.mod_add_div r (162 * 59049)] at hdj2
+                  unfold digitMod at hdj2 ⊢
+                  rw [digit_eq_of_modPow (2^r) (dj+5) (dj+6) (by omega),
+                      digit_eq_of_modPow (2^(r%(162*59049))) (dj+5) (dj+6) (by omega)]
+                  suffices h : 2^r % 3^(dj+6) = 2^(r%(162*59049)) % 3^(dj+6) by rw [h]
+                  rw [show r = (r%(162*59049)) + 162*59049*(r/(162*59049)) from by omega]
+                  suffices key : ∀ k, 2^((r%(162*59049)) + 162*59049*k) % 3^(dj+6) =
+                    2^(r%(162*59049)) % 3^(dj+6) from key (r/(162*59049))
+                  intro k; induction k with
+                  | zero => simp
+                  | succ k ih =>
+                    rw [show (r%(162*59049)) + 162*59049*(k+1) =
+                         ((r%(162*59049)) + 162*59049*k) + 162*59049 from by omega,
+                        pow_add, Nat.mul_mod, ih, h162k, Nat.one_mul,
+                        Nat.mod_mod_of_dvd _ (by omega : 2 ∣ 162 * 59049)]
+                have hdj3 : digit₃ (2^r) (dj + 5) = 2 := by
+                  rw [digitMod_eq_digit₃] at hdj_transfer; exact hdj_transfer
+                exact ⟨dj + 5, by omega, by
+                  have h3j : 3^((dj+5)+1) ≤ 3^12 := Nat.pow_le_pow_right (by omega) (by omega)
+                  have h2r : 3^12 ≤ 2^r := by
+                    have h48 : 2^48 ≤ 2^r := Nat.pow_le_pow_right (by omega) hr48'
+                    have : (2^48 : Nat) ≥ 3^12 := by norm_num
+                    omega
+                  exact K_star_gt_j r (dj+5) (le_trans h3j h2r), hdj3⟩
       · -- r not N5: low-digit obstruction
         obtain ⟨j, hjK, hj2⟩ := even_not_N5_digit2_below_K r hr48' hr_even hN5
         exact ⟨j, by rw [digit₃_criticalGap_eq r j hjK]; exact hj2⟩

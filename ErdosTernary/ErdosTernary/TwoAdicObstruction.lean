@@ -311,25 +311,25 @@ theorem obstruction_le12 (d : ℕ) (hd : d ≤ 12) (n : ℕ) :
 -- the heavy native_decide certificates above.
 
 -- Helper: doubling shifts all bits up by 1
-private theorem testBit_two_mul (n k : ℕ) :
+theorem testBit_two_mul (n k : ℕ) :
     (2 * n).testBit (k + 1) = n.testBit k := by
   rw [Nat.testBit_succ]
   congr 1
   omega
 
 -- Lemma: the 0th bit of 2n is always 0 (since 2n is even)
-private theorem testBit_zero_of_even (n : ℕ) : (2 * n).testBit 0 = false := by
+theorem testBit_zero_of_even (n : ℕ) : (2 * n).testBit 0 = false := by
   rw [Nat.testBit_zero]
   simp [show (2 * n) % 2 = 0 from by omega]
 
 -- evalBit(d, 2n) = 3 * evalBit(d-1, n) for d >= 1
 -- Proof: by induction on d, unfolding evalBit and using testBit_two_mul.
 -- The key algebraic fact: (if p then 3^d else 0) + 3 * E = 3 * ((if p then 3^(d-1) else 0) + E)
-private theorem pow3_eq (d : ℕ) (hd : 1 ≤ d) : 3 ^ d = 3 * 3 ^ (d - 1) := by
+theorem pow3_eq (d : ℕ) (hd : 1 ≤ d) : 3 ^ d = 3 * 3 ^ (d - 1) := by
   conv in (3 ^ d) => rw [show d = (d - 1) + 1 from by omega]
   rw [pow_succ]; ring
 
-private theorem evalBit_two_mul :
+theorem evalBit_two_mul :
     ∀ (d n : ℕ), 1 ≤ d → evalBit d (2 * n) = 3 * evalBit (d - 1) n := by
   intro d
   induction d with
@@ -355,31 +355,64 @@ private theorem evalBit_two_mul :
 -- ================================================================
 -- COPRIMALITY: 2^k | 3*x iff 2^k | x (since gcd(3, 2^k) = 1)
 -- ================================================================
-private theorem coprime_pow2_3 (k : ℕ) : Nat.Coprime 3 (2 ^ k) := by
+theorem coprime_pow2_3 (k : ℕ) : Nat.Coprime 3 (2 ^ k) := by
   induction k with
   | zero => simp [Nat.Coprime]
   | succ k ih =>
     rw [show 2 ^ (k + 1) = 2 * 2 ^ k from by ring]
     exact (by decide : Nat.Coprime 3 2).mul_right ih
 
-private theorem coprime_dvd_iff (k x : ℕ) :
+theorem coprime_dvd_iff (k x : ℕ) :
     2 ^ k ∣ 3 * x ↔ 2 ^ k ∣ x :=
   ⟨fun h => (coprime_pow2_3 k).symm.dvd_of_dvd_mul_left h,
    fun h => by obtain ⟨q, rfl⟩ := h; exact ⟨3 * q, by ring⟩⟩
+
+-- ================================================================
+-- ODD INPUT SHIFT: evalBit on odd input
+-- ================================================================
+-- evalBit(d, 2m+1) = 1 + 3 * evalBit(d-1, m) for d >= 1
+-- Proof: bit 0 of 2m+1 is 1 (odd), bits 1..d-1 are bits 0..d-2 of m
+
+theorem evalBit_one_add_mul :
+    ∀ (d m : ℕ), 1 ≤ d → evalBit d (2 * m + 1) = 1 + 3 * evalBit (d - 1) m := by
+  intro d
+  induction d with
+  | zero => intro; omega
+  | succ d ih =>
+    intro m hd
+    simp only [evalBit]
+    have h0 : (2 * m + 1).testBit 0 = true := by
+      rw [Nat.testBit_zero]; simp [show (2 * m + 1) % 2 = 1 from by omega]
+    by_cases hd0 : d = 0
+    · subst hd0; simp [evalBit, h0]
+    · have htest : (2 * m + 1).testBit d = m.testBit (d - 1) := by
+        rw [show d = (d - 1) + 1 from by omega]
+        rw [Nat.testBit_succ]
+        congr 1; omega
+      rw [htest]
+      have ih' := ih m (by omega); rw [ih']
+      simp only [show d + 1 - 1 = d from by omega]
+      by_cases hp : m.testBit (d - 1) = true
+      · rw [if_pos hp, pow3_eq d (by omega)]
+        conv in (evalBit d m) => rw [show d = (d - 1) + 1 from by omega]
+        simp only [evalBit]; rw [if_pos hp]; ring
+      · rw [if_neg hp]
+        conv in (evalBit d m) => rw [show d = (d - 1) + 1 from by omega]
+        simp only [evalBit]; rw [if_neg hp]; ring
 
 -- ================================================================
 -- CONTRAPOSITIVE TRANSFER
 -- ================================================================
 
 -- When m = 2n (even): 3^{d+1} + evalBit(d+1, 2n) = 3 * (3^d + evalBit(d, n))
-private theorem shift_even_obstruction (d n : ℕ) (hd : 1 ≤ d) :
+theorem shift_even_obstruction (d n : ℕ) (hd : 1 ≤ d) :
     3 ^ (d + 1) + evalBit (d + 1) (2 * n) =
       3 * (3 ^ d + evalBit d n) := by
   rw [show evalBit (d + 1) (2 * n) = 3 * evalBit d n from evalBit_two_mul (d + 1) n (by omega)]
   ring
 
 -- Key transfer: 2^{d+5} | 3^{d+1} + evalBit(d+1, 2n) implies 2^{d+4} | 3^d + evalBit(d, n)
-private theorem shift_even_dvd (d n : ℕ) (hd : 1 ≤ d) :
+theorem shift_even_dvd (d n : ℕ) (hd : 1 ≤ d) :
     2 ^ (d + 5) ∣ (3 ^ (d + 1) + evalBit (d + 1) (2 * n)) →
     2 ^ (d + 4) ∣ (3 ^ d + evalBit d n) := by
   intro h

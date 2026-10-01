@@ -1,6 +1,8 @@
 import Mathlib.Tactic
 import ErdosTernary.MomentSystem
 import ErdosTernary.TwoAdicObstruction
+import ErdosTernary.OddEncObstruction
+import ErdosTernary.OddCaseDigit2
 
 /-!
 # V(d) ≤ d+3 Bound
@@ -10,7 +12,8 @@ Main theorem: for non-zero a : BinVec d, 2^{d+4} does not divide evalP3 a.
 
 namespace VdBound
 open MomentSystem
-open TwoAdicObstruction (evalBit evalBit_mod)
+open TwoAdicObstruction (evalBit evalBit_mod evalBit_two_mul evalBit_one_add_mul pow3_eq coprime_dvd_iff
+  obstruction_le23)
 
 def NonZeroBinVec (d : ℕ) (a : BinVec d) : Prop :=
   ∃ i : Fin (d + 1), a i ≠ 0
@@ -135,6 +138,50 @@ private theorem encodeLower_lt {m d : ℕ} (hdm : d ≤ m) (a : BinVec m) :
   have h3 : 1 ≤ 2 ^ d := Nat.one_le_pow d 2 (by omega)
   omega
 
+-- For i < k: n / 2^i % 2 = (n % 2^k) / 2^i % 2
+private theorem mod_pow_eq (k n i : ℕ) (hi : i < k) :
+    n / 2 ^ i % 2 = (n % 2 ^ k) / 2 ^ i % 2 := by
+  have h2i : 0 < 2 ^ i := Nat.pow_pos (by norm_num : (0 : ℕ) < 2)
+  have h2k : 2 ^ k = 2 ^ (k - i) * 2 ^ i := by
+    conv_lhs => rw [show k = (k - i) + i from by omega]
+    rw [Nat.pow_add]
+  have h := Nat.div_add_mod n (2^k)
+  have h1 : 2^k * (n / 2^k) = (n / 2^k) * 2 ^ (k - i) * 2 ^ i := by
+    rw [mul_comm (2^k) (n/2^k), h2k, mul_assoc]
+  have hn : n = (n % 2 ^ k) + (n / 2 ^ k) * 2 ^ (k - i) * 2 ^ i := by
+    rw [add_comm] at h; rw [h1] at h; exact h.symm
+  rw [show n / 2 ^ i = (n % 2 ^ k + (n / 2 ^ k) * 2 ^ (k - i) * 2 ^ i) / 2 ^ i from congr_arg (· / 2 ^ i) hn]
+  rw [Nat.add_mul_div_right (n % 2 ^ k) ((n / 2 ^ k) * 2 ^ (k - i)) h2i]
+  have hki : k - i = (k - i - 1) + 1 := by omega
+  have h2ki : 2 ^ (k - i) = 2 ^ (k - i - 1) * 2 := by
+    rw [congr_arg (2 ^ ·) hki, Nat.pow_succ, mul_comm]
+  rw [congr_arg (fun e => (n / 2 ^ k) * e) h2ki]
+  rw [← mul_assoc]
+  exact Nat.add_mul_mod_self_right ((n % 2 ^ k) / 2 ^ i) ((n / 2 ^ k) * 2 ^ (k - i - 1)) 2
+
+-- Binary decomposition: ∑_{i<k} (n/2^i % 2) * 2^i = n for n < 2^k
+private theorem binary_sum (k n : ℕ) (hn : n < 2 ^ k) :
+    ∑ i in Finset.range k, (n / 2 ^ i % 2) * 2 ^ i = n := by
+  induction k generalizing n with
+  | zero => simp; omega
+  | succ k ih =>
+    rw [Finset.range_succ, Finset.sum_insert (by simp)]
+    have hmod : n % 2 ^ k < 2 ^ k := Nat.mod_lt n (Nat.pow_pos (by norm_num : (0 : ℕ) < 2))
+    have sum_eq : ∑ i in Finset.range k, (n / 2 ^ i % 2) * 2 ^ i = n % 2 ^ k := by
+      rw [← ih (n % 2^k) hmod]
+      exact Finset.sum_congr rfl (fun i hi => by
+        rw [Finset.mem_range] at hi; rw [mod_pow_eq k n i hi])
+    rw [sum_eq]
+    have h_bit : n / 2^k % 2 = n / 2^k := by
+      have h1 : n / 2^k * 2^k ≤ n := Nat.div_mul_le_self n (2^k)
+      have h2 : n / 2^k < 2 := by nlinarith [show 2 ^ (k + 1) = 2 * 2 ^ k from by rw [Nat.pow_succ, mul_comm]]
+      exact Nat.mod_eq_of_lt h2
+    have hdm : n / 2 ^ k * 2 ^ k + n % 2 ^ k = n := by
+      rw [mul_comm (n / 2 ^ k) (2 ^ k)]
+      exact Nat.div_add_mod n (2 ^ k)
+    rw [h_bit]
+    exact hdm
+
 private theorem evalBit_encodeLower (d : ℕ) (a : BinVec d) :
     evalBit d (∑ i in Finset.range d, aVal a i * 2 ^ i) =
     ∑ i in Finset.range d, aVal a i * 3 ^ i := by
@@ -237,7 +284,92 @@ theorem no_pow2_divides (d : ℕ) (a : BinVec d) (hne : NonZeroBinVec d a) :
                 (evalBit_encodeLower d a).symm
               rw [hbridge] at hdiv
               exact absurd hdiv (TwoAdicObstruction.obstruction_le23 d hd_le23 enc)
-            · -- d >= 24: sorry
-              sorry -- TODO: carry lemma: c_d % 8 != 0 holds for ALL d (exhaustively verified d<=23, sampled d<=50)
+            · -- d >= 24: split enc by parity, handle even enc via shift
+              have hsplit : evalP3 a = 3 ^ d + ∑ i in Finset.range d, aVal a i * 3 ^ i := by
+                show ∑ i in Finset.range (d + 1), aVal a i * 3 ^ i =
+                  3 ^ d + ∑ i in Finset.range d, aVal a i * 3 ^ i
+                rw [Finset.range_succ, Finset.sum_insert (by simp)]
+                simp only [aVal, dif_pos (Nat.lt_succ_self d)]
+                rw [hd1, one_mul]
+              rw [hsplit] at hdiv
+              let enc : ℕ := ∑ i in Finset.range d, aVal a i * 2 ^ i
+              have hbridge : ∑ i in Finset.range d, aVal a i * 3 ^ i = evalBit d enc :=
+                (evalBit_encodeLower d a).symm
+              rw [hbridge] at hdiv
+              rcases (show enc % 2 = 0 ∨ enc % 2 = 1 by omega) with heven | hodd
+              · -- enc even: shift + coprimality
+                have ⟨m, hm⟩ : ∃ m, enc = 2 * m := ⟨enc / 2, by omega⟩
+                rw [hm] at hdiv
+                rw [evalBit_two_mul d m (by omega)] at hdiv
+                rw [pow3_eq d (by omega)] at hdiv
+                have hfactor : 2 ^ (d + 4) ∣ 3 * (3 ^ (d - 1) + evalBit (d - 1) m) := by
+                  rw [show 3 * 3 ^ (d - 1) + 3 * evalBit (d - 1) m =
+                    3 * (3 ^ (d - 1) + evalBit (d - 1) m) from by ring] at hdiv; exact hdiv
+                have hdiv' : 2 ^ (d + 4) ∣ 3 ^ (d - 1) + evalBit (d - 1) m :=
+                  (coprime_dvd_iff (d + 4) (3 ^ (d - 1) + evalBit (d - 1) m)).mp hfactor
+                have hsmall : 2 ^ ((d - 1) + 4) ∣ 3 ^ (d - 1) + evalBit (d - 1) m :=
+                  dvd_trans (Nat.pow_dvd_pow 2 (by omega : d - 1 + 4 ≤ d + 4)) hdiv'
+                rcases (show d ≤ 24 ∨ 25 ≤ d by omega) with hd_le24 | hd_ge25
+                · -- d = 24: obstruction_le23 handles d-1=23
+                  exact absurd hsmall (TwoAdicObstruction.obstruction_le23 (d - 1) (by omega) m)
+                · -- d >= 25: build a' : BinVec (d-1) encoding m with leading 1, apply IH
+                  have hm_lt : m < 2 ^ (d - 1) := by
+                    have henc : enc < 2 ^ d := encodeLower_lt (le_refl d) a
+                    rw [hm] at henc
+                    have hd : d = (d - 1) + 1 := by omega
+                    rw [hd, Nat.pow_succ] at henc
+                    omega
+                  let a' : BinVec (d - 1) := fun j =>
+                    if h : j.val = d - 1 then ⟨1, by omega⟩
+                    else ⟨m / 2 ^ j.val % 2, by omega⟩
+                  have hne' : NonZeroBinVec (d - 1) a' :=
+                    ⟨⟨d - 1, by omega⟩, by simp [a']⟩
+                  have hlower : ∑ i in Finset.range (d - 1), aVal a' i * 3 ^ i = evalBit (d - 1) m := by
+                    trans evalBit (d - 1) (∑ i in Finset.range (d - 1), aVal a' i * 2 ^ i)
+                    · exact (evalBit_encodeLower (d - 1) a').symm
+                    · congr 1
+                      trans ∑ i in Finset.range (d - 1), (m / 2 ^ i % 2) * 2 ^ i
+                      · apply Finset.sum_congr rfl; intro i hi
+                        rw [Finset.mem_range] at hi
+                        simp only [aVal, a']
+                        split
+                        · split
+                          · omega
+                          · rfl
+                        · omega
+                      · exact binary_sum (d - 1) m hm_lt
+                  have heval' : evalP3 a' = 3 ^ (d - 1) + evalBit (d - 1) m := by
+                    show ∑ i in Finset.range ((d - 1) + 1), aVal a' i * 3 ^ i =
+                      3 ^ (d - 1) + evalBit (d - 1) m
+                    rw [Finset.range_succ, Finset.sum_insert (by simp)]
+                    simp only [aVal, a', Finset.mem_range, ite_true, ite_false,
+                      dite_true, dite_false]
+                    norm_num
+                    exact hlower
+                  exact ih (d - 1) (by omega) a' hne' (heval' ▸ hsmall)
+              · -- enc odd: THE MATHEMATICAL CORE
+                -- For odd enc = 2m+1: evalBit d enc = 1 + 3·evalBit(d-1,m)
+                have ⟨m, hm⟩ : ∃ m, enc = 2 * m + 1 := ⟨enc / 2, by omega⟩
+                rw [hm] at hdiv
+                rw [evalBit_one_add_mul d m (by omega)] at hdiv
+                rw [pow3_eq d (by omega)] at hdiv
+                -- hdiv currently: 2^(d+4) | 3 * 3^(d-1) + 1 + 3 * evalBit(d-1, m)
+                have hdiv' : 2 ^ (d + 4) ∣ 3 * (3 ^ (d - 1) + evalBit (d - 1) m) + 1 := by
+                  -- hdiv : 2^(d+4) | 3 * 3^(d-1) + (1 + 3 * evalBit (d-1, m))
+                  -- goal: 2^(d+4) | 3 * (3^(d-1) + evalBit (d-1, m)) + 1
+                  have h := hdiv
+                  rw [show 3 * 3 ^ (d - 1) + (1 + 3 * evalBit (d - 1) m) =
+                    3 * (3 ^ (d - 1) + evalBit (d - 1) m) + 1 from by ring] at h
+                  exact h
+                -- Split: d=24 needs separate handling, d=25..70 uses bridge, d>=71 uses digit-2
+                rcases (show d ≤ 24 ∨ 25 ≤ d by omega) with hd24 | hd25
+                · -- d=24: obstruction_le23 gives 2^27 ∤ 3^23 + evalBit(23,m)
+                  -- Need: 2^28 ∤ 3*(3^23 + evalBit(23,m)) + 1
+                  sorry -- d=24 odd enc: needs separate argument
+                · rcases (show d ≤ 70 ∨ 71 ≤ d by omega) with hd70 | hd71
+                  · -- d=25..70: use bridge theorem (carry machine soundness)
+                    exact OddCaseDigit2.odd_enc_bridge d hd25 hd70 m hdiv'
+                  · -- d>=71: use digit-2 property of oddTarget
+                    sorry -- d>=71: needs oddTarget_hasDigit2_all
 
 end VdBound
