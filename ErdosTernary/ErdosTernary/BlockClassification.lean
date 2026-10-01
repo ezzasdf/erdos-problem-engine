@@ -384,7 +384,8 @@ theorem filter_preimage_le_of_injOn {N : Nat} {f : Nat → Nat}
 /-- Subtracting 3^k does not change digits at positions t < k. -/
 private theorem digit_below_k_eq {n k t : Nat} (hge : 3 ^ k ≤ n) (ht : t < k) :
     (n / 3 ^ t) % 3 = ((n - 3 ^ k) / 3 ^ t) % 3 := by
-  have hnk : n = 3 ^ k + (n - 3 ^ k) := (Nat.add_sub_of_le hge).symm
+  have hnk : n = (n - 3 ^ k) + 3 ^ k :=
+    (Nat.add_sub_of_le hge).symm.trans (by rw [Nat.add_comm])
   have hdvd : 3 ^ t ∣ 3 ^ k := by
     have h1 : k = t + (k - t) := by omega
     rw [h1]
@@ -394,7 +395,7 @@ private theorem digit_below_k_eq {n k t : Nat} (hge : 3 ^ k ≤ n) (ht : t < k) 
   have hdiv : 3 ^ k / 3 ^ t = 3 ^ (k - t) := by
     conv_lhs => rw [show k = t + (k - t) from by omega]
     rw [Nat.pow_add, Nat.mul_comm]
-    exact Nat.mul_div_cancel (3 ^ (k - t)) (by omega : (3:ℕ) ^ t ≠ 0)
+    exact Nat.mul_div_cancel (3 ^ (k - t)) (by omega : (0:Nat) < 3 ^ t)
   rw [hdiv]
   have hmod : 3 ^ (k - t) % 3 = 0 := by
     rw [show k - t = (k - t - 1) + 1 from by omega, Nat.pow_succ]
@@ -433,12 +434,11 @@ private theorem d2f_card_aux :
         have hq3 : q < 3 := by
           rw [hq]
           exact Nat.div_lt_of_lt_mul (by rw [← Nat.pow_succ]; exact hlt)
-        have h := Nat.div_add_mod n (3 ^ k)
-        rw [← hq, ← hr] at h
-        -- h : 3 ^ k * q + r = n, hr' : r < 3 ^ k
-        have hr' : r < 3 ^ k := by rw [hr]; exact Nat.mod_lt n (Nat.pow_pos (by omega) k)
+        have hr' : r < 3 ^ k := by rw [hr]; exact Nat.mod_lt n (Nat.pow_pos (n := k) (by omega : (0:Nat) < 3))
         rcases hd with hd0 | hd1
         · have hq0 : q = 0 := by omega
+          have h := Nat.div_add_mod n (3 ^ k)
+          rw [← hq, ← hr] at h
           rw [hq0, Nat.zero_mul, Nat.add_zero] at h
           -- h : r = n
           left
@@ -446,6 +446,8 @@ private theorem d2f_card_aux :
           · rw [← h]; exact hr'
           · exact fun t ht => hall t ht
         · have hq1 : q = 1 := by omega
+          have h := Nat.div_add_mod n (3 ^ k)
+          rw [← hq, ← hr] at h
           rw [hq1, Nat.mul_one] at h
           -- h : 3 ^ k + r = n
           right
@@ -474,28 +476,31 @@ private theorem d2f_card_aux :
                 exact (Nat.pow_succ 3 k).symm
           set q := n / 3 ^ k with hq
           set r := n % 3 ^ k with hr
-          have h := Nat.div_add_mod n (3 ^ k)
-          rw [← hq, ← hr] at h
-          -- h : 3 ^ k * q + r = n
           have hq3 : q < 3 := by
             rw [hq]
             exact Nat.div_lt_of_lt_mul (by rw [← Nat.pow_succ]; exact hlt1)
+          have hr' : r < 3 ^ k := by rw [hr]; exact Nat.mod_lt n (Nat.pow_pos (n := k) (by omega : (0:Nat) < 3))
           have hge' : 1 ≤ q := by
             by_contra h0
             push_neg at h0
-            rw [h0, Nat.zero_mul, Nat.add_zero] at h
+            -- h0 : q = 0, so n = r, contradicting hge : 3^k ≤ n
+            have h := Nat.div_add_mod n (3 ^ k)
+            rw [← hq, ← hr, h0, Nat.zero_mul, Nat.add_zero] at h
             -- h : r = n
             rw [← h, ← hr] at hge
-            exact absurd hge (not_le.mpr (Nat.mod_lt n (Nat.pow_pos (by omega) k)))
+            exact absurd hge (not_le.mpr (Nat.mod_lt n (Nat.pow_pos (n := k) (by omega : (0:Nat) < 3))))
           have hne2 : q ≠ 2 := by
             intro heq
-            rw [heq, Nat.mul_comm] at h
+            have h := Nat.div_add_mod n (3 ^ k)
+            rw [← hq, ← hr, heq, Nat.mul_comm] at h
             -- h : 2 * 3 ^ k + r = n
             have hle : 2 * 3 ^ k ≤ n := by
               rw [← h]
               exact Nat.le_add_right (2 * 3 ^ k) r
             omega
           have hq1 : q = 1 := by omega
+          have h := Nat.div_add_mod n (3 ^ k)
+          rw [← hq, ← hr] at h
           refine ⟨hlt, ?_, ?_⟩
           · rw [hq1]
             norm_num
