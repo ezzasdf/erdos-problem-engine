@@ -19,16 +19,19 @@ namespace ErdosTernary.BlockClassification
 def P : Nat := 2 * 3 ^ 14
 theorem P_pos : 0 < P := by unfold P; norm_num
 
-/-- 2^P mod 3^30, as a Nat value (not a theorem). -/
-def pow2Pmod30 : Nat := pow2Mod P (3 ^ 30)
-theorem pow2Pmod30_eq : pow2Pmod30 = 2 ^ P % 3 ^ 30 := pow2Mod_eq ..
+/-- 2^P mod 3^30, as a literal Nat (avoids kernel WF-recursion blowup in native_decide). -/
+def pow2Pmod30 : Nat := 82792762922791
+theorem pow2Pmod30_eq : pow2Pmod30 = 2 ^ P % 3 ^ 30 := by
+  rw [← pow2Mod_eq]; native_decide
 
-/-- 2^P mod 3^45 and 2^P mod 3^60, computed via binary exponentiation. -/
-def pow2Pmod45 : Nat := pow2Mod P (3 ^ 45)
-def pow2Pmod60 : Nat := pow2Mod P (3 ^ 60)
+/-- 2^P mod 3^45 and 2^P mod 3^60, as literal Nats. -/
+def pow2Pmod45 : Nat := 1374779850164398834624
+def pow2Pmod60 : Nat := 14907740997429772786119085066
 
-theorem pow2Pmod45_eq : pow2Pmod45 = 2 ^ P % 3 ^ 45 := pow2Mod_eq ..
-theorem pow2Pmod60_eq : pow2Pmod60 = 2 ^ P % 3 ^ 60 := pow2Mod_eq ..
+theorem pow2Pmod45_eq : pow2Pmod45 = 2 ^ P % 3 ^ 45 := by
+  rw [← pow2Mod_eq]; native_decide
+theorem pow2Pmod60_eq : pow2Pmod60 = 2 ^ P % 3 ^ 60 := by
+  rw [← pow2Mod_eq]; native_decide
 
 /-- Local copy of pow2ModAux correctness (private in BridgeCompute). -/
 private theorem pow2ModAux_eq' (n b md : Nat) :
@@ -93,48 +96,62 @@ private theorem euler_result : (2 ^ P) ^ (3 ^ 15) % 3 ^ 30 = 1 := by
 /-! The cubing chain: (2^P)^(3^k) mod 3^30 = v_k for k = 0..14 -/
 
 private theorem pow_P_3_0 : (2 ^ P) ^ (3 ^ 0) % 3 ^ 30 = 82792762922791 := by
-  rw [Nat.pow_zero, Nat.pow_one]; exact v0
+  exact v0
 private theorem pow_P_3_1 : (2 ^ P) ^ (3 ^ 1) % 3 ^ 30 = 42487156673722 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_2 : (2 ^ P) ^ (3 ^ 2) % 3 ^ 30 = 127461470021164 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_3 : (2 ^ P) ^ (3 ^ 3) % 3 ^ 30 = 176493277968841 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_4 : (2 ^ P) ^ (3 ^ 4) % 3 ^ 30 = 117697569717223 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_5 : (2 ^ P) ^ (3 ^ 5) % 3 ^ 30 = 147201577057018 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_6 : (2 ^ P) ^ (3 ^ 6) % 3 ^ 30 = 29822466981754 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_7 : (2 ^ P) ^ (3 ^ 7) % 3 ^ 30 = 89467400945260 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_8 : (2 ^ P) ^ (3 ^ 8) % 3 ^ 30 = 62511070741129 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_9 : (2 ^ P) ^ (3 ^ 9) % 3 ^ 30 = 187533212223385 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_10 : (2 ^ P) ^ (3 ^ 10) % 3 ^ 30 = 150817372480855 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_11 : (2 ^ P) ^ (3 ^ 11) % 3 ^ 30 = 40669853253265 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_12 : (2 ^ P) ^ (3 ^ 12) % 3 ^ 30 = 122009559759793 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_13 : (2 ^ P) ^ (3 ^ 13) % 3 ^ 30 = 160137547184728 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 private theorem pow_P_3_14 : (2 ^ P) ^ (3 ^ 14) % 3 ^ 30 = 68630377364884 := by
-  rw [Nat.pow_mod, ← pow2Pmod30_eq, ← pow2ModAux_eq']
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
   native_decide
 
 private theorem pow_P_3_14_ne_1 : (2 ^ P) ^ (3 ^ 14) % 3 ^ 30 ≠ 1 := by
