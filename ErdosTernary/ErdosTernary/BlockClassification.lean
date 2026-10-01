@@ -90,13 +90,18 @@ private theorem totient_3_30 : Nat.totient (3 ^ 30) = P * 3 ^ 15 := by
 private theorem euler_result : (2 ^ P) ^ (3 ^ 15) % 3 ^ 30 = 1 := by
   have h := Nat.ModEq.pow_totient coprime_2_3_30
   rw [totient_3_30] at h
-  rw [(Nat.pow_mul 2 P (3 ^ 15)).symm]
+  have key : 2 ^ (P * 3 ^ 15) = (2 ^ P) ^ (3 ^ 15) := Nat.pow_mul 2 P (3 ^ 15)
+  rw [key] at h
+  have h2 : 1 % 3 ^ 30 = 1 := by norm_num
+  rw [← h2]
   exact h
 
 /-! The cubing chain: (2^P)^(3^k) mod 3^30 = v_k for k = 0..14 -/
 
 private theorem pow_P_3_0 : (2 ^ P) ^ (3 ^ 0) % 3 ^ 30 = 82792762922791 := by
-  exact v0
+  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
+    ← pow2ModAux_eq']
+  native_decide
 private theorem pow_P_3_1 : (2 ^ P) ^ (3 ^ 1) % 3 ^ 30 = 42487156673722 := by
   rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
     ← pow2ModAux_eq']
