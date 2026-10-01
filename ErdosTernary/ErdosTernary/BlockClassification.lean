@@ -457,11 +457,14 @@ private theorem d2f_card_aux :
         · exact hall t htk
         · have : t = k := by omega
           rw [this]; exact hk
-    have hpred : (fun n => ∀ t, t < k + 1 → (n / 3 ^ t) % 3 ≠ 2) =
+    have hconv : (Finset.range (3 ^ (k + 1))).filter
+        (fun n => ∀ t, t < k + 1 → (n / 3 ^ t) % 3 ≠ 2) =
+        (Finset.range (3 ^ (k + 1))).filter
         (fun n => ((n / 3 ^ k) % 3 ≠ 2) ∧ ∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2) := by
-      funext n
-      exact hsplit n
-    rw [hpred]
+      refine Finset.filter_congr ?_
+      intro x _hx
+      exact hsplit x
+    rw [hconv]
     -- S_{k+1} = {n < 3^{k+1} | digit k ≠ 2 ∧ noDigit2 in lower k digits}
     -- Split by MSB: digit k = 0 or digit k = 1
     have hpart :
