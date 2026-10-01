@@ -784,30 +784,36 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hr : r > 8) :
                 have hdj7 : dj < 7 := by simp [Finset.mem_range] at hdj_range; exact hdj_range
                 have h162k : 2^(162*59049) % 3^(dj+6) = 1 := two_pow_P_mod (dj+5) (by omega)
                 have hdj_transfer : digitMod r (dj + 5) = 2 := by
-                  rw [Nat.mod_add_div r (162 * 59049)] at hdj2
                   unfold digitMod at hdj2 ⊢
-                  rw [digit_eq_of_modPow (2^r) (dj+5) (dj+6) (by omega),
-                      digit_eq_of_modPow (2^(r%(162*59049))) (dj+5) (dj+6) (by omega)]
-                  suffices h : 2^r % 3^(dj+6) = 2^(r%(162*59049)) % 3^(dj+6) by rw [h]
-                  rw [show r = (r%(162*59049)) + 162*59049*(r/(162*59049)) from by omega]
-                  suffices key : ∀ k, 2^((r%(162*59049)) + 162*59049*k) % 3^(dj+6) =
-                    2^(r%(162*59049)) % 3^(dj+6) from key (r/(162*59049))
-                  intro k; induction k with
-                  | zero => simp
-                  | succ k ih =>
-                    rw [show (r%(162*59049)) + 162*59049*(k+1) =
-                         ((r%(162*59049)) + 162*59049*k) + 162*59049 from by omega,
-                        pow_add, Nat.mul_mod, ih, h162k, Nat.one_mul,
-                        Nat.mod_mod_of_dvd _ (by omega : 2 ∣ 162 * 59049)]
+                  suffices h : 2 ^ r % 3 ^ (dj + 6) =
+                      2 ^ (r % (162 * 59049)) % 3 ^ (dj + 6) by
+                    rw [h]; exact hdj2
+                  conv_lhs => rw [show r = (r % (162 * 59049)) + 162 * 59049 * (r / (162 * 59049))
+                    from by omega]
+                  have key : ∀ k, 2 ^ ((r % (162 * 59049)) + 162 * 59049 * k)
+                        % 3 ^ (dj + 6) = 2 ^ (r % (162 * 59049)) % 3 ^ (dj + 6) := by
+                    intro k; induction k with
+                    | zero => simp
+                    | succ k ih =>
+                      rw [show (r % (162 * 59049)) + 162 * 59049 * (k + 1) =
+                           ((r % (162 * 59049)) + 162 * 59049 * k) + 162 * 59049
+                           from by omega,
+                          pow_add, Nat.mul_mod, ih, h162k, Nat.mul_one]
+                      rw [Nat.mod_mod_of_dvd (2 ^ (r % (162 * 59049))) ⟨1, by ring⟩]
+                  exact key (r / (162 * 59049))
                 have hdj3 : digit₃ (2^r) (dj + 5) = 2 := by
                   rw [digitMod_eq_digit₃] at hdj_transfer; exact hdj_transfer
-                exact ⟨dj + 5, by omega, by
-                  have h3j : 3^((dj+5)+1) ≤ 3^12 := Nat.pow_le_pow_right (by omega) (by omega)
-                  have h2r : 3^12 ≤ 2^r := by
-                    have h48 : 2^48 ≤ 2^r := Nat.pow_le_pow_right (by omega) hr48'
-                    have : (2^48 : Nat) ≥ 3^12 := by norm_num
+                exact ⟨dj + 5, by
+                  have h3j : 3 ^ ((dj + 5) + 1) ≤ 3 ^ 12 :=
+                    Nat.pow_le_pow_right (by omega : (1 : Nat) ≤ 3) (by omega)
+                  have h2r : 3 ^ 12 ≤ 2 ^ r := by
+                    have h48 : 2 ^ 48 ≤ 2 ^ r :=
+                      Nat.pow_le_pow_right (by omega : (1 : Nat) ≤ 2) hr48'
+                    have : (2 ^ 48 : Nat) ≥ 3 ^ 12 := by norm_num
                     omega
-                  exact K_star_gt_j r (dj+5) (le_trans h3j h2r), hdj3⟩
+                  have hjK : dj + 5 < K_star r := K_star_gt_j r (dj + 5) (le_trans h3j h2r)
+                  rw [digit₃_criticalGap_eq r (dj + 5) hjK]
+                  exact hdj3⟩
       · -- r not N5: low-digit obstruction
         obtain ⟨j, hjK, hj2⟩ := even_not_N5_digit2_below_K r hr48' hr_even hN5
         exact ⟨j, by rw [digit₃_criticalGap_eq r j hjK]; exact hj2⟩
