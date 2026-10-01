@@ -282,31 +282,63 @@ private theorem pow_eq_one_implies_order_dvd (d : Nat) (hd : 0 < d) :
 
 /-! ## Part 3: Injectivity of the full residue map -/
 
+/-- Helper: equality of residues at r₁ ≤ r₂ implies (2^P)^(r₂-r₁) ≡ 1 (mod 3^30).
+    Derived via ModEq arithmetic + LTE-free prime-power divisibility
+    (Prime.pow_dvd_of_dvd_mul_left), avoiding coprime-mod cast issues. -/
+private theorem hdiff_aux (s r₁ r₂ : Nat) (hle : r₁ ≤ r₂)
+    (h : 2 ^ (s + P * r₁) % 3 ^ 30 = 2 ^ (s + P * r₂) % 3 ^ 30) :
+    (2 ^ P) ^ (r₂ - r₁) % 3 ^ 30 = 1 := by
+  have h2 : s + P * r₂ = s + P * r₁ + P * (r₂ - r₁) := by
+    conv_lhs => rw [(Nat.add_sub_of_le hle).symm]
+    ring
+  have hmeq : (2 ^ (s + P * r₂)) ≡ (2 ^ (s + P * r₁)) [MOD 3 ^ 30] := by
+    show 2 ^ (s + P * r₂) % 3 ^ 30 = 2 ^ (s + P * r₁) % 3 ^ 30
+    exact h.symm
+  rw [h2, Nat.pow_add] at hmeq
+  have hle' : 2 ^ (s + P * r₁) ≤ 2 ^ (s + P * r₁) * 2 ^ (P * (r₂ - r₁)) :=
+    Nat.le_mul_of_pos_right _ (Nat.pow_pos (n := P * (r₂ - r₁)) (by norm_num : 0 < 2))
+  have hdvd : 3 ^ 30 ∣ 2 ^ (s + P * r₁) * 2 ^ (P * (r₂ - r₁)) - 2 ^ (s + P * r₁) :=
+    (Nat.modEq_iff_dvd' hle').mp hmeq.symm
+  have hident : 2 ^ (s + P * r₁) * 2 ^ (P * (r₂ - r₁)) - 2 ^ (s + P * r₁) =
+      2 ^ (s + P * r₁) * (2 ^ (P * (r₂ - r₁)) - 1) :=
+    (congrArg (fun z => 2 ^ (s + P * r₁) * 2 ^ (P * (r₂ - r₁)) - z)
+      (Nat.mul_one (2 ^ (s + P * r₁))).symm).trans (Nat.mul_sub ..).symm
+  rw [hident] at hdvd
+  have hcop : Nat.Coprime (2 ^ (s + P * r₁)) 3 :=
+    Nat.Coprime.pow_left (s + P * r₁) (by decide : Nat.Coprime 2 3)
+  have hnot3X : ¬3 ∣ 2 ^ (s + P * r₁) := by
+    intro h3
+    have := Nat.eq_one_of_dvd_coprimes hcop h3 (dvd_refl 3)
+    omega
+  have hdivZ : 3 ^ 30 ∣ 2 ^ (P * (r₂ - r₁)) - 1 :=
+    Prime.pow_dvd_of_dvd_mul_left (hp := Nat.prime_iff.mp (by decide : Nat.Prime 3)) 30 hnot3X hdvd
+  obtain ⟨t, ht⟩ := hdivZ
+  have hY1 : 1 ≤ 2 ^ (P * (r₂ - r₁)) :=
+    Nat.succ_le_of_lt (Nat.pow_pos (n := P * (r₂ - r₁)) (by norm_num : 0 < 2))
+  have hYeq : 2 ^ (P * (r₂ - r₁)) = 3 ^ 30 * t + 1 := by
+    rw [← ht]
+    exact (Nat.sub_add_cancel hY1).symm
+  rw [show (2 ^ P) ^ (r₂ - r₁) = 2 ^ (P * (r₂ - r₁)) from (Nat.pow_mul 2 P (r₂ - r₁)).symm]
+  rw [hYeq]
+  omega
+
 theorem full_injective (s r₁ r₂ : Nat)
     (h₁ : r₁ < 3 ^ 15) (h₂ : r₂ < 3 ^ 15) :
     2 ^ (s + P * r₁) % 3 ^ 30 = 2 ^ (s + P * r₂) % 3 ^ 30 → r₁ = r₂ := by
-  wlog hle : r₁ ≤ r₂ generalizing r₁ r₂ with hle'
-  · intro h; symm at h; have := this hle' h₂ h₁ h; omega
   intro h
-  have diff_le : r₂ - r₁ < 3 ^ 15 := Nat.sub_lt_left_of_lt_add hle (by omega)
-  -- From 2^(s+P*r₁) ≡ 2^(s+P*r₂) [MOD 3^30], derive (2^P)^(r₂-r₁) ≡ 1 [MOD 3^30]
-  have hdiff : (2 ^ P) ^ (r₂ - r₁) % 3 ^ 30 = 1 := by
-    have h1 : 2 ^ (s + P * r₂) % 3 ^ 30 = 2 ^ (s + P * r₁) % 3 ^ 30 := h.symm
-    have h2 : s + P * r₂ = s + P * r₁ + P * (r₂ - r₁) := by omega
-    rw [h2, Nat.pow_add, ← Nat.mul_mod] at h1
-    have cop : Nat.Coprime (2 ^ (s + P * r₁) % 3 ^ 30) (3 ^ 30) := by
-      apply Nat.Coprime.symm; rw [Nat.coprime_comm, Nat.Coprime.pow_right]
-      exact coprime_2_3_30
-    have hne0 : 2 ^ (s + P * r₁) % 3 ^ 30 ≠ 0 := by
-      intro hz; have := cop.eq_one_of_dvd_left (dvd_zero _) hz; norm_num at this
-    have := cop.mul_right_cancel hne0 (by omega : (2 ^ (s + P * r₁) % 3 ^ 30) *
-      (2 ^ (P * (r₂ - r₁)) % 3 ^ 30) % 3 ^ 30 = 2 ^ (s + P * r₁) % 3 ^ 30)
-    rwa [Nat.pow_mul] at this
-  -- (2^P)^(r₂-r₁) ≡ 1 with 0 ≤ r₂-r₁ < 3^15 ⟹ 3^15 | (r₂-r₁) ⟹ r₂-r₁ = 0
-  by_contra hne
-  have hd_pos : 0 < r₂ - r₁ := Nat.sub_pos_of_lt (by omega)
-  have hdvd := pow_eq_one_implies_order_dvd (r₂ - r₁) hd_pos hdiff
-  omega
+  rcases Nat.le_total r₁ r₂ with hle | hle
+  · have diff_le : r₂ - r₁ < 3 ^ 15 := Nat.sub_lt_left_of_lt_add hle (by omega)
+    have hdiff := hdiff_aux s r₁ r₂ hle h
+    by_contra hne
+    have hd_pos : 0 < r₂ - r₁ := Nat.sub_pos_of_lt (by omega)
+    have hdvd := pow_eq_one_implies_order_dvd (r₂ - r₁) hd_pos hdiff
+    omega
+  · have diff_le : r₁ - r₂ < 3 ^ 15 := Nat.sub_lt_left_of_lt_add hle (by omega)
+    have hdiff := hdiff_aux s r₂ r₁ hle h.symm
+    by_contra hne
+    have hd_pos : 0 < r₁ - r₂ := Nat.sub_pos_of_lt (by omega)
+    have hdvd := pow_eq_one_implies_order_dvd (r₁ - r₂) hd_pos hdiff
+    omega
 
 /-! ## Part 4: Block values and digit predicates -/
 
