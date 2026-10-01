@@ -90,7 +90,7 @@ private theorem totient_3_30 : Nat.totient (3 ^ 30) = P * 3 ^ 15 := by
 private theorem euler_result : (2 ^ P) ^ (3 ^ 15) % 3 ^ 30 = 1 := by
   have h := Nat.ModEq.pow_totient coprime_2_3_30
   rw [totient_3_30] at h
-  have key : 2 ^ (P * 3 ^ 15) = (2 ^ P) ^ (3 ^ 15) := Nat.pow_mul 2 P (3 ^ 15)
+  have key := pow_mul 2 P (3 ^ 15)
   rw [key] at h
   have h2 : 1 % 3 ^ 30 = 1 := by norm_num
   rw [← h2]
@@ -98,66 +98,48 @@ private theorem euler_result : (2 ^ P) ^ (3 ^ 15) % 3 ^ 30 = 1 := by
 
 /-! The cubing chain: (2^P)^(3^k) mod 3^30 = v_k for k = 0..14 -/
 
-private theorem pow_P_3_0 : (2 ^ P) ^ (3 ^ 0) % 3 ^ 30 = 82792762922791 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_1 : (2 ^ P) ^ (3 ^ 1) % 3 ^ 30 = 42487156673722 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_2 : (2 ^ P) ^ (3 ^ 2) % 3 ^ 30 = 127461470021164 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_3 : (2 ^ P) ^ (3 ^ 3) % 3 ^ 30 = 176493277968841 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_4 : (2 ^ P) ^ (3 ^ 4) % 3 ^ 30 = 117697569717223 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_5 : (2 ^ P) ^ (3 ^ 5) % 3 ^ 30 = 147201577057018 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_6 : (2 ^ P) ^ (3 ^ 6) % 3 ^ 30 = 29822466981754 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_7 : (2 ^ P) ^ (3 ^ 7) % 3 ^ 30 = 89467400945260 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_8 : (2 ^ P) ^ (3 ^ 8) % 3 ^ 30 = 62511070741129 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_9 : (2 ^ P) ^ (3 ^ 9) % 3 ^ 30 = 187533212223385 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_10 : (2 ^ P) ^ (3 ^ 10) % 3 ^ 30 = 150817372480855 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_11 : (2 ^ P) ^ (3 ^ 11) % 3 ^ 30 = 40669853253265 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_12 : (2 ^ P) ^ (3 ^ 12) % 3 ^ 30 = 122009559759793 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_13 : (2 ^ P) ^ (3 ^ 13) % 3 ^ 30 = 160137547184728 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
-private theorem pow_P_3_14 : (2 ^ P) ^ (3 ^ 14) % 3 ^ 30 = 68630377364884 := by
-  rw [Nat.pow_mod, show 2 ^ P % 3 ^ 30 = pow2Pmod30 from pow2Pmod30_eq.symm,
-    ← pow2ModAux_eq']
-  native_decide
+/-- Bridge: (2^P)^e % 3^30 via pow2ModAux (term-level composition; avoids
+    rw patterns with 2^P that trigger instance-reconciliation blowup). -/
+private theorem pow_chain30 (k V : Nat)
+    (h3 : pow2ModAux (3 ^ k) pow2Pmod30 (3 ^ 30) = V) :
+    (2 ^ P) ^ (3 ^ k) % 3 ^ 30 = V := by
+  have h1 : (2 ^ P) ^ (3 ^ k) % 3 ^ 30 = ((2 ^ P) % 3 ^ 30) ^ (3 ^ k) % 3 ^ 30 := Nat.pow_mod ..
+  have h1b : ((2 ^ P) % 3 ^ 30) ^ (3 ^ k) % 3 ^ 30 = pow2Pmod30 ^ (3 ^ k) % 3 ^ 30 := by
+    rw [← pow2Pmod30_eq]
+  have h2 : pow2Pmod30 ^ (3 ^ k) % 3 ^ 30 = pow2ModAux (3 ^ k) pow2Pmod30 (3 ^ 30) :=
+    (pow2ModAux_eq' (3 ^ k) pow2Pmod30 (3 ^ 30)).symm
+  exact h1.trans (h1b.trans (h2.trans h3))
+
+private theorem pow_P_3_0 : (2 ^ P) ^ (3 ^ 0) % 3 ^ 30 = 82792762922791 :=
+  pow_chain30 0 82792762922791 (by native_decide)
+private theorem pow_P_3_1 : (2 ^ P) ^ (3 ^ 1) % 3 ^ 30 = 42487156673722 :=
+  pow_chain30 1 42487156673722 (by native_decide)
+private theorem pow_P_3_2 : (2 ^ P) ^ (3 ^ 2) % 3 ^ 30 = 127461470021164 :=
+  pow_chain30 2 127461470021164 (by native_decide)
+private theorem pow_P_3_3 : (2 ^ P) ^ (3 ^ 3) % 3 ^ 30 = 176493277968841 :=
+  pow_chain30 3 176493277968841 (by native_decide)
+private theorem pow_P_3_4 : (2 ^ P) ^ (3 ^ 4) % 3 ^ 30 = 117697569717223 :=
+  pow_chain30 4 117697569717223 (by native_decide)
+private theorem pow_P_3_5 : (2 ^ P) ^ (3 ^ 5) % 3 ^ 30 = 147201577057018 :=
+  pow_chain30 5 147201577057018 (by native_decide)
+private theorem pow_P_3_6 : (2 ^ P) ^ (3 ^ 6) % 3 ^ 30 = 29822466981754 :=
+  pow_chain30 6 29822466981754 (by native_decide)
+private theorem pow_P_3_7 : (2 ^ P) ^ (3 ^ 7) % 3 ^ 30 = 89467400945260 :=
+  pow_chain30 7 89467400945260 (by native_decide)
+private theorem pow_P_3_8 : (2 ^ P) ^ (3 ^ 8) % 3 ^ 30 = 62511070741129 :=
+  pow_chain30 8 62511070741129 (by native_decide)
+private theorem pow_P_3_9 : (2 ^ P) ^ (3 ^ 9) % 3 ^ 30 = 187533212223385 :=
+  pow_chain30 9 187533212223385 (by native_decide)
+private theorem pow_P_3_10 : (2 ^ P) ^ (3 ^ 10) % 3 ^ 30 = 150817372480855 :=
+  pow_chain30 10 150817372480855 (by native_decide)
+private theorem pow_P_3_11 : (2 ^ P) ^ (3 ^ 11) % 3 ^ 30 = 40669853253265 :=
+  pow_chain30 11 40669853253265 (by native_decide)
+private theorem pow_P_3_12 : (2 ^ P) ^ (3 ^ 12) % 3 ^ 30 = 122009559759793 :=
+  pow_chain30 12 122009559759793 (by native_decide)
+private theorem pow_P_3_13 : (2 ^ P) ^ (3 ^ 13) % 3 ^ 30 = 160137547184728 :=
+  pow_chain30 13 160137547184728 (by native_decide)
+private theorem pow_P_3_14 : (2 ^ P) ^ (3 ^ 14) % 3 ^ 30 = 68630377364884 :=
+  pow_chain30 14 68630377364884 (by native_decide)
 
 private theorem pow_P_3_14_ne_1 : (2 ^ P) ^ (3 ^ 14) % 3 ^ 30 ≠ 1 := by
   rw [pow_P_3_14]; norm_num
@@ -563,18 +545,26 @@ theorem block3_catches_all (s : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8) :
 theorem powP_period_block1 : (2 ^ P) ^ (3 ^ 15) % 3 ^ 30 = 1 := euler_result
 
 /-- Period of block2: (2^P)^(3^30) ≡ 1 (mod 3^45).
-    Proof: reduce to pow2ModAux + native_decide. -/
+    Proof: reduce to pow2ModAux + native_decide (term-level composition). -/
 theorem powP_period_block2 : (2 ^ P) ^ (3 ^ 30) % 3 ^ 45 = 1 := by
-  have key : (2 ^ P) ^ (3 ^ 30) % 3 ^ 45 = pow2ModAux (3 ^ 30) pow2Pmod45 (3 ^ 45) := by
-    rw [Nat.pow_mod, ← pow2Pmod45_eq, ← pow2ModAux_eq']
-  rw [key]; native_decide
+  have h1 : (2 ^ P) ^ (3 ^ 30) % 3 ^ 45 = ((2 ^ P) % 3 ^ 45) ^ (3 ^ 30) % 3 ^ 45 := Nat.pow_mod ..
+  have h1b : ((2 ^ P) % 3 ^ 45) ^ (3 ^ 30) % 3 ^ 45 = pow2Pmod45 ^ (3 ^ 30) % 3 ^ 45 := by
+    rw [← pow2Pmod45_eq]
+  have h2 : pow2Pmod45 ^ (3 ^ 30) % 3 ^ 45 = pow2ModAux (3 ^ 30) pow2Pmod45 (3 ^ 45) :=
+    (pow2ModAux_eq' (3 ^ 30) pow2Pmod45 (3 ^ 45)).symm
+  have h3 : pow2ModAux (3 ^ 30) pow2Pmod45 (3 ^ 45) = 1 := by native_decide
+  exact h1.trans (h1b.trans (h2.trans h3))
 
 /-- Period of block3: (2^P)^(3^45) ≡ 1 (mod 3^60).
-    Proof: reduce to pow2ModAux + native_decide. -/
+    Proof: reduce to pow2ModAux + native_decide (term-level composition). -/
 theorem powP_period_block3 : (2 ^ P) ^ (3 ^ 45) % 3 ^ 60 = 1 := by
-  have key : (2 ^ P) ^ (3 ^ 45) % 3 ^ 60 = pow2ModAux (3 ^ 45) pow2Pmod60 (3 ^ 60) := by
-    rw [Nat.pow_mod, ← pow2Pmod60_eq, ← pow2ModAux_eq']
-  rw [key]; native_decide
+  have h1 : (2 ^ P) ^ (3 ^ 45) % 3 ^ 60 = ((2 ^ P) % 3 ^ 60) ^ (3 ^ 45) % 3 ^ 60 := Nat.pow_mod ..
+  have h1b : ((2 ^ P) % 3 ^ 60) ^ (3 ^ 45) % 3 ^ 60 = pow2Pmod60 ^ (3 ^ 45) % 3 ^ 60 := by
+    rw [← pow2Pmod60_eq]
+  have h2 : pow2Pmod60 ^ (3 ^ 45) % 3 ^ 60 = pow2ModAux (3 ^ 45) pow2Pmod60 (3 ^ 60) :=
+    (pow2ModAux_eq' (3 ^ 45) pow2Pmod60 (3 ^ 60)).symm
+  have h3 : pow2ModAux (3 ^ 45) pow2Pmod60 (3 ^ 60) = 1 := by native_decide
+  exact h1.trans (h1b.trans (h2.trans h3))
 
 /-! ## Part 10: Block value periodicity
 
