@@ -1064,4 +1064,33 @@ theorem cantor_blockVals_noDigit2 (s m : Nat)
     simp [noDigit2, List.all_eq_true, List.mem_range, decide_eq_true_eq]
     exact fun t ht => hne 45 60 t rfl ht
 
+/-- Descent invariant (catch form): if X = 2^(s + P·m) is Cantor with
+    s ∈ {0,2,8} and the residue m mod 3^45 lies in [1, 3^15), contradiction.
+    This composes the block-extraction helper with periodicity (each block
+    value depends only on m modulo its own period 3^(15+15j), all dividing
+    3^45) and the machine-checked `block3_catches_all`.
+
+    The blocks-clean invariant itself — memCantorNat(2^(s+P·m)) → all three
+    blocks digit-2-free — is `cantor_blockVals_noDigit2` above; it survives
+    every re-decomposition of the exponent (it is a property of the fixed
+    integer 2^(s+P·m), never of a quotient), and m mod 3^45 is the complete
+    residue determining it (block1Val_periodic / block2Val_periodic /
+    block3Val_periodic). -/
+theorem cantor_mmod_catch (s m : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8)
+    (hm_lo : 1 ≤ m % 3 ^ 45) (hm_hi : m % 3 ^ 45 < 3 ^ 15)
+    (hc : memCantorNat (2 ^ (s + P * m))) : False := by
+  obtain ⟨h1, h2, h3⟩ := cantor_blockVals_noDigit2 s m hc
+  have h15 : 3 ^ 15 ∣ 3 ^ 45 := ⟨3 ^ 30, by rw [← Nat.pow_add]⟩
+  have h30 : 3 ^ 30 ∣ 3 ^ 45 := ⟨3 ^ 15, by rw [← Nat.pow_add]⟩
+  have p1 : block1Val s (m % 3 ^ 45) = block1Val s m := by
+    rw [block1Val_periodic s m, block1Val_periodic s (m % 3 ^ 45)]
+    rw [Nat.mod_mod_of_dvd m h15]
+  have p2 : block2Val s (m % 3 ^ 45) = block2Val s m := by
+    rw [block2Val_periodic s m, block2Val_periodic s (m % 3 ^ 45)]
+    rw [Nat.mod_mod_of_dvd m h30]
+  have p3 : block3Val s (m % 3 ^ 45) = block3Val s m := by
+    rw [block3Val_periodic s m]
+  exact block3_catches_all s hs (m % 3 ^ 45) hm_lo hm_hi
+    (by rw [p1]; exact h1) (by rw [p2]; exact h2) (by rw [p3]; exact h3)
+
 end ErdosTernary.BlockClassification
