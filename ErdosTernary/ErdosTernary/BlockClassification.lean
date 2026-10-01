@@ -400,8 +400,25 @@ private theorem digit_below_k_eq {n k t : Nat} (hge : 3 ^ k ≤ n) (ht : t < k) 
   have hmod : 3 ^ (k - t) % 3 = 0 := by
     rw [show k - t = (k - t - 1) + 1 from by omega, Nat.pow_succ]
     exact Nat.mul_mod_left _ _
-  rw [Nat.add_mod, hmod, Nat.zero_add]
+  rw [Nat.add_mod, hmod, Nat.add_zero]
   exact Nat.mod_eq_of_lt (Nat.mod_lt _ (by omega : (0:Nat) < 3))
+
+/-- Digit-characterization helpers: for q = n / 3^k with q < 3, the residue
+    q % 3 determines q exactly. Proved without omega (omega cannot handle
+    division by the variable 3^k when it appears in context). -/
+private theorem digit0_eq_zero {q : Nat} (hq3 : q < 3) (hd : q % 3 = 0) : q = 0 := by
+  have h2 : q = 3 * (q / 3) + q % 3 := (Nat.div_add_mod q 3).symm
+  rw [hd, Nat.add_zero] at h2
+  have h1 : q / 3 < 1 := Nat.div_lt_of_lt_mul (by rw [Nat.mul_one]; exact hq3)
+  have hqc : q / 3 = 0 := Nat.lt_one_iff.mp h1
+  rw [h2, hqc, Nat.mul_zero]
+
+private theorem digit1_eq_one {q : Nat} (hq3 : q < 3) (hd : q % 3 = 1) : q = 1 := by
+  have h2 : q = 3 * (q / 3) + q % 3 := (Nat.div_add_mod q 3).symm
+  rw [hd, Nat.add_zero] at h2
+  have h1 : q / 3 < 1 := Nat.div_lt_of_lt_mul (by rw [Nat.mul_one]; exact hq3)
+  have hqc : q / 3 = 0 := Nat.lt_one_iff.mp h1
+  rw [h2, hqc, Nat.mul_zero, Nat.zero_add]
 
 /-- Digit-2-free counting: exactly 2^k values in [0, 3^k) have no digit 2
     in their k-digit ternary representation.
@@ -435,19 +452,19 @@ private theorem d2f_card_aux :
           rw [hq]
           exact Nat.div_lt_of_lt_mul (by rw [← Nat.pow_succ]; exact hlt)
         have hr' : r < 3 ^ k := by rw [hr]; exact Nat.mod_lt n (Nat.pow_pos (n := k) (by omega : (0:Nat) < 3))
+        have h := Nat.div_add_mod n (3 ^ k)
+        rw [← hq, ← hr] at h
+        -- h : 3 ^ k * q + r = n
+        clear hq hr
         rcases hd with hd0 | hd1
-        · have hq0 : q = 0 := by omega
-          have h := Nat.div_add_mod n (3 ^ k)
-          rw [← hq, ← hr] at h
-          rw [hq0, Nat.zero_mul, Nat.add_zero] at h
+        · have hq0 : q = 0 := digit0_eq_zero hq3 hd0
+          rw [hq0, Nat.mul_zero, Nat.add_zero] at h
           -- h : r = n
           left
           refine ⟨hlt, ?_, ?_⟩
           · rw [← h]; exact hr'
           · exact fun t ht => hall t ht
-        · have hq1 : q = 1 := by omega
-          have h := Nat.div_add_mod n (3 ^ k)
-          rw [← hq, ← hr] at h
+        · have hq1 : q = 1 := digit1_eq_one hq3 hd1
           rw [hq1, Nat.mul_one] at h
           -- h : 3 ^ k + r = n
           right
@@ -480,27 +497,26 @@ private theorem d2f_card_aux :
             rw [hq]
             exact Nat.div_lt_of_lt_mul (by rw [← Nat.pow_succ]; exact hlt1)
           have hr' : r < 3 ^ k := by rw [hr]; exact Nat.mod_lt n (Nat.pow_pos (n := k) (by omega : (0:Nat) < 3))
+          have h := Nat.div_add_mod n (3 ^ k)
+          rw [← hq, ← hr] at h
+          -- h : 3 ^ k * q + r = n
+          clear hq hr
           have hge' : 1 ≤ q := by
             by_contra h0
             push_neg at h0
-            -- h0 : q = 0, so n = r, contradicting hge : 3^k ≤ n
-            have h := Nat.div_add_mod n (3 ^ k)
-            rw [← hq, ← hr, h0, Nat.zero_mul, Nat.add_zero] at h
+            rw [h0, Nat.mul_zero, Nat.add_zero] at h
             -- h : r = n
-            rw [← h, ← hr] at hge
-            exact absurd hge (not_le.mpr (Nat.mod_lt n (Nat.pow_pos (n := k) (by omega : (0:Nat) < 3))))
+            rw [← h] at hge
+            exact absurd hge (not_le.mpr hr')
           have hne2 : q ≠ 2 := by
             intro heq
-            have h := Nat.div_add_mod n (3 ^ k)
-            rw [← hq, ← hr, heq, Nat.mul_comm] at h
+            rw [heq, Nat.mul_comm] at h
             -- h : 2 * 3 ^ k + r = n
             have hle : 2 * 3 ^ k ≤ n := by
               rw [← h]
               exact Nat.le_add_right (2 * 3 ^ k) r
             omega
           have hq1 : q = 1 := by omega
-          have h := Nat.div_add_mod n (3 ^ k)
-          rw [← hq, ← hr] at h
           refine ⟨hlt, ?_, ?_⟩
           · rw [hq1]
             norm_num
