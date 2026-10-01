@@ -767,11 +767,14 @@ def checkBlock3LoopSD (pow30 pow45 pow60 : Nat) : Nat → Nat → Nat → Nat �
     else checkBlock3LoopSD pow30 pow45 pow60 n
       ((v30 * pow30) % (3 ^ 30)) ((v45 * pow45) % (3 ^ 45)) ((v60 * pow60) % (3 ^ 60))
 
-/-- Check that no r < 3^15 has noDigit2 in all three blocks.
-    Counts down from 3^15 with running accumulators. -/
+/-- Check that no r in [1, 3^15) has noDigit2 in all three blocks.
+    Iteration starts from the values at r = 1 (matching the Python reference,
+    which iterates range(1, 3^15)): r = 0 gives the trivially digit-2-free
+    value 2^s, so it must be skipped. Runs 3^15 - 1 steps. -/
 def checkBlock3All (s : Nat) : Bool :=
-  checkBlock3LoopSD pow2Pmod30 pow2Pmod45 pow2Pmod60 (3 ^ 15)
-    (2 ^ s % 3 ^ 30) (2 ^ s % 3 ^ 45) (2 ^ s % 3 ^ 60)
+  checkBlock3LoopSD pow2Pmod30 pow2Pmod45 pow2Pmod60 (3 ^ 15 - 1)
+    ((2 ^ s * pow2Pmod30) % 3 ^ 30) ((2 ^ s * pow2Pmod45) % 3 ^ 45)
+    ((2 ^ s * pow2Pmod60) % 3 ^ 60)
 
 /-- Verify: for s=0, no residue has noDigit2 in all three blocks. -/
 theorem block3_caught_0 : checkBlock3All 0 = true := by
@@ -847,7 +850,11 @@ private theorem checkBlock3LoopSD_sound (pow30 pow45 pow60 s : Nat)
         have hb1' : noDigit2 ((v30 / 3 ^ 15) % 3 ^ 15) = true := hb1
         have hb2' : noDigit2 ((v45 / 3 ^ 30) % 3 ^ 15) = true := hb2
         have hb3' : noDigit2 ((v60 / 3 ^ 45) % 3 ^ 15) = true := hb3
-        exact bool_clean_not hcond ⟨hb1', hb2', hb3'⟩
+        exact bool_clean_not
+          (a := noDigit2 ((v30 / 3 ^ 15) % 3 ^ 15))
+          (b := noDigit2 ((v45 / 3 ^ 30) % 3 ^ 15))
+          (c := noDigit2 ((v60 / 3 ^ 45) % 3 ^ 15))
+          hcond ⟨hb1', hb2', hb3'⟩
       · have hri : r < i := by omega
         have hv30' : (v30 * pow30) % (3 ^ 30) = iterVal s (3 ^ 30) (r + 1) := by
           simp only [iterVal_succ, hv30, hp30]
@@ -858,21 +865,34 @@ private theorem checkBlock3LoopSD_sound (pow30 pow45 pow60 s : Nat)
         exact ih (r + 1) ((v30 * pow30) % (3 ^ 30)) ((v45 * pow45) % (3 ^ 45))
           ((v60 * pow60) % (3 ^ 60)) (by omega) hv30' hv45' hv60' h i (by omega) hi_lt
 
-/-- Block-3 catches everything: for every s ∈ {0,2,8} and every r < 3^15,
-    if block1 and block2 have no digit 2, then block3 does have digit 2. -/
+/-- Block-3 catches everything: for every s ∈ {0,2,8} and every r with
+    1 ≤ r < 3^15, if block1 and block2 have no digit 2, then block3 does
+    have digit 2. (r = 0 is excluded: 2^s is digit-2-free in all three
+    blocks, so no universal claim can hold at r = 0.) -/
 theorem block3_catches_all (s : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8) :
-    ∀ r < 3 ^ 15, noDigit2 (block1Val s r) → noDigit2 (block2Val s r) →
+    ∀ r, 1 ≤ r → r < 3 ^ 15 → noDigit2 (block1Val s r) → noDigit2 (block2Val s r) →
     ¬noDigit2 (block3Val s r) := by
   have h0 := checkBlock3LoopSD_sound pow2Pmod30 pow2Pmod45 pow2Pmod60 s
     pow2Pmod30_eq pow2Pmod45_eq pow2Pmod60_eq
-  intro r hr h1 h2 h3
+  intro r hr0 hr h1 h2 h3
   have hc : checkBlock3All s = true := by
     rcases hs with rfl | rfl | rfl
     · set_option maxRecDepth 10000000 in native_decide
     · set_option maxRecDepth 10000000 in native_decide
     · set_option maxRecDepth 10000000 in native_decide
   unfold checkBlock3All at hc
-  exact h0 (3 ^ 15) 0 (2^s%3^30) (2^s%3^45) (2^s%3^60) (by omega) rfl rfl rfl hc r (by omega) hr ⟨h1, h2, h3⟩
+  have hv1 : iterVal s (3 ^ 30) 1 = (2 ^ s * pow2Pmod30) % 3 ^ 30 := by
+    simp only [iterVal_succ, iterVal_zero]
+    rw [← Nat.mul_mod, pow2Pmod30_eq]
+  have hv45 : iterVal s (3 ^ 45) 1 = (2 ^ s * pow2Pmod45) % 3 ^ 45 := by
+    simp only [iterVal_succ, iterVal_zero]
+    rw [← Nat.mul_mod, pow2Pmod45_eq]
+  have hv60 : iterVal s (3 ^ 60) 1 = (2 ^ s * pow2Pmod60) % 3 ^ 60 := by
+    simp only [iterVal_succ, iterVal_zero]
+    rw [← Nat.mul_mod, pow2Pmod60_eq]
+  exact h0 (3 ^ 15 - 1) 1 ((2 ^ s * pow2Pmod30) % 3 ^ 30)
+    ((2 ^ s * pow2Pmod45) % 3 ^ 45) ((2 ^ s * pow2Pmod60) % 3 ^ 60)
+    (by omega) hv1 hv45 hv60 hc r (by omega) hr ⟨h1, h2, h3⟩
 
 /-! ## Part 9: Period lemmas for block values
 
