@@ -12,6 +12,7 @@ import ErdosTernary.Narkiewicz
 import ErdosTernary.Lifting
 import ErdosTernary.CarryAnalysis
 import ErdosTernary.ThreeLevelCompat
+import ErdosTernary.BlockClassification
 
 open ErdosTernary.BridgeCompute
 open Narkiewicz
@@ -366,7 +367,7 @@ private lemma cubic_one_plus_178_mod3K6 (K : Nat) (_hK : K ≥ 6) :
       have : 3 * 178 ^ 2 * 3 ^ (2 * K) = 31684 * 3 ^ (2 * K + 1) := by norm_num; ring
       rw [this, show 2 * K + 1 = (K - 5) + (K + 6) from by omega, Nat.pow_add]; ring
     have h5639752 : 178 ^ 3 * 3 ^ (3 * K) = 3 ^ (K + 6) * (5639752 * 3 ^ (2 * K - 6)) := by
-      have : 178 ^ 3 * 3 ^ (3 * K) = 5639752 * 3 ^ (3 * K) := by norm_num; ring
+      have : 178 ^ 3 * 3 ^ (3 * K) = 5639752 * 3 ^ (3 * K) := by norm_num
       rw [this, show 3 * K = (2 * K - 6) + (K + 6) from by omega, Nat.pow_add]; ring
     rw [show (1 + 178 * 3 ^ K) ^ 3 =
         1 + 534 * 3 ^ K + 3 * 178 ^ 2 * 3 ^ (2 * K) + 178 ^ 3 * 3 ^ (3 * K) from by ring,
@@ -723,5 +724,289 @@ theorem cantor_exceptional_forces_zero (s q K : Nat)
         -- The q>1 sub-case covers numbers with more complex ternary structure.
         have hs_next := state_pushes_beyond_exceptionals s q K hs hK h1
         sorry
+
+
+/-! ## Part 7: Digit-transfer fact for the hard case (q % 3 = 1, q > 1) -/
+
+private lemma pow_three_mod (K : Nat) (hK : 1 ≤ K) : (3 : Nat) ^ K % 3 = 0 :=
+  Nat.mod_eq_zero_of_dvd ⟨3 ^ (K - 1), by
+    conv_lhs => rw [show K = (K - 1) + 1 from by omega, Nat.pow_succ]
+    ring⟩
+
+private lemma add_mul_mod3 (x M : Nat) (hM : 2 ≤ M) :
+    (1 + x * M) % (3 * M) = 1 + (x % 3) * M := by
+  conv_lhs => rw [show x = 3 * (x / 3) + x % 3 from (Nat.div_add_mod x 3).symm]
+  rw [show 1 + (3 * (x / 3) + x % 3) * M = 1 + (x % 3) * M + 3 * M * (x / 3) from by ring]
+  rw [Nat.add_mod]
+  rw [show (3 * M * (x / 3)) % (3 * M) = 0 from
+    Nat.mod_eq_zero_of_dvd ⟨x / 3, by ring⟩]
+  rw [Nat.add_zero]
+  rw [Nat.mod_mod_of_dvd (1 + (x % 3) * M) ⟨1, by ring⟩]
+  exact Nat.mod_eq_of_lt (by
+    have hy2 : x % 3 ≤ 2 := by omega
+    calc (1 : Nat) + (x % 3) * M ≤ 1 + 2 * M :=
+      Nat.add_le_add_left (Nat.mul_le_mul_right M hy2) 1
+      _ < 3 * M := by omega)
+
+private lemma pow_one_plus_3pow (K n : Nat) :
+    (1 + 3 ^ (K + 1)) ^ n % 3 ^ (K + 2) = 1 + (n % 3) * 3 ^ (K + 1) := by
+  induction n with
+  | zero =>
+    simp
+    rw [Nat.mod_eq_of_lt (lt_of_lt_of_le (by norm_num : (1 : Nat) < 3)
+      (Nat.pow_le_pow_right (by omega : (1 : Nat) ≤ 3) (by omega : (1 : Nat) ≤ K + 2)))]
+  | succ n ih =>
+    have hpow : (1 + 3 ^ (K + 1)) ^ (n + 1) =
+        (1 + 3 ^ (K + 1)) ^ n * (1 + 3 ^ (K + 1)) := by
+      rw [Nat.pow_succ]
+    have hb : (1 + 3 ^ (K + 1)) % 3 ^ (K + 2) = 1 + 3 ^ (K + 1) :=
+      Nat.mod_eq_of_lt (by
+        have h3 : (3 : Nat) ^ (K + 2) = 3 ^ (K + 1) * 3 := by rw [← Nat.pow_succ]
+        rw [h3]
+        nlinarith [show (1 : Nat) ≤ 3 ^ (K + 1) from
+          Nat.succ_le_of_lt (Nat.pow_pos (by omega))])
+    rw [hpow, Nat.mul_mod, ih, hb]
+    have hexpand : (1 + (n % 3) * 3 ^ (K + 1)) * (1 + 3 ^ (K + 1)) =
+        1 + (1 + n % 3) * 3 ^ (K + 1) + (n % 3) * 3 ^ (2 * K + 2) := by ring
+    rw [hexpand, Nat.add_mod]
+    have hdvd : 3 ^ (K + 2) ∣ 3 ^ (2 * K + 2) :=
+      ⟨3 ^ (2 * K + 2 - (K + 2)), by rw [← Nat.pow_add]; congr 1; omega⟩
+    have hbig : (n % 3) * 3 ^ (2 * K + 2) % 3 ^ (K + 2) = 0 := by
+      rw [show (n % 3) * 3 ^ (2 * K + 2) = 3 ^ (2 * K + 2) * (n % 3) from by ring]
+      exact Nat.mod_eq_zero_of_dvd (hdvd.trans (Nat.dvd_mul_right _ _))
+    rw [hbig, Nat.add_zero]
+    rw [Nat.mod_mod_of_dvd (1 + (1 + n % 3) * 3 ^ (K + 1)) ⟨1, by ring⟩]
+    rw [show (3 : Nat) ^ (K + 2) = 3 * 3 ^ (K + 1) from by ring_nf]
+    rw [add_mul_mod3 (1 + n % 3) (3 ^ (K + 1)) (by
+      exact Nat.le_trans (by norm_num : (2 : Nat) ≤ 3 ^ 1)
+        (Nat.pow_le_pow_right (by omega : (1 : Nat) ≤ 3)
+          (by omega : (1 : Nat) ≤ K + 1)))]
+    rw [show (1 + n % 3) % 3 = (n + 1) % 3 from by omega]
+
+/-- Shared tail for digit K+1: A = δ·3^(K+1) + L with L < 3^(K+1), L ≡ 1 (mod 3);
+    A·(1 + c·3^(K+1)) mod 3^(K+2) has digit K+1 = (δ + c) mod 3.
+    All carries across the 3^(K+2) wrap change the digit by a multiple of 3. -/
+private lemma digitK1_of_A (K δ L c A : Nat)
+    (hA : A = δ * 3 ^ (K + 1) + L)
+    (hL : L < 3 ^ (K + 1)) (hL3 : L % 3 = 1) :
+    (A * (1 + c * 3 ^ (K + 1)) % 3 ^ (K + 2)) / 3 ^ (K + 1) % 3 = (δ + c) % 3 := by
+  have hexpand : A * (1 + c * 3 ^ (K + 1)) =
+      (δ + L * c) * 3 ^ (K + 1) + L + δ * c * 3 ^ (2 * K + 2) := by
+    rw [hA]; ring
+  rw [hexpand, Nat.add_mod]
+  have hdvd : 3 ^ (K + 2) ∣ 3 ^ (2 * K + 2) :=
+    ⟨3 ^ (2 * K + 2 - (K + 2)), by rw [← Nat.pow_add]; congr 1; omega⟩
+  have hbig : δ * c * 3 ^ (2 * K + 2) % 3 ^ (K + 2) = 0 := by
+    rw [show δ * c * 3 ^ (2 * K + 2) = 3 ^ (2 * K + 2) * (δ * c) from by ring]
+    exact Nat.mod_eq_zero_of_dvd (hdvd.trans (Nat.dvd_mul_right _ _))
+  rw [hbig, Nat.add_zero]
+  rw [Nat.mod_mod_of_dvd ((δ + L * c) * 3 ^ (K + 1) + L)
+    (by norm_num : 3 ^ (K + 2) ∣ 3 ^ (K + 2))]
+  have hmr := Nat.mod_mul_right_div_self
+    ((δ + L * c) * 3 ^ (K + 1) + L) (3 ^ (K + 1)) (3 : Nat)
+  rw [show 3 ^ (K + 1) * 3 = 3 ^ (K + 2) from by rw [← Nat.pow_succ]] at hmr
+  rw [hmr]
+  have hquot : ((δ + L * c) * 3 ^ (K + 1) + L) / 3 ^ (K + 1) = δ + L * c := by
+    rw [show (δ + L * c) * 3 ^ (K + 1) + L = L + (δ + L * c) * 3 ^ (K + 1) from by ring,
+      Nat.add_mul_div_right L (δ + L * c) (by omega : 0 < 3 ^ (K + 1)),
+      Nat.div_eq_of_lt hL, Nat.zero_add]
+  rw [hquot, Nat.mod_mod_of_dvd (δ + L * c) (by norm_num : 3 ∣ 3)]
+  calc (δ + L * c) % 3 = (δ % 3 + (L * c) % 3) % 3 := Nat.add_mod δ (L * c) 3
+    _ = (δ % 3 + (L % 3 * (c % 3)) % 3) % 3 := by rw [Nat.mul_mod]
+    _ = (δ % 3 + (1 * (c % 3)) % 3) % 3 := by rw [hL3]
+    _ = (δ % 3 + (c % 3) % 3) % 3 := by rw [Nat.one_mul]
+    _ = (δ % 3 + c % 3) % 3 := by rw [Nat.mod_mod_of_dvd c (by norm_num : 3 ∣ 3)]
+    _ = (δ + c) % 3 := by rw [← Nat.add_mod δ c 3]
+
+/-- Digit at position K+1 of 2^(s + q·uK K) for q % 3 = 1:
+    (2 + q/3) % 3 if s = 0, q/3 % 3 otherwise. -/
+theorem digit_K1_quotient (s q K : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8)
+    (hK : 6 ≤ K) (hq : q % 3 = 1) :
+    (2 ^ (s + q * uK K) / 3 ^ (K + 1)) % 3 =
+      (if s = 0 then (2 + q / 3) % 3 else q / 3 % 3) := by
+  have hq3 : q = 3 * (q / 3) + 1 := by omega
+  have h3k : (3 : Nat) ^ K % 3 = 0 := pow_three_mod K (by omega)
+  have huK_succ : uK (K + 1) = 3 * uK K := by
+    unfold uK
+    rw [show K + 1 - 1 = K from by omega]
+    have hpow : (3 : Nat) ^ K = 3 ^ (K - 1) * 3 := by
+      conv_lhs => rw [show K = (K - 1) + 1 from by omega, Nat.pow_succ]
+    rw [hpow]; ring
+  have hexp : s + q * uK K = (s + uK K) + (q / 3) * uK (K + 1) := by
+    conv_lhs => rw [hq3]
+    rw [huK_succ]; ring
+  have hsplit : ∀ s', 2 ^ (s' + (q / 3) * uK (K + 1)) =
+      2 ^ s' * (2 ^ uK (K + 1)) ^ (q / 3) := by
+    intro s'
+    rw [Nat.pow_add, show (q / 3) * uK (K + 1) = uK (K + 1) * (q / 3) from by ring,
+      Nat.pow_mul]
+  have hbase : 2 ^ uK (K + 1) % 3 ^ (K + 2) = 1 + 3 ^ (K + 1) := by
+    have h := pow2_uK_mod3K_plus2 (K + 1) (by omega)
+    have hdvd : 3 ^ (K + 2) ∣ 3 ^ (K + 3) := ⟨3, by rw [← Nat.pow_succ]⟩
+    rw [← Nat.mod_mod_of_dvd (2 ^ uK (K + 1)) hdvd, h]
+    have hfac : (1 + 7 * 3 ^ (K + 1)) % 3 ^ (K + 2) = 1 + 3 ^ (K + 1) := by
+      rw [show (1 + 7 * 3 ^ (K + 1)) = (1 + 3 ^ (K + 1)) + 2 * 3 ^ (K + 2) from by ring,
+        Nat.add_mod,
+        show (2 * 3 ^ (K + 2)) % 3 ^ (K + 2) = 0 from
+          Nat.mod_eq_zero_of_dvd ⟨2, by ring⟩,
+        Nat.add_zero]
+      rw [Nat.mod_mod_of_dvd (1 + 3 ^ (K + 1)) (by norm_num : 3 ^ (K + 2) ∣ 3 ^ (K + 2))]
+      exact Nat.mod_eq_of_lt (by
+        have h3 : (3 : Nat) ^ (K + 2) = 3 ^ (K + 1) * 3 := by rw [← Nat.pow_succ]
+        rw [h3]
+        nlinarith [show (1 : Nat) ≤ 3 ^ (K + 1) from
+          Nat.succ_le_of_lt (Nat.pow_pos (by omega))])
+    exact hfac
+  rcases hs with rfl | rfl | rfl
+  · simp only [if_pos rfl]
+    rw [hexp, hsplit, zero_add]
+    have hde := digit_eq_of_modPow
+      ((2 ^ uK K) * (2 ^ uK (K + 1)) ^ (q / 3)) (K + 1) (K + 2) (by omega)
+    rw [hde, Nat.mul_mod]
+    have hA : 2 ^ uK K % 3 ^ (K + 2) = 1 + 7 * 3 ^ K := pow2_uK_mod3K_plus2 K hK
+    rw [hA, Nat.pow_mod, hbase, pow_one_plus_3pow K (q / 3)]
+    have hA' : (1 + 7 * 3 ^ K) = 2 * 3 ^ (K + 1) + (1 + 3 ^ K) := by ring
+    rw [hA']
+    have hL : (1 + 3 ^ K) < 3 ^ (K + 1) := by
+      have h31 : (3 : Nat) ^ 1 ≤ 3 ^ (K + 1) := Nat.pow_le_pow_right (by omega) (by omega)
+      norm_num at h31; omega
+    have hL0 : (1 + 3 ^ K) % 3 = 1 := by
+      omega
+    have hq3v : (2 + q / 3 % 3) % 3 = (2 + q / 3) % 3 := by omega
+    exact (digitK1_of_A K 2 (1 + 3 ^ K) (q / 3 % 3) _ rfl hL hL0).trans hq3v
+  · rw [if_neg (by decide)]
+    rw [hexp, hsplit]
+    rw [show 2 ^ (2 + uK K) = 4 * 2 ^ uK K from by ring]
+    have hde := digit_eq_of_modPow
+      ((4 * 2 ^ uK K) * (2 ^ uK (K + 1)) ^ (q / 3)) (K + 1) (K + 2) (by omega)
+    rw [hde, Nat.mul_mod]
+    have hA : 4 * 2 ^ uK K % 3 ^ (K + 2) = 4 + 3 ^ K := by
+      have h := pow2_uK_mod3K_plus2 K hK
+      have h4 : (4 : Nat) % 3 ^ (K + 2) = 4 := by
+        exact Nat.mod_eq_of_lt (by
+          have h32 : (3 : Nat) ^ (K + 2) = 9 * 3 ^ K := by ring_nf
+          rw [h32]; nlinarith [show (1 : Nat) ≤ 3 ^ K from
+            Nat.succ_le_of_lt (Nat.pow_pos (by omega))])
+      have hfac : 4 * (1 + 7 * 3 ^ K) = (4 + 3 ^ K) + 3 * 3 ^ (K + 2) := by
+        have h32 : (3 : Nat) ^ (K + 2) = 9 * 3 ^ K := by ring_nf
+        ring
+      have hsmall : 4 + 3 ^ K < 3 ^ (K + 2) := by
+        have h32 : (3 : Nat) ^ (K + 2) = 9 * 3 ^ K := by ring_nf
+        rw [h32]; nlinarith [show (1 : Nat) ≤ 3 ^ K from
+          Nat.succ_le_of_lt (Nat.pow_pos (by omega))]
+      rw [Nat.mul_mod, h4, h, hfac, Nat.add_mod,
+        show 3 * 3 ^ (K + 2) % 3 ^ (K + 2) = 0 from
+          Nat.mod_eq_zero_of_dvd ⟨3, by ring⟩,
+        Nat.add_zero]
+      rw [Nat.mod_mod_of_dvd (4 + 3 ^ K) (by norm_num : 3 ^ (K + 2) ∣ 3 ^ (K + 2))]
+      exact Nat.mod_eq_of_lt hsmall
+    rw [hA, Nat.pow_mod, hbase, pow_one_plus_3pow K (q / 3)]
+    have hA' : (4 + 3 ^ K) = 0 * 3 ^ (K + 1) + (4 + 3 ^ K) := by ring
+    rw [hA']
+    have hL : (4 + 3 ^ K) < 3 ^ (K + 1) := by
+      have h31 : (3 : Nat) ^ 1 ≤ 3 ^ (K + 1) := Nat.pow_le_pow_right (by omega) (by omega)
+      norm_num at h31; omega
+    have hL3 : (4 + 3 ^ K) % 3 = 1 := by
+      omega
+    have h := digitK1_of_A K 0 (4 + 3 ^ K) (q / 3 % 3) _ rfl hL hL3
+    rw [Nat.zero_add, Nat.mod_mod_of_dvd (q / 3) (by norm_num : 3 ∣ 3)] at h
+    exact h
+  · rw [if_neg (by decide)]
+    rw [hexp, hsplit]
+    rw [show 2 ^ (8 + uK K) = 256 * 2 ^ uK K from by ring]
+    have hde := digit_eq_of_modPow
+      ((256 * 2 ^ uK K) * (2 ^ uK (K + 1)) ^ (q / 3)) (K + 1) (K + 2) (by omega)
+    rw [hde, Nat.mul_mod]
+    have hA : 256 * 2 ^ uK K % 3 ^ (K + 2) = 256 + 3 ^ K := by
+      have h := pow2_uK_mod3K_plus2 K hK
+      have h36 : (3 : Nat) ^ K ≥ 729 := by
+        have h := Nat.pow_le_pow_right (by omega : (1 : Nat) ≤ 3) hK
+        have h6 : (3 : Nat) ^ 6 = 729 := by norm_num
+        rw [h6] at h; exact h
+      have h256 : (256 : Nat) % 3 ^ (K + 2) = 256 := by
+        exact Nat.mod_eq_of_lt (by
+          have h32 : (3 : Nat) ^ (K + 2) = 9 * 3 ^ K := by ring_nf
+          rw [h32]; nlinarith [h36])
+      have hfac : 256 * (1 + 7 * 3 ^ K) = (256 + 3 ^ K) + 199 * 3 ^ (K + 2) := by
+        have h32 : (3 : Nat) ^ (K + 2) = 9 * 3 ^ K := by ring_nf
+        ring
+      have hsmall : 256 + 3 ^ K < 3 ^ (K + 2) := by
+        have h32 : (3 : Nat) ^ (K + 2) = 9 * 3 ^ K := by ring_nf
+        rw [h32]; nlinarith [h36]
+      rw [Nat.mul_mod, h256, h, hfac, Nat.add_mod,
+        show 199 * 3 ^ (K + 2) % 3 ^ (K + 2) = 0 from
+          Nat.mod_eq_zero_of_dvd ⟨199, by ring⟩,
+        Nat.add_zero]
+      rw [Nat.mod_mod_of_dvd (256 + 3 ^ K) (by norm_num : 3 ^ (K + 2) ∣ 3 ^ (K + 2))]
+      exact Nat.mod_eq_of_lt hsmall
+    rw [hA, Nat.pow_mod, hbase, pow_one_plus_3pow K (q / 3)]
+    have hA' : (256 + 3 ^ K) = 0 * 3 ^ (K + 1) + (256 + 3 ^ K) := by ring
+    rw [hA']
+    have hL : (256 + 3 ^ K) < 3 ^ (K + 1) := by
+      have h5 : (3 : Nat) ^ 5 ≤ 3 ^ K :=
+        Nat.pow_le_pow_right (by omega : (1 : Nat) ≤ 3) (by omega : (5 : Nat) ≤ K)
+      have h5v : (3 : Nat) ^ 5 = 243 := by norm_num
+      rw [h5v] at h5
+      have h3 : (3 : Nat) ^ (K + 1) = 3 ^ K * 3 := by rw [← Nat.pow_succ]
+      rw [h3]; omega
+    have hL3 : (256 + 3 ^ K) % 3 = 1 := by
+      omega
+    have h := digitK1_of_A K 0 (256 + 3 ^ K) (q / 3 % 3) _ rfl hL hL3
+    rw [Nat.zero_add, Nat.mod_mod_of_dvd (q / 3) (by norm_num : 3 ∣ 3)] at h
+    exact h
+
+/-- Cantor consequence: for q % 3 = 1, s = 0 forces q/3 % 3 ≠ 0,
+    s ∈ {2,8} forces q/3 % 3 ≠ 2. -/
+theorem cantor_qprime_restricted (s q K : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8)
+    (hK : 6 ≤ K) (hq : q % 3 = 1)
+    (hc : memCantorNat (2 ^ (s + q * uK K))) :
+    (s = 0 ∧ q / 3 % 3 ≠ 0) ∨ (s ≠ 0 ∧ q / 3 % 3 ≠ 2) := by
+  rcases hs with rfl | rfl | rfl
+  · have hd := digit_K1_quotient 0 q K (by decide) hK hq
+    rw [if_pos rfl] at hd
+    have hne : (2 ^ (0 + q * uK K) / 3 ^ (K + 1)) % 3 ≠ 2 := hc (K + 1)
+    rw [hd] at hne
+    exact Or.inl ⟨rfl, by omega⟩
+  · have hd := digit_K1_quotient 2 q K (by decide) hK hq
+    rw [if_neg (by decide)] at hd
+    have hne : (2 ^ (2 + q * uK K) / 3 ^ (K + 1)) % 3 ≠ 2 := hc (K + 1)
+    rw [hd] at hne
+    exact Or.inr ⟨by omega, by omega⟩
+  · have hd := digit_K1_quotient 8 q K (by decide) hK hq
+    rw [if_neg (by decide)] at hd
+    have hne : (2 ^ (8 + q * uK K) / 3 ^ (K + 1)) % 3 ≠ 2 := hc (K + 1)
+    rw [hd] at hne
+    exact Or.inr ⟨by omega, by omega⟩
+
+/-! ## Part 8: Block-invariant wrappers (composition with BlockClassification)
+
+    At level K ≥ 15 the exponent is exactly r = s + P·m with m = q·3^(K-15),
+    so the block-extraction helper applies at m.  m is invariant under the
+    q → q/3 (K → K+1) transition.  Together with
+    BlockClassification.cantor_mmod_catch this discharges every q whose
+    m mod 3^45 lies in [1, 3^15). -/
+
+theorem cantor_blocks_at_level (s q K : Nat) (hK : 15 ≤ K)
+    (hc : memCantorNat (2 ^ (s + q * uK K))) :
+    BlockClassification.noDigit2 (BlockClassification.block1Val s (q * 3 ^ (K - 15))) = true ∧
+    BlockClassification.noDigit2 (BlockClassification.block2Val s (q * 3 ^ (K - 15))) = true ∧
+    BlockClassification.noDigit2 (BlockClassification.block3Val s (q * 3 ^ (K - 15))) = true := by
+  have huK : uK K = BlockClassification.P * 3 ^ (K - 15) := by
+    rw [show uK K = 2 * 3 ^ (K - 1) from rfl,
+        show BlockClassification.P = 2 * 3 ^ 14 from rfl]
+    rw [show 2 * 3 ^ (K - 1) = 2 * 3 ^ 14 * 3 ^ (K - 15) from by
+      rw [show 2 * 3 ^ 14 * 3 ^ (K - 15) = 2 * (3 ^ 14 * 3 ^ (K - 15)) from by ring,
+        show 3 ^ 14 * 3 ^ (K - 15) = 3 ^ (14 + (K - 15)) from by rw [← Nat.pow_add],
+        show 14 + (K - 15) = K - 1 from by omega]]
+  have hr : s + q * uK K = s + BlockClassification.P * (q * 3 ^ (K - 15)) := by
+    rw [huK]; ring
+  rw [hr] at hc
+  exact BlockClassification.cantor_blockVals_noDigit2 s (q * 3 ^ (K - 15)) hc
+
+theorem blocks_m_invariant (q t K : Nat) (hq : q = 3 * t) (hK : 15 ≤ K) :
+    (q / 3) * 3 ^ (K + 1 - 15) = q * 3 ^ (K - 15) := by
+  rw [hq, Nat.mul_div_cancel_left t (by omega : (0 : Nat) < 3)]
+  rw [show K + 1 - 15 = (K - 15) + 1 from by omega, Nat.pow_succ]
+  ring
 
 end ErdosTernary.LiftingDynamics
