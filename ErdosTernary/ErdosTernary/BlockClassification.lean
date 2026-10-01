@@ -146,8 +146,9 @@ private theorem pow_P_3_14_ne_1 : (2 ^ P) ^ (3 ^ 14) % 3 ^ 30 ≠ 1 := by
 
 /-! ## Part 2: Order divisibility via Mathlib's pow_gcd_eq_one -/
 
-private theorem coprime_2_P : Nat.Coprime 2 (2 ^ P) := by
-  exact Nat.Coprime.symm (Nat.Coprime.pow P_pos (by decide))
+-- REMOVED (false + unused): `coprime_2_P : Nat.Coprime 2 (2 ^ P)`
+-- is mathematically FALSE (gcd(2, 2^P) = 2 for P >= 1) and was never
+-- referenced. Reported per audit rules instead of silently kept.
 
 private theorem euler_mod (d : Nat) (hd : d = 3 ^ 15) :
     (2 ^ P) ^ d % 3 ^ 30 = 1 := by rw [hd]; exact euler_result
@@ -162,24 +163,36 @@ private theorem cast_natCast_pow_mod_eq_zero {m : Nat} (hm : 0 < m) {a : Nat}
     (h : a % m = 0) : (a : ZMod m) = 0 := by
   rw [ZMod.natCast_zmod_eq_zero_iff_dvd]; omega
 
-private theorem mod_eq_one_iff_cast {m : Nat} (hm : 0 < m) {a : Nat} :
+/-- Bridge for m >= 2 (m = 1 would make the iff false: LHS always 0). -/
+private theorem mod_eq_one_iff_cast {m : Nat} (hm : 2 ≤ m) {a : Nat} :
     a % m = 1 ↔ (a : ZMod m) = 1 := by
   constructor
-  · intro h; rw [show (1 : ZMod m) = (1 : Nat) from by norm_cast,
-      ZMod.natCast_zmod_eq_zero_iff_dvd]; omega
-  · intro h; rw [show (1 : ZMod m) = (1 : Nat) from by norm_cast,
-      ZMod.natCast_zmod_eq_zero_iff_dvd] at h; omega
+  · intro h
+    show (a : ZMod m) = ((1 : Nat) : ZMod m)
+    apply (ZMod.natCast_eq_natCast_iff a 1 m).mpr
+    show a ≡ 1 [MOD m]
+    show a % m = 1 % m
+    rw [h, Nat.mod_eq_of_lt (by omega : 1 < m)]
+  · intro h
+    have h' : (a : ZMod m) = ((1 : Nat) : ZMod m) := by
+      rw [Nat.cast_one]; exact h
+    have hm' := (ZMod.natCast_eq_natCast_iff a 1 m).mp h'
+    show a % m = 1 at hm'
+    rw [Nat.ModEq] at hm'
+    rwa [Nat.mod_eq_of_lt (by omega : 1 < m)] at hm'
 
 private theorem pow_gcd_mod30 (a b : Nat)
     (ha : (2 ^ P) ^ a % 3 ^ 30 = 1) (hb : (2 ^ P) ^ b % 3 ^ 30 = 1) :
     (2 ^ P) ^ (Nat.gcd a b) % 3 ^ 30 = 1 := by
-  have h30 : 0 < 3 ^ 30 := by norm_num
-  have hza : (2 ^ P : ZMod (3 ^ 30)) ^ a = 1 := (mod_eq_one_iff_cast h30).mp ha |>.symm ▸ by
-    rw [show (1 : ZMod (3 ^ 30)) = (1 : Nat) from by norm_cast]; norm_cast
-  have hzb : (2 ^ P : ZMod (3 ^ 30)) ^ b = 1 := (mod_eq_one_iff_cast h30).mp hb |>.symm ▸ by
-    rw [show (1 : ZMod (3 ^ 30)) = (1 : Nat) from by norm_cast]; norm_cast
+  have h30 : 2 ≤ 3 ^ 30 := by norm_num
+  have hza : (2 ^ P : ZMod (3 ^ 30)) ^ a = 1 := by
+    have h1 : ((2 ^ P) ^ a : ZMod (3 ^ 30)) = 1 := (mod_eq_one_iff_cast h30).mp ha
+    rwa [Nat.cast_pow] at h1
+  have hzb : (2 ^ P : ZMod (3 ^ 30)) ^ b = 1 := by
+    have h1 : ((2 ^ P) ^ b : ZMod (3 ^ 30)) = 1 := (mod_eq_one_iff_cast h30).mp hb
+    rwa [Nat.cast_pow] at h1
   have hz := pow_gcd_eq_one (2 ^ P : ZMod (3 ^ 30)) hza hzb
-  exact (mod_eq_one_iff_cast h30).mpr (by rw [show (1 : ZMod (3 ^ 30)) = (1 : Nat) from by norm_cast]; norm_cast; exact hz)
+  exact (mod_eq_one_iff_cast h30).mpr (by rw [Nat.cast_pow]; exact hz)
 
 /-! The order of 2^P mod 3^30 is 3^15.
     Since (2^P)^(3^15) ≡ 1 and (2^P)^(3^14) ≢ 1, the only divisor of 3^15
@@ -190,15 +203,17 @@ private theorem pow_eq_one_implies_order_dvd (d : Nat) (hd : 0 < d) :
   intro h
   have hgcd := pow_gcd_mod30 d (3 ^ 15) h euler_result
   have hgcd_dvd : Nat.gcd d (3 ^ 15) ∣ 3 ^ 15 := Nat.gcd_dvd_right d (3 ^ 15)
-  obtain ⟨k, hk_le, rfl⟩ := (dvd_prime_pow (by decide : Nat.Prime 3)).mp hgcd_dvd
+  obtain ⟨k, hk_le, hg⟩ := (Nat.dvd_prime_pow (by decide : Nat.Prime 3)).mp hgcd_dvd
   by_cases hk14 : k < 15
   · -- k ≤ 14: 3^k | 3^14, so (2^P)^(3^14) ≡ 1, contradiction
     have hk14' : k ≤ 14 := by omega
     have h3k : (2 ^ P) ^ (3 ^ k) % 3 ^ 30 = 1 := by
-      rwa [Nat.pow_right_comm] at hgcd
+      rw [hg] at hgcd
+      exact hgcd
     have h314 : (2 ^ P) ^ (3 ^ 14) % 3 ^ 30 = 1 := by
-      have : 3 ^ 14 = 3 ^ k * 3 ^ (14 - k) := by rw [← Nat.pow_add]; omega
-      rw [this, Nat.pow_mul, ← Nat.pow_mod_mod, h3k, Nat.one_pow, Nat.one_mod]
+      have hsplit : 3 ^ 14 = 3 ^ k * 3 ^ (14 - k) := by rw [← Nat.pow_add]; omega
+      rw [hsplit, pow_mul, Nat.pow_mod, h3k, Nat.one_pow]
+      exact Nat.mod_eq_of_lt (by norm_num : 1 < 3 ^ 30)
     exact absurd h314 pow_P_3_14_ne_1
   · -- k ≥ 15 and k ≤ 15, so k = 15
     have : k = 15 := by omega
