@@ -434,7 +434,7 @@ private theorem d2f_card_aux :
           rw [hq]
           exact Nat.div_lt_of_lt_mul (by rw [← Nat.pow_succ]; exact hlt)
         have h := Nat.div_add_mod n (3 ^ k)
-        rw [hq, hr] at h
+        rw [← hq, ← hr] at h
         -- h : 3 ^ k * q + r = n, hr' : r < 3 ^ k
         have hr' : r < 3 ^ k := by rw [hr]; exact Nat.mod_lt n (Nat.pow_pos (by omega) k)
         rcases hd with hd0 | hd1
@@ -475,7 +475,7 @@ private theorem d2f_card_aux :
           set q := n / 3 ^ k with hq
           set r := n % 3 ^ k with hr
           have h := Nat.div_add_mod n (3 ^ k)
-          rw [hq, hr] at h
+          rw [← hq, ← hr] at h
           -- h : 3 ^ k * q + r = n
           have hq3 : q < 3 := by
             rw [hq]
