@@ -166,20 +166,21 @@ private theorem cast_natCast_pow_mod_eq_zero {m : Nat} (hm : 0 < m) {a : Nat}
 /-- Bridge for m >= 2 (m = 1 would make the iff false: LHS always 0). -/
 private theorem mod_eq_one_iff_cast {m : Nat} (hm : 2 ≤ m) {a : Nat} :
     a % m = 1 ↔ (a : ZMod m) = 1 := by
+  have key : ((1 : Nat) : ZMod m) = (1 : ZMod m) := Nat.cast_one
   constructor
   · intro h
-    show (a : ZMod m) = ((1 : Nat) : ZMod m)
+    rw [← key]
     apply (ZMod.natCast_eq_natCast_iff a 1 m).mpr
     show a ≡ 1 [MOD m]
     show a % m = 1 % m
     rw [h, Nat.mod_eq_of_lt (by omega : 1 < m)]
   · intro h
     have h' : (a : ZMod m) = ((1 : Nat) : ZMod m) := by
-      rw [Nat.cast_one]; exact h
+      rw [key]; exact h
     have hm' := (ZMod.natCast_eq_natCast_iff a 1 m).mp h'
-    show a % m = 1 at hm'
-    rw [Nat.ModEq] at hm'
-    rwa [Nat.mod_eq_of_lt (by omega : 1 < m)] at hm'
+    have hm'' : a % m = 1 % m := hm'
+    rw [Nat.mod_eq_of_lt (by omega : 1 < m)] at hm''
+    exact hm''
 
 private theorem pow_gcd_mod30 (a b : Nat)
     (ha : (2 ^ P) ^ a % 3 ^ 30 = 1) (hb : (2 ^ P) ^ b % 3 ^ 30 = 1) :
