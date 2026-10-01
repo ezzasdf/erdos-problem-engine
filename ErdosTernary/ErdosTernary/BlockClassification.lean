@@ -361,14 +361,18 @@ def noDigit2 (n : Nat) : Bool :=
     then |{r < N | P(f r)}| ≤ |{n < N | P n}|. -/
 theorem filter_preimage_le_of_injOn {N : Nat} {f : Nat → Nat}
     (hf : ∀ r₁ r₂, r₁ < N → r₂ < N → f r₁ = f r₂ → r₁ = r₂)
+    (h_range : ∀ r, r < N → f r < N)
     (P : Nat → Prop) [DecidablePred P] :
     ((Finset.range N).filter fun r => P (f r)).card ≤
     ((Finset.range N).filter P).card := by
   have key :
       ((Finset.range N).filter fun r => P (f r)).image f ⊆
       (Finset.range N).filter P := by
-    intro n hn; simp [Finset.mem_image, Finset.mem_filter] at hn
-    obtain ⟨r, hr, rfl⟩ := hn; exact hr.2
+    intro n hn
+    simp [Finset.mem_image, Finset.mem_filter] at hn
+    obtain ⟨r, hr, rfl⟩ := hn
+    simp only [Finset.mem_filter, Finset.mem_range]
+    exact ⟨h_range r hr.1, hr.2⟩
   have hcard : (((Finset.range N).filter fun r => P (f r)).image f).card =
       ((Finset.range N).filter fun r => P (f r)).card := by
     apply Finset.card_image_of_injOn
@@ -383,7 +387,7 @@ theorem filter_preimage_le_of_injOn {N : Nat} {f : Nat → Nat}
 private theorem d2f_card_aux :
     ∀ k, ((Finset.range (3 ^ k)).filter fun n =>
       (List.range k).all fun t => (n / 3 ^ t) % 3 ≠ 2).card = 2 ^ k
-  | 0 => by simp [List.range, List.all]; norm_num
+  | 0 => by simp [List.range, List.all]
   | k + 1 => by
     simp only [List.range_succ, List.all, Bool.and_eq_true, decide_eq_true_eq]
     -- S_{k+1} = {n < 3^{k+1} | digit k ≠ 2 ∧ noDigit2 in lower k digits}
@@ -434,7 +438,9 @@ private theorem d2f_card_aux :
         · constructor
           · exact hlt
           · constructor
-            · have : n / 3 ^ k = 0 := Nat.div_eq_zero_of_lt hlt
+            · have h1 : n / 3 ^ k < 1 :=
+                Nat.div_lt_of_lt_mul (by rw [← Nat.mul_one (3 ^ k)]; exact hlt)
+              have : n / 3 ^ k = 0 := by omega
               omega
             · intro t ht; exact hall t ht
         · constructor
@@ -466,7 +472,7 @@ theorem block1_exceptional_le (s : Nat) :
   have hinj : ∀ r₁ r₂, r₁ < 3 ^ 15 → r₂ < 3 ^ 15 →
       block1Val s r₁ = block1Val s r₂ → r₁ = r₂ :=
     fun r₁ r₂ h₁ h₂ h => full_injective s r₁ r₂ h₁ h₂ h
-  have hpre := filter_preimage_le_of_injOn hinj noDigit2
+  have hpre := filter_preimage_le_of_injOn hinj (fun r _ => block1_val_lt s r) noDigit2
   have hcard : ((Finset.range (3 ^ 15)).filter noDigit2).card = 2 ^ 15 := by
     unfold noDigit2; exact d2f_card_aux 15
   omega
