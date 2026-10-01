@@ -1007,4 +1007,61 @@ theorem block3Val_periodic (s m : Nat) :
     rw [Nat.pow_mod, powP_period_block3, Nat.one_pow]; norm_num
   rw [← Nat.mul_mod_mod, hper, Nat.mul_one]
 
+/-! ## Part 11: Block-extraction helper — Cantor ⟹ three blocks digit-2-free
+
+    Standalone lemma (no hypotheses beyond Cantor of the number itself).
+    Exact data made explicit:
+
+    - exponent decomposition: X = 2^(s + P·m) with P = 2·3^14, so
+      X = 2^s · (2^P)^m  (Nat.pow_add + Nat.pow_mul); all three block
+      values read digit windows of THIS X.
+    - block j (j = 0,1,2) reads window [15 + 15·j, 30 + 15·j) of X as
+      (X % 3^(30 + 15·j) / 3^(15 + 15·j)) % 3^15:
+        block1Val = window [15, 30), modulus 3^30,
+        block2Val = window [30, 45), modulus 3^45,
+        block3Val = window [45, 60), modulus 3^60.
+    - digit t (t < 15) of the block equals digit (15 + 15·j + t) of X:
+      low digits of X equal low digits of its residue mod 3^(30+15·j)
+      (digit_eq_of_modPow), and division by 3^(15+15·j) shifts the window.
+    memCantorNat X says every digit of X differs from 2, hence each block
+    value is digit-2-free, i.e. noDigit2 = true. -/
+
+/-- Digit t of the window [lo, lo+15) of X % 3^M equals digit (lo+t) of X,
+    for M = lo + 15 and t < 15. (The intermediate `% 3^15` is a no-op:
+    the windowed quotient is already < 3^15.) -/
+private theorem block_window_digit (s m lo M t : Nat)
+    (hM : M = lo + 15) (ht : t < 15) :
+    (((2 ^ (s + P * m) % 3 ^ M / 3 ^ lo) % 3 ^ 15) / 3 ^ t) % 3 =
+    (2 ^ (s + P * m) / 3 ^ (lo + t)) % 3 := by
+  have hpos : 0 < 3 := by omega
+  have hmod : 2 ^ (s + P * m) % 3 ^ M < 3 ^ M := Nat.mod_lt _ (Nat.pow_pos hpos)
+  have hpow : 3 ^ lo * 3 ^ 15 = 3 ^ M := by rw [← Nat.pow_add, hM]
+  have ha : 2 ^ (s + P * m) % 3 ^ M / 3 ^ lo < 3 ^ 15 :=
+    Nat.div_lt_of_lt_mul (by rw [hpow]; exact hmod)
+  rw [Nat.mod_eq_of_lt ha]
+  rw [Nat.div_div_eq_div_mul, show 3 ^ lo * 3 ^ t = 3 ^ (lo + t) from by rw [← Nat.pow_add]]
+  exact (digit_eq_of_modPow (2 ^ (s + P * m)) (lo + t) M (by omega)).symm
+
+/-- Block-extraction helper: if X = 2^(s + P·m) is Cantor (all ternary
+    digits ≠ 2), then each of the three block values — digits 15–29 (mod
+    3^30), 30–44 (mod 3^45), 45–59 (mod 3^60) of X — is digit-2-free. -/
+theorem cantor_blockVals_noDigit2 (s m : Nat)
+    (hc : memCantorNat (2 ^ (s + P * m))) :
+    noDigit2 (block1Val s m) = true ∧
+    noDigit2 (block2Val s m) = true ∧
+    noDigit2 (block3Val s m) = true := by
+  have hne (lo M t : Nat) (hM : M = lo + 15) (ht : t < 15) :
+      (((2 ^ (s + P * m) % 3 ^ M / 3 ^ lo) % 3 ^ 15) / 3 ^ t) % 3 ≠ 2 := by
+    rw [block_window_digit s m lo M t hM ht]
+    exact hc (lo + t)
+  refine ⟨?_, ?_, ?_⟩
+  · simp [noDigit2, block1Val, List.all_eq_true, List.mem_range, decide_eq_true_eq]
+    exact fun t ht => hne 15 30 t rfl ht
+  · rw [block2Val_eq]
+    simp [noDigit2, List.all_eq_true, List.mem_range, decide_eq_true_eq]
+    exact fun t ht => hne 30 45 t rfl ht
+  · rw [block3Val_eq]
+    simp [noDigit2, List.all_eq_true, List.mem_range, decide_eq_true_eq]
+    exact fun t ht => hne 45 60 t rfl ht
+
 end ErdosTernary.BlockClassification
