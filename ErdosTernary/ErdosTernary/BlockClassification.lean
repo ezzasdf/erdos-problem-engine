@@ -435,8 +435,8 @@ private theorem d2f_card_aux :
     -- Split by MSB: digit k = 0 or digit k = 1
     have hpart :
         ((Finset.range (3 ^ (k + 1))).filter fun n =>
-            (n / 3 ^ k) % 3 ≠ 2 ∧
-            ∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2) =
+            (∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2) ∧
+            (n / 3 ^ k) % 3 ≠ 2) =
         ((Finset.range (3 ^ (k + 1))).filter fun n =>
             n < 3 ^ k ∧ ∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2) ∪
         ((Finset.range (3 ^ (k + 1))).filter fun n =>
@@ -445,7 +445,7 @@ private theorem d2f_card_aux :
       ext n
       simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_union]
       constructor
-      · rintro ⟨hlt, hdne, hall⟩
+      · rintro ⟨hlt, hall, hdne⟩
         -- Make digit and remainder variables so omega can reason about them
         set q := n / 3 ^ k with hq
         set r := n % 3 ^ k with hr
@@ -478,6 +478,7 @@ private theorem d2f_card_aux :
             exact hall t ht
       · rintro (⟨hlt, hlt3, hall⟩ | ⟨hlt, hge, hlt2, hall'⟩)
         · refine ⟨hlt, ?_, ?_⟩
+          · exact fun t ht => hall t ht
           · set q := n / 3 ^ k with hq
             have hq1 : q < 1 := by
               rw [hq]
@@ -485,7 +486,6 @@ private theorem d2f_card_aux :
             have hq0 : q = 0 := Nat.lt_one_iff.mp hq1
             rw [hq0]
             norm_num
-          · exact fun t ht => hall t ht
         · have hlt1 : n < 3 ^ (k + 1) := by
             have h23 : 2 * 3 ^ k ≤ 3 * 3 ^ k := Nat.mul_le_mul_right (3 ^ k) (by omega)
             calc n < 2 * 3 ^ k := hlt2
@@ -506,7 +506,9 @@ private theorem d2f_card_aux :
           have hge' : 1 ≤ q := by
             by_contra h0
             push_neg at h0
-            rw [h0, Nat.mul_zero, Nat.zero_add] at h
+            -- h0 : q < 1
+            have hq0 : q = 0 := Nat.lt_one_iff.mp h0
+            rw [hq0, Nat.mul_zero, Nat.zero_add] at h
             -- h : r = n
             rw [← h] at hge
             exact absurd hge (not_le.mpr hr')
@@ -565,11 +567,11 @@ theorem block1Val_injective (s : Nat) {r₁ r₂ : Nat}
   have hq : 2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15 = 2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15 := by
     have e1 : 2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15 < 3 ^ 15 :=
       Nat.div_lt_of_lt_mul (by
-        rw [show 3 ^ 15 * 3 ^ 15 = 3 ^ 30 from by rw [← Nat.pow_add]; norm_num]
+        rw [show 3 ^ 15 * 3 ^ 15 = 3 ^ 30 from by rw [← Nat.pow_add]]
         exact hv1)
     have e2 : 2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15 < 3 ^ 15 :=
       Nat.div_lt_of_lt_mul (by
-        rw [show 3 ^ 15 * 3 ^ 15 = 3 ^ 30 from by rw [← Nat.pow_add]; norm_num]
+        rw [show 3 ^ 15 * 3 ^ 15 = 3 ^ 30 from by rw [← Nat.pow_add]]
         exact hv2)
     rw [← Nat.mod_eq_of_lt e1, ← Nat.mod_eq_of_lt e2]
     exact h
@@ -578,7 +580,7 @@ theorem block1Val_injective (s : Nat) {r₁ r₂ : Nat}
     have hd := Nat.div_add_mod (2 ^ (s + P * r₁) % 3 ^ 30) (3 ^ 15)
     calc 2 ^ (s + P * r₁) % 3 ^ 30
         = 3 ^ 15 * (2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15) + 2 ^ (s + P * r₁) % 3 ^ 15 := by
-          rw [Nat.add_comm]; exact hd.symm
+          exact hd.symm
       _ = 2 ^ s % 3 ^ 15 + 3 ^ 15 * (2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15) := by
           rw [low15_const s r₁, Nat.add_comm]
   have hv2' : 2 ^ (s + P * r₂) % 3 ^ 30 =
@@ -586,7 +588,7 @@ theorem block1Val_injective (s : Nat) {r₁ r₂ : Nat}
     have hd := Nat.div_add_mod (2 ^ (s + P * r₂) % 3 ^ 30) (3 ^ 15)
     calc 2 ^ (s + P * r₂) % 3 ^ 30
         = 3 ^ 15 * (2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15) + 2 ^ (s + P * r₂) % 3 ^ 15 := by
-          rw [Nat.add_comm]; exact hd.symm
+          exact hd.symm
       _ = 2 ^ s % 3 ^ 15 + 3 ^ 15 * (2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15) := by
           rw [low15_const s r₂, Nat.add_comm]
   apply full_injective s r₁ r₂ h₁ h₂
@@ -594,13 +596,19 @@ theorem block1Val_injective (s : Nat) {r₁ r₂ : Nat}
 
 /-- Block-1 exceptional count ≤ 2^15 for each s. -/
 theorem block1_exceptional_le (s : Nat) :
-    ((Finset.range (3 ^ 15)).filter fun r => noDigit2 (block1Val s r)).card ≤ 2 ^ 15 := by
+    ((Finset.range (3 ^ 15)).filter fun r => noDigit2 (block1Val s r) = true).card ≤ 2 ^ 15 := by
   have hinj : ∀ r₁ r₂, r₁ < 3 ^ 15 → r₂ < 3 ^ 15 →
       block1Val s r₁ = block1Val s r₂ → r₁ = r₂ :=
     fun r₁ r₂ h₁ h₂ heq => block1Val_injective s h₁ h₂ heq
-  have hpre := filter_preimage_le_of_injOn hinj (fun r _ => block1_val_lt s r) noDigit2
-  have hcard : ((Finset.range (3 ^ 15)).filter noDigit2).card = 2 ^ 15 := by
-    unfold noDigit2; exact d2f_card_aux 15
+  have hpre := filter_preimage_le_of_injOn hinj (fun r _ => block1_val_lt s r)
+    (fun r => noDigit2 r = true)
+  have hcard : ((Finset.range (3 ^ 15)).filter (fun r => noDigit2 r = true)).card = 2 ^ 15 := by
+    have h := d2f_card_aux 15
+    rw [show (fun r => noDigit2 r = true) =
+        (fun n => (List.range 15).all fun t => (n / 3 ^ t) % 3 ≠ 2) from by
+      funext r
+      simp [noDigit2, List.all_eq_true, List.mem_range, decide_eq_true_eq]]
+    exact h
   omega
 
 /-! ## Part 6: Convergence facts -/
