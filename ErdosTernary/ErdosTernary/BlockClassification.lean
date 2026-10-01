@@ -522,18 +522,69 @@ private theorem d2f_card_aux :
             omega
           have hq1 : q = 1 := by omega
           refine ⟨hlt, ?_, ?_⟩
-          · rw [hq1]
-            norm_num
           · intro t ht
             rw [digit_below_k_eq hge ht]
             exact hall' t ht
+          · rw [hq1]
+            norm_num
     -- Now count each half
-    rw [hpart, Finset.card_union_eq, d2f_card_aux k, d2f_card_aux k]
-    · ring
+    rw [hpart, Finset.card_union_eq, filter_left_eq, d2f_card_aux k,
+      filter_right_card]
+    · rw [show 2 ^ k + 2 ^ k = 2 ^ k * 2 from by ring, ← Nat.pow_succ]
     · -- Disjoint: left half has all elements < 3^k, right half has all ≥ 3^k
       apply Finset.disjoint_left.mpr
       intro n hL hR
+      simp only [Finset.mem_filter, Finset.mem_range] at hL hR
       omega
+
+/-- Left half (n < 3^k) over range 3^{k+1} agrees with the k-digit filter over range 3^k. -/
+private theorem filter_left_eq (k : Nat) :
+    ((Finset.range (3 ^ (k + 1))).filter fun n =>
+      n < 3 ^ k ∧ ∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2) =
+    ((Finset.range (3 ^ k)).filter fun n =>
+      ∀ t, t < k → (n / 3 ^ t) % 3 ≠ 2) := by
+  ext n
+  simp only [Finset.mem_filter, Finset.mem_range]
+  constructor
+  · rintro ⟨_, hlt3, hall⟩
+    exact ⟨hlt3, hall⟩
+  · rintro ⟨hlt3, hall⟩
+    have h23 : 3 ^ k * 1 ≤ 3 ^ k * 3 := Nat.mul_le_mul_left (3 ^ k) (by omega)
+    rw [Nat.mul_one] at h23
+    have hk : 3 ^ k ≤ 3 ^ (k + 1) := by rw [Nat.pow_succ]; exact h23
+    exact ⟨Nat.lt_of_lt_of_le hlt3 hk, hlt3, hall⟩
+
+/-- Right half (digit k = 1) has cardinality 2^k, by the shift n ↦ n - 3^k. -/
+private theorem filter_right_card (k : Nat) :
+    ((Finset.range (3 ^ (k + 1))).filter fun n =>
+      3 ^ k ≤ n ∧ n < 2 * 3 ^ k ∧ ∀ t, t < k → ((n - 3 ^ k) / 3 ^ t) % 3 ≠ 2).card = 2 ^ k := by
+  have h := d2f_card_aux k
+  have heq :
+      ((Finset.range (3 ^ (k + 1))).filter fun n =>
+        3 ^ k ≤ n ∧ n < 2 * 3 ^ k ∧ ∀ t, t < k → ((n - 3 ^ k) / 3 ^ t) % 3 ≠ 2) =
+      ((Finset.range (3 ^ k)).filter fun m =>
+        ∀ t, t < k → (m / 3 ^ t) % 3 ≠ 2).image (fun m => m + 3 ^ k) := by
+    constructor
+    · intro n hn
+      simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_image] at hn ⊢
+      obtain ⟨hlt, hge', hlt2, hall⟩ := hn.2
+      refine ⟨n - 3 ^ k, ⟨⟨by omega, hall⟩, by omega⟩⟩
+    · intro n hn
+      simp only [Finset.mem_image, Finset.mem_filter, Finset.mem_range] at hn ⊢
+      obtain ⟨m, ⟨hm, hall⟩, rfl⟩ := hn
+      have hlt23 : m + 3 ^ k < 2 * 3 ^ k := by omega
+      have h23 : 2 * 3 ^ k ≤ 3 ^ (k + 1) := by
+        have h2 := Nat.mul_le_mul_right (3 ^ k) (by omega : (2:ℕ) ≤ 3)
+        rw [Nat.mul_comm 3 (3 ^ k)] at h2
+        rwa [← Nat.pow_succ] at h2
+      have hlt1 : m + 3 ^ k < 3 ^ (k + 1) := Nat.lt_of_lt_of_le hlt23 h23
+      refine ⟨hlt1, by omega, hlt23, ?_⟩
+      intro t ht
+      rw [show m + 3 ^ k - 3 ^ k = m from Nat.add_sub_cancel_right m (3 ^ k)]
+      exact hall t ht
+  rw [heq, Finset.card_image_of_injOn, h]
+  · intro a₁ _ a₂ _ heq'
+    omega
 
 /-- Low 15 bits of 2^(s+P·r) mod 3^30 are constant in r (Euler: 2^P ≡ 1 mod 3^15). -/
 private theorem low15_const (s : Nat) : ∀ r, 2 ^ (s + P * r) % 3 ^ 15 = 2 ^ s % 3 ^ 15 := by
@@ -575,22 +626,28 @@ theorem block1Val_injective (s : Nat) {r₁ r₂ : Nat}
         exact hv2)
     rw [← Nat.mod_eq_of_lt e1, ← Nat.mod_eq_of_lt e2]
     exact h
+  have hlow₁ : (2 ^ (s + P * r₁) % 3 ^ 30) % 3 ^ 15 = 2 ^ s % 3 ^ 15 := by
+    rw [Nat.mod_mod_of_dvd (2 ^ (s + P * r₁)) (by norm_num : 3 ^ 15 ∣ 3 ^ 30)]
+    exact low15_const s r₁
+  have hlow₂ : (2 ^ (s + P * r₂) % 3 ^ 30) % 3 ^ 15 = 2 ^ s % 3 ^ 15 := by
+    rw [Nat.mod_mod_of_dvd (2 ^ (s + P * r₂)) (by norm_num : 3 ^ 15 ∣ 3 ^ 30)]
+    exact low15_const s r₂
   have hv1' : 2 ^ (s + P * r₁) % 3 ^ 30 =
       2 ^ s % 3 ^ 15 + 3 ^ 15 * (2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15) := by
     have hd := Nat.div_add_mod (2 ^ (s + P * r₁) % 3 ^ 30) (3 ^ 15)
     calc 2 ^ (s + P * r₁) % 3 ^ 30
-        = 3 ^ 15 * (2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15) + 2 ^ (s + P * r₁) % 3 ^ 15 := by
+        = 3 ^ 15 * (2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15) + (2 ^ (s + P * r₁) % 3 ^ 30) % 3 ^ 15 := by
           exact hd.symm
       _ = 2 ^ s % 3 ^ 15 + 3 ^ 15 * (2 ^ (s + P * r₁) % 3 ^ 30 / 3 ^ 15) := by
-          rw [low15_const s r₁, Nat.add_comm]
+          rw [hlow₁, Nat.add_comm]
   have hv2' : 2 ^ (s + P * r₂) % 3 ^ 30 =
       2 ^ s % 3 ^ 15 + 3 ^ 15 * (2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15) := by
     have hd := Nat.div_add_mod (2 ^ (s + P * r₂) % 3 ^ 30) (3 ^ 15)
     calc 2 ^ (s + P * r₂) % 3 ^ 30
-        = 3 ^ 15 * (2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15) + 2 ^ (s + P * r₂) % 3 ^ 15 := by
+        = 3 ^ 15 * (2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15) + (2 ^ (s + P * r₂) % 3 ^ 30) % 3 ^ 15 := by
           exact hd.symm
       _ = 2 ^ s % 3 ^ 15 + 3 ^ 15 * (2 ^ (s + P * r₂) % 3 ^ 30 / 3 ^ 15) := by
-          rw [low15_const s r₂, Nat.add_comm]
+          rw [hlow₂, Nat.add_comm]
   apply full_injective s r₁ r₂ h₁ h₂
   rw [hv1', hv2', hq]
 
@@ -604,10 +661,14 @@ theorem block1_exceptional_le (s : Nat) :
     (fun r => noDigit2 r = true)
   have hcard : ((Finset.range (3 ^ 15)).filter (fun r => noDigit2 r = true)).card = 2 ^ 15 := by
     have h := d2f_card_aux 15
-    rw [show (fun r => noDigit2 r = true) =
-        (fun n => (List.range 15).all fun t => (n / 3 ^ t) % 3 ≠ 2) from by
-      funext r
-      simp [noDigit2, List.all_eq_true, List.mem_range, decide_eq_true_eq]]
+    have heq :
+        (Finset.range (3 ^ 15)).filter (fun r => noDigit2 r = true) =
+        (Finset.range (3 ^ 15)).filter (fun n => (List.range 15).all fun t => (n / 3 ^ t) % 3 ≠ 2) := by
+      ext r
+      simp only [Finset.mem_filter, Finset.mem_range]
+      rw [show noDigit2 r = true ↔ (List.range 15).all fun t => (r / 3 ^ t) % 3 ≠ 2 from by
+        simp [noDigit2, List.all_eq_true, List.mem_range, decide_eq_true_eq]
+    rw [heq]
     exact h
   omega
 
