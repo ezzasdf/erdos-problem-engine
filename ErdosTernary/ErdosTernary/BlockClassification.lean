@@ -8,6 +8,8 @@
 -/
 import Mathlib.Tactic
 import Mathlib.Data.Int.GCD
+import Mathlib.NumberTheory.Multiplicity
+import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import ErdosTernary.BridgeCompute
 import ErdosTernary.Narkiewicz
 
@@ -163,50 +165,25 @@ private theorem cast_natCast_pow_mod_eq_zero {m : Nat} (hm : 0 < m) {a : Nat}
     (h : a % m = 0) : (a : ZMod m) = 0 := by
   rw [ZMod.natCast_zmod_eq_zero_iff_dvd]; omega
 
-/-- Bridge for m >= 2 (m = 1 would make the iff false: LHS always 0). -/
-private theorem mod_eq_one_iff_cast {m : Nat} (hm : 2 ≤ m) {a : Nat} :
-    a % m = 1 ↔ (a : ZMod m) = 1 := by
-  have key : ((1 : Nat) : ZMod m) = (1 : ZMod m) := Nat.cast_one
-  constructor
-  · intro h
-    rw [← key]
-    apply (ZMod.natCast_eq_natCast_iff a 1 m).mpr
-    show a ≡ 1 [MOD m]
-    show a % m = 1 % m
-    rw [h, Nat.mod_eq_of_lt (by omega : 1 < m)]
-  · intro h
-    have h' : (a : ZMod m) = ((1 : Nat) : ZMod m) := by
-      rw [key]; exact h
-    have hm' := (ZMod.natCast_eq_natCast_iff a 1 m).mp h'
-    have hm'' : a % m = 1 % m := hm'
-    rw [Nat.mod_eq_of_lt (by omega : 1 < m)] at hm''
-    exact hm''
+-- REMOVED (superseded by the LTE proof below): `mod_eq_one_iff_cast` and
+-- `pow_gcd_mod30` (ZMod-cast bridge). Applying cast-iff lemmas against
+-- file-elaborated hypotheses triggered isDefEq fallbacks that whnf'd 2^P
+-- (maxRecDepth/OOM). The order-divisibility result is now proved cast-free
+-- via padicValNat + LTE; research history preserved in git.
 
-private theorem pow_gcd_mod30 (a b : Nat)
-    (ha : (2 ^ P) ^ a % 3 ^ 30 = 1) (hb : (2 ^ P) ^ b % 3 ^ 30 = 1) :
-    (2 ^ P) ^ (Nat.gcd a b) % 3 ^ 30 = 1 := by
-  have hza : (2 ^ P : ZMod (3 ^ 30)) ^ a = 1 := by
-    have hx : ((2 ^ P) ^ a) ≡ 1 [MOD 3 ^ 30] := by
-      show ((2 ^ P) ^ a) % 3 ^ 30 = 1 % 3 ^ 30
-      rw [ha, Nat.mod_eq_of_lt (by norm_num : 1 < 3 ^ 30)]
-    have hcast := (ZMod.natCast_eq_natCast_iff ((2 ^ P) ^ a) 1 (3 ^ 30)).mpr hx
-    rw [Nat.cast_one] at hcast
-    rwa [Nat.cast_pow] at hcast
-  have hzb : (2 ^ P : ZMod (3 ^ 30)) ^ b = 1 := by
-    have hx : ((2 ^ P) ^ b) ≡ 1 [MOD 3 ^ 30] := by
-      show ((2 ^ P) ^ b) % 3 ^ 30 = 1 % 3 ^ 30
-      rw [hb, Nat.mod_eq_of_lt (by norm_num : 1 < 3 ^ 30)]
-    have hcast := (ZMod.natCast_eq_natCast_iff ((2 ^ P) ^ b) 1 (3 ^ 30)).mpr hx
-    rw [Nat.cast_one] at hcast
-    rwa [Nat.cast_pow] at hcast
-  have hz := pow_gcd_eq_one (2 ^ P : ZMod (3 ^ 30)) hza hzb
-  have h1 : ((2 ^ P) ^ (Nat.gcd a b) : ZMod (3 ^ 30)) = 1 := by
-    rw [Nat.cast_pow]; exact hz
-  have hcast : ((2 ^ P) ^ (Nat.gcd a b) : ZMod (3 ^ 30)) = ((1 : Nat) : ZMod (3 ^ 30)) := by
-    rw [h1, Nat.cast_one]
-  have hm' := (ZMod.natCast_eq_natCast_iff ((2 ^ P) ^ (Nat.gcd a b)) 1 (3 ^ 30)).mp hcast
-  have hm'' : ((2 ^ P) ^ (Nat.gcd a b)) % 3 ^ 30 = 1 % 3 ^ 30 := hm'
-  rwa [Nat.mod_eq_of_lt (by norm_num : 1 < 3 ^ 30)] at hm''
+private theorem coprime_2_3_15 : Nat.Coprime 2 (3 ^ 15) :=
+  Nat.Coprime.pow_right 15 (by decide : Nat.Coprime 2 3)
+
+private theorem totient_3_15 : Nat.totient (3 ^ 15) = P := by
+  rw [Nat.totient_prime_pow (by decide : Nat.Prime 3) (by omega : 0 < 15)]
+  show 3 ^ (15 - 1) * (3 - 1) = P
+  rw [show P = 2 * 3 ^ 14 from rfl]; norm_num
+
+private theorem two_pow_P_mod_3_15_eq_1 : 2 ^ P % 3 ^ 15 = 1 := by
+  have h := Nat.ModEq.pow_totient coprime_2_3_15
+  rw [totient_3_15] at h
+  have h2 : 2 ^ P % 3 ^ 15 = 1 % 3 ^ 15 := h
+  rwa [Nat.mod_eq_of_lt (by norm_num : 1 < 3 ^ 15)] at h2
 
 /-! The order of 2^P mod 3^30 is 3^15.
     Since (2^P)^(3^15) ≡ 1 and (2^P)^(3^14) ≢ 1, the only divisor of 3^15
@@ -215,23 +192,93 @@ private theorem pow_gcd_mod30 (a b : Nat)
 private theorem pow_eq_one_implies_order_dvd (d : Nat) (hd : 0 < d) :
     (2 ^ P) ^ d % 3 ^ 30 = 1 → 3 ^ 15 ∣ d := by
   intro h
-  have hgcd := pow_gcd_mod30 d (3 ^ 15) h euler_result
-  have hgcd_dvd : Nat.gcd d (3 ^ 15) ∣ 3 ^ 15 := Nat.gcd_dvd_right d (3 ^ 15)
-  obtain ⟨k, hk_le, hg⟩ := (Nat.dvd_prime_pow (by decide : Nat.Prime 3)).mp hgcd_dvd
-  by_cases hk14 : k < 15
-  · -- k ≤ 14: 3^k | 3^14, so (2^P)^(3^14) ≡ 1, contradiction
-    have hk14' : k ≤ 14 := by omega
-    have h3k : (2 ^ P) ^ (3 ^ k) % 3 ^ 30 = 1 := by
-      rw [hg] at hgcd
-      exact hgcd
-    have h314 : (2 ^ P) ^ (3 ^ 14) % 3 ^ 30 = 1 := by
-      have hsplit : 3 ^ 14 = 3 ^ k * 3 ^ (14 - k) := by rw [← Nat.pow_add]; omega
-      rw [hsplit, pow_mul, Nat.pow_mod, h3k, Nat.one_pow]
-      exact Nat.mod_eq_of_lt (by norm_num : 1 < 3 ^ 30)
-    exact absurd h314 pow_P_3_14_ne_1
-  · -- k ≥ 15 and k ≤ 15, so k = 15
-    have : k = 15 := by omega
-    subst this; exact Nat.dvd_refl (3 ^ 15)
+  -- Cast-free proof via LTE (Lifting The Exponent) on padicValNat.
+  -- v_3((2^P)^d - 1) = v_3(2^P - 1) + v_3(d) = 15 + v_3(d),
+  -- and (2^P)^d ≡ 1 (mod 3^30) iff v_3((2^P)^d - 1) ≥ 30 iff v_3(d) ≥ 15
+  -- iff 3^15 ∣ d.
+  haveI hFact3 : Fact (Nat.Prime 3) := ⟨by norm_num⟩
+  have h1le : 1 ≤ 2 ^ P := Nat.succ_le_of_lt (Nat.pow_pos (n := P) (by norm_num : 0 < 2))
+  have hP1 : 1 ≤ P := by unfold P; norm_num
+  have h2P : 2 ≤ 2 ^ P := by
+    rw [show P = (P - 1) + 1 from by omega, Nat.pow_succ]
+    have hp1 : 1 ≤ 2 ^ (P - 1) := Nat.succ_le_of_lt (Nat.pow_pos (n := P - 1) (by norm_num : 0 < 2))
+    omega
+  have hpow16 : 2 ^ P % 3 ^ 16 = 14348908 := by rw [← pow2Mod_eq]; native_decide
+  have h1d : 1 ≤ (2 ^ P) ^ d := Nat.succ_le_of_lt (Nat.pow_pos (n := d) (Nat.pow_pos (n := P) (by norm_num : 0 < 2)))
+  have h2d : 2 ≤ (2 ^ P) ^ d := by
+    have h1 : (2 ^ P) ^ 1 ≤ (2 ^ P) ^ d := pow_le_pow_right' h1le (Nat.succ_le_of_lt hd)
+    rw [Nat.pow_one] at h1
+    exact le_trans h2P h1
+  have ha_pos : 0 < (2 ^ P) ^ d - 1 :=
+    Nat.sub_pos_of_lt (lt_of_lt_of_le (by norm_num : (1:ℕ) < 2) h2d)
+  have ha_ne : (2 ^ P) ^ d - 1 ≠ 0 := ne_of_gt ha_pos
+  have hb_pos : 0 < 2 ^ P - 1 := Nat.sub_pos_of_lt (lt_of_lt_of_le (by norm_num : (1:ℕ) < 2) h2P)
+  have hne : 2 ^ P - 1 ≠ 0 := ne_of_gt hb_pos
+  -- A: h -> 3^30 ∣ (2^P)^d - 1
+  have hme : (1 : Nat) ≡ (2 ^ P) ^ d [MOD 3 ^ 30] := by
+    show (1 : Nat) % 3 ^ 30 = (2 ^ P) ^ d % 3 ^ 30
+    rw [show (1 : Nat) % 3 ^ 30 = 1 from by norm_num]
+    exact h.symm
+  have hdiv : 3 ^ 30 ∣ (2 ^ P) ^ d - 1 := (Nat.modEq_iff_dvd' h1d).mp hme
+  -- B: v3(2^P - 1) = 15
+  have hpow15 : 2 ^ P % 3 ^ 15 = 1 := two_pow_P_mod_3_15_eq_1
+  have hme15 : (1 : Nat) ≡ 2 ^ P [MOD 3 ^ 15] := by
+    show (1 : Nat) % 3 ^ 15 = 2 ^ P % 3 ^ 15
+    rw [show (1 : Nat) % 3 ^ 15 = 1 from by norm_num]
+    exact hpow15.symm
+  have hdvd15 : 3 ^ 15 ∣ 2 ^ P - 1 := (Nat.modEq_iff_dvd' h1le).mp hme15
+  have hnot16 : ¬3 ^ 16 ∣ 2 ^ P - 1 := by
+    intro hdiv16
+    have hme16 : (1 : Nat) ≡ 2 ^ P [MOD 3 ^ 16] := (Nat.modEq_iff_dvd' h1le).mpr hdiv16
+    have h16eq : 1 % 3 ^ 16 = 2 ^ P % 3 ^ 16 := hme16
+    rw [show (1 : Nat) % 3 ^ 16 = 1 from by norm_num] at h16eq
+    rw [← h16eq] at hpow16
+    omega
+  have h15 : 15 ≤ padicValNat 3 (2 ^ P - 1) :=
+    (padicValNat_dvd_iff_le (p := 3) hne).mp hdvd15
+  have h16 : ¬16 ≤ padicValNat 3 (2 ^ P - 1) := by
+    intro hle
+    exact hnot16 ((padicValNat_dvd_iff_le (p := 3) hne).mpr hle)
+  have hpvB : padicValNat 3 (2 ^ P - 1) = 15 := by
+    rcases Nat.lt_or_ge (padicValNat 3 (2 ^ P - 1)) 15 with hlt | hge
+    · exact absurd hlt (not_lt.mpr h15)
+    · have hlt16 : padicValNat 3 (2 ^ P - 1) < 16 := not_le.mp h16
+      have hle15 : padicValNat 3 (2 ^ P - 1) ≤ 15 := Nat.le_of_lt_succ hlt16
+      exact Nat.le_antisymm hle15 hge
+  -- C: LTE
+  have h3 : 2 ^ P % 3 = 1 := by
+    have h31 := Nat.mod_mod_of_dvd (2 ^ P) (by norm_num : 3 ∣ 3 ^ 15)
+    rw [hpow15] at h31
+    rw [show (1 : Nat) % 3 = 1 from by norm_num] at h31
+    exact h31.symm
+  have hme3 : (1 : Nat) ≡ 2 ^ P [MOD 3] := by
+    show (1 : Nat) % 3 = 2 ^ P % 3
+    rw [show (1 : Nat) %  3 = 1 from by norm_num]
+    exact h3.symm
+  have hdvd3 : 3 ∣ 2 ^ P - 1 := (Nat.modEq_iff_dvd' h1le).mp hme3
+  have hnot3 : ¬3 ∣ 2 ^ P := by
+    intro h
+    rw [Nat.dvd_iff_mod_eq_zero] at h
+    rw [h3] at h
+    omega
+  have hodd3 : Odd 3 := ⟨1, by norm_num⟩
+  have hmul := multiplicity.Nat.pow_sub_pow (p := 3) (hp := by norm_num) (hp1 := hodd3) hdvd3 hnot3 d
+  rw [Nat.one_pow] at hmul
+  have hpv_a := padicValNat_def' (by norm_num : 3 ≠ 1) ha_pos
+  have hpv_b := padicValNat_def' (by norm_num : 3 ≠ 1) hb_pos
+  have hpv_d := padicValNat_def' (by norm_num : 3 ≠ 1) hd
+  rw [← hpv_a, ← hpv_b, ← hpv_d] at hmul
+  push_cast at hmul
+  have hsum : padicValNat 3 ((2 ^ P) ^ d - 1) = padicValNat 3 (2 ^ P - 1) + padicValNat 3 d := by
+    exact_mod_cast hmul
+  rw [hpvB] at hsum
+  -- D: conclusion
+  clear h15 h16 hnot16 hdvd15 hme15 hne hpv_b hpvB
+  have h30 : 30 ≤ padicValNat 3 ((2 ^ P) ^ d - 1) :=
+    (padicValNat_dvd_iff_le (p := 3) ha_ne).mp hdiv
+  rw [hsum] at h30
+  have hge : 15 ≤ padicValNat 3 d := by omega
+  exact (padicValNat_dvd_iff_le (p := 3) (Nat.pos_iff_ne_zero.mp hd)).mpr hge
 
 /-! ## Part 3: Injectivity of the full residue map -/
 
