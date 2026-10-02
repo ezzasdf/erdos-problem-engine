@@ -705,6 +705,26 @@ private theorem digitMod_cantor_P_m (s m : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8)
     rw [Nat.mul_mod, two_pow_s_mod3 s hs, Nat.mul_one,
       Nat.mod_mod_of_dvd m (by omega : 3 ∣ 3)]]
 
+/-- Any digit-2 of 2^r below K_star r is a digit-2 of criticalGap r. -/
+private theorem criticalGap_digit2_of_digitMod (r j : Nat) (hj : j < K_star r)
+    (hd : digitMod r j = 2) : ∃ i, digit₃ (criticalGap r) i = 2 := by
+  refine ⟨j, ?_⟩
+  rw [digit₃_criticalGap_eq r j hj]
+  rw [← digitMod_eq_digit₃]
+  exact hd
+
+/-- For r >= P, positions 15..300 all lie below K_star r (3^301 <= 2^478 <= 2^P <= 2^r). -/
+private theorem digit_window_lt_K_star (r : Nat) (hrP : r ≥ 162 * 59049)
+    (hj : j ≤ 300) : j < K_star r := by
+  have h3 : (3 : Nat) ^ 301 ≤ 2 ^ r := by
+    have h1 : (3 : Nat) ^ 301 ≤ 2 ^ 478 := by norm_num
+    have h2 : (2 : Nat) ^ 478 ≤ 2 ^ (162 * 59049) :=
+      Nat.pow_le_pow_right (by norm_num : (0 : Nat) < 2) (by norm_num)
+    have h3' : (2 : Nat) ^ (162 * 59049) ≤ 2 ^ r :=
+      Nat.pow_le_pow_right (by norm_num : (0 : Nat) < 2) (by omega)
+    exact le_trans h1 (le_trans h2 h3')
+  exact lt_of_le_of_lt hj (K_star_gt_j r 300 h3)
+
 private theorem cantor_survivor_large_r (r : Nat) (hc : memCantorNat (2 ^ r))
     (hr : r > 8) (hr_even : r % 2 = 0)
     (hN5 : ∀ j < 5, digit₃ (2^r) j ∈ ({0, 1} : Finset Nat))
@@ -843,14 +863,43 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hc : memCantorNat (2 ^ r))
                     have hjK : dj + 5 < K_star r := K_star_gt_j r (dj + 5) (le_trans h3j h2r)
                     rw [digit₃_criticalGap_eq r (dj + 5) hjK]
                     exact hdj3⟩
-                · -- ρ ≥ 162: RESEARCH BLOCKER — the digit-2 of 2^r at positions ≥ 15
-                  -- depends on the quotient k = r / P; for ρ with all 15 low digits of
-                  -- 2^ρ clean (e.g. ρ = 332) no position ≤ 14 carries a 2, and a
-                  -- certificate on ρ cannot transfer above position 14 (2^P ≡ 1 only
-                  -- mod 3^15). Producing the digit requires the non-exceptional-state
-                  -- descent, which does not exist in this file yet. See
-                  -- .superpowers/sdd/phase3-bridge.md (Task ledger).
-                  sorry
+                · -- ρ ≥ 162: P4 hit-split + fixed digit window [15, 61)
+                  -- (P4) Exceptional state at level 6: uK 6 = 486 | P, so
+                  -- r mod 486 = ρ mod 486; if that state is in {0,2,8},
+                  -- cantor_exceptional_forces_zero at K=6 gives r/6 = 0,
+                  -- hence r = r mod 486 < 486 < P ≤ r — contradiction.
+                  by_cases h486 : r % 486 ∈ ({0, 2, 8} : Finset Nat)
+                  · have huK6 : uK 6 = 486 := by norm_num [uK]
+                    have hs_val : r % uK 6 = 0 ∨ r % uK 6 = 2 ∨ r % uK 6 = 8 := by
+                      rw [huK6]
+                      simp only [Finset.mem_insert, Finset.mem_singleton] at h486
+                      exact h486
+                    have hre : r = r % uK 6 + (r / uK 6) * uK 6 := by
+                      have h := Nat.div_add_mod r (uK 6)
+                      rw [mul_comm, add_comm] at h
+                      exact h.symm
+                    have hq0 : r / uK 6 = 0 :=
+                      cantor_exceptional_forces_zero (r % uK 6) (r / uK 6) 6
+                        hs_val (by omega)
+                        (Nat.mod_lt r (by norm_num [uK] : (0 : Nat) < uK 6))
+                        (by rw [← hre]; exact hc)
+                    exfalso
+                    have hlt : r < 486 := by
+                      rw [hre, hq0, Nat.zero_mul, Nat.add_zero, huK6]
+                      exact Nat.mod_lt r (by norm_num : (0 : Nat) < 486)
+                    omega
+                  · rcases em (∃ j, 15 ≤ j ∧ j < 301 ∧ digitMod r j = 2)
+                      with ⟨j, hj15, hj61, hd⟩ | hclean
+                    · exact criticalGap_digit2_of_digitMod r j
+                        (digit_window_lt_K_star r (by omega) (by omega)) hd
+                    · -- RESIDUAL SORRY (scoped): rho >= 162, rho notin {0,2,8},
+                      -- rho mod 486 notin {0,2,8}, and every digit 15..300 of 2^r
+                      -- differs from 2 (no digit-2 in the window [15, 301)).
+                      -- Empirically p(rho,q) <= 15 + floor(log3 q) + 13 (max excess 13
+                      -- over ~10^5 q), so only adversarial long-clean-prefix q reach
+                      -- this case; a full proof needs tail bound INV-2 (research:
+                      -- phase3-bridge.md Front 2, section D).
+                      sorry
       · -- r not N5: low-digit obstruction
         obtain ⟨j, hjK, hj2⟩ := even_not_N5_digit2_below_K r hr48' hr_even hN5
         exact ⟨j, by rw [digit₃_criticalGap_eq r j hjK]; exact hj2⟩
