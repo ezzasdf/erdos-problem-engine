@@ -830,6 +830,66 @@ private theorem digit_window_lt_K_star (r : Nat) (hrP : r ≥ 162 * 59049)
     exact le_trans h1 (le_trans h2 h3')
   exact lt_of_le_of_lt hj (K_star_gt_j r 300 h3)
 
+/-! ## Part G7: Prefix induction over q's ternary digits + residual barrier
+
+    Step 3 of the recommended order (phase3-bridge.md F): G_j = digit_{15+j} is a
+    function of q's ternary prefix; the window is determined by q mod 3^(N+1).
+
+    digit_shift_remainder: digit_{15+j}(2^(ρ+P·q)) = digit_{15+j}(2^(ρ+P·(q mod 3^(j+1)))).
+    digit_prefix_determinism: equal prefixes of length N+1 ⟹ equal window digits 15..15+N
+    (locality at each level j ≤ N — induction over the prefix).
+    ternary_prefix_digits: prefix-mod equality ⟹ ternary digits d_0..d_N agree.
+    criticalGap_no_digit2_of_memCantor: 2^r Cantor ⟹ criticalGap r has NO digit 2 at any
+    position. Formal barrier for the R2 residual: the branch goal (∃ i, digit₃(criticalGap r) i = 2)
+    is refuted by hc alone, so that branch closes only by deriving False from its hypotheses.
+    Prefix determinism pins q mod 3^287 but is satisfiable for every depth (gj_bfs: exactly
+    2^j survivors at level j); the contradiction needs the clean tail beyond position 300
+    up to K_star r — the INV-2 tail bound (RESEARCH, phase3-bridge.md D). Hence prefix
+    induction alone does NOT eliminate the residual sorry. -/
+
+/-- The G_j digit at 15+j depends only on q mod 3^(j+1). -/
+theorem digit_shift_remainder (ρ q j : Nat) :
+    digit₃ (2 ^ (ρ + P * q)) (15 + j) =
+    digit₃ (2 ^ (ρ + P * (q % 3 ^ (j + 1)))) (15 + j) := by
+  exact digit_shift_locality ρ q (q % 3 ^ (j + 1)) j
+    (Nat.mod_eq_of_lt (Nat.mod_lt _ (Nat.pow_pos (by omega)))).symm
+
+/-- Prefix induction over q's ternary digits: the window digits 15..15+N of 2^(ρ+P·q)
+    are determined by the ternary prefix q mod 3^(N+1). -/
+theorem digit_prefix_determinism (ρ q q' N : Nat)
+    (h : q % 3 ^ (N + 1) = q' % 3 ^ (N + 1)) :
+    ∀ j ≤ N,
+      digit₃ (2 ^ (ρ + P * q)) (15 + j) =
+      digit₃ (2 ^ (ρ + P * q')) (15 + j) := by
+  intro j hj
+  apply digit_shift_locality ρ q q' j
+  rw [← Nat.mod_mod_of_dvd q (Nat.pow_dvd_pow 3 (show j + 1 ≤ N + 1 by omega)), h]
+  exact Nat.mod_mod_of_dvd q' (Nat.pow_dvd_pow 3 (show j + 1 ≤ N + 1 by omega))
+
+/-- Equal ternary prefixes of length N+1 have equal ternary digits d_0..d_N. -/
+theorem ternary_prefix_digits (q q' N : Nat)
+    (h : q % 3 ^ (N + 1) = q' % 3 ^ (N + 1)) :
+    ∀ k ≤ N, q / 3 ^ k % 3 = q' / 3 ^ k % 3 := by
+  intro k hk
+  rw [digit_eq_of_modPow q k (N + 1) (by omega),
+      digit_eq_of_modPow q' k (N + 1) (by omega), h]
+
+/-- Barrier: for Cantor 2^r, criticalGap r has no digit 2 at any position —
+    i < K_star by digit₃_criticalGap_eq + hc; i = K_star by criticalGap_digit_K_star_ne_two;
+    i > K_star by criticalGap_digit_gt_K_star. -/
+theorem criticalGap_no_digit2_of_memCantor (r : Nat)
+    (hc : memCantorNat (2 ^ r)) : ∀ i, digit₃ (criticalGap r) i ≠ 2 := by
+  intro i
+  rcases lt_or_ge i (K_star r) with hlt | hge
+  · rw [digit₃_criticalGap_eq r i hlt]
+    exact hc i
+  · by_cases heq : i = K_star r
+    · rw [heq]
+      exact criticalGap_digit_K_star_ne_two r
+    · have hgt : K_star r < i := by omega
+      rw [criticalGap_digit_gt_K_star r i hgt]
+      exact (by norm_num : (0 : Nat) ≠ 2)
+
 private theorem cantor_survivor_large_r (r : Nat) (hc : memCantorNat (2 ^ r))
     (hr : r > 8) (hr_even : r % 2 = 0)
     (hN5 : ∀ j < 5, digit₃ (2^r) j ∈ ({0, 1} : Finset Nat))
@@ -1000,13 +1060,14 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hc : memCantorNat (2 ^ r))
                     · -- RESIDUAL SORRY (scoped): rho >= 162, rho notin {0,2,8},
                       -- rho mod 486 notin {0,2,8}, and every digit 5..300 of 2^r
                       -- differs from 2 (no digit-2 in the window [5, 301)).
-                      -- Positions 5..14 subsume the rho<162 low-digit certificate
-                      -- (hN5 covers 0..4); G_j locality/recurrence (Part G6) are the
-                      -- route to eliminating the residual, not bounding it.
-                      -- Empirically p(rho,q) <= 15 + floor(log3 q) + 13 (max excess 13
-                      -- over ~10^5 q), so only adversarial long-clean-prefix q reach
-                      -- this case; a full proof needs tail bound INV-2 (research:
-                      -- phase3-bridge.md Front 2, section D).
+                      -- G7 formal barrier: criticalGap_no_digit2_of_memCantor shows
+                      -- hc (memCantorNat) refutes the branch goal outright, so this
+                      -- branch closes only by deriving False from its hypotheses;
+                      -- digit_prefix_determinism pins the window to q's ternary
+                      -- prefix (satisfiable at every depth — gj_bfs survivors 2^j),
+                      -- and the clean tail beyond 300 up to K_star r is exactly the
+                      -- INV-2 tail bound (RESEARCH: phase3-bridge.md D). Prefix
+                      -- induction alone does not eliminate this sorry.
                       sorry
       · -- r not N5: low-digit obstruction
         obtain ⟨j, hjK, hj2⟩ := even_not_N5_digit2_below_K r hr48' hr_even hN5
