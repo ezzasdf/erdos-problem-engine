@@ -712,8 +712,8 @@ private theorem digitMod_cantor_P_m (s m : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8)
     by Euler (Nat.ModEq.pow_totient); digit extraction via digit_eq_of_modPow.
 
     digit_shift_recurrence: X_{j+1}(q + d·3^(j+1)) = X_{j+1}(q)·w^d (mod 3^(17+j))
-    with w = ((2^P)^(3^(j+1)))^d mod 3^(17+j) — the exact G_j transition
-    (state space bijective of size 3^(j+2); recurrence validated j ≤ 10). -/
+    with w^d = ((2^P)^(3^(j+1)))^d mod 3^(17+j) — the exact G_j transition
+    (state space bijective of size 3^(j+2), j ≤ 10; recurrence validated j ≤ 30). -/
 
 private theorem gj_P_eq : P = 2 * 3 ^ 14 := by unfold P; norm_num
 
@@ -968,7 +968,7 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hc : memCantorNat (2 ^ r))
                     have hjK : dj + 5 < K_star r := K_star_gt_j r (dj + 5) (le_trans h3j h2r)
                     rw [digit₃_criticalGap_eq r (dj + 5) hjK]
                     exact hdj3⟩
-                · -- ρ ≥ 162: P4 hit-split + fixed digit window [15, 61)
+                · -- ρ ≥ 162: P4 hit-split + fixed digit window [5, 301)
                   -- (P4) Exceptional state at level 6: uK 6 = 486 | P, so
                   -- r mod 486 = ρ mod 486; if that state is in {0,2,8},
                   -- cantor_exceptional_forces_zero at K=6 gives r/6 = 0,
@@ -994,7 +994,7 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hc : memCantorNat (2 ^ r))
                       exact Nat.mod_lt r (by norm_num : (0 : Nat) < 486)
                     omega
                   · rcases em (∃ j, 5 ≤ j ∧ j < 301 ∧ digitMod r j = 2)
-                      with ⟨j, hj5, hj61, hd⟩ | hclean
+                      with ⟨j, hj5, hj301, hd⟩ | hclean
                     · exact criticalGap_digit2_of_digitMod r j
                         (digit_window_lt_K_star r (by omega) (by omega)) hd
                     · -- RESIDUAL SORRY (scoped): rho >= 162, rho notin {0,2,8},
