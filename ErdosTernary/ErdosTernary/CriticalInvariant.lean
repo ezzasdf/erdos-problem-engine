@@ -705,6 +705,111 @@ private theorem digitMod_cantor_P_m (s m : Nat) (hs : s = 0 ∨ s = 2 ∨ s = 8)
     rw [Nat.mul_mod, two_pow_s_mod3 s hs, Nat.mul_one,
       Nat.mod_mod_of_dvd m (by omega : 3 ∣ 3)]]
 
+/-! ## Part G6: G_j locality and transition recurrence (validated in gj_validate.py)
+
+    digit_shift_locality: q ≡ q' (mod 3^(j+1)) → digit_{15+j}(2^(ρ+P·q)) agrees.
+    Proof: P·3^(j+1) = 2·3^(15+j) = φ(3^(16+j)), so 2^(P·3^(j+1)) ≡ 1 (mod 3^(16+j))
+    by Euler (Nat.ModEq.pow_totient); digit extraction via digit_eq_of_modPow.
+
+    digit_shift_recurrence: X_{j+1}(q + d·3^(j+1)) = X_{j+1}(q)·w^d (mod 3^(17+j))
+    with w = ((2^P)^(3^(j+1)))^d mod 3^(17+j) — the exact G_j transition
+    (state space bijective of size 3^(j+2); recurrence validated j ≤ 10). -/
+
+private theorem gj_P_eq : P = 2 * 3 ^ 14 := by unfold P; norm_num
+
+private theorem gj_totient_3_16_add (j : Nat) :
+    Nat.totient (3 ^ (16 + j)) = 2 * 3 ^ (15 + j) := by
+  rw [Nat.totient_prime_pow (by decide : Nat.Prime 3) (by omega : 0 < 16 + j)]
+  rw [show 16 + j - 1 = 15 + j from by omega]
+  ring
+
+private theorem two_pow_periodic_mod_3_pow (j : Nat) :
+    (2 ^ (P * 3 ^ (j + 1))) % 3 ^ (16 + j) = 1 := by
+  have hc : Nat.Coprime 2 (3 ^ (16 + j)) :=
+    Nat.Coprime.pow_right _ (by decide : Nat.Coprime 2 3)
+  have hmod := Nat.ModEq.pow_totient hc
+  have key : Nat.totient (3 ^ (16 + j)) = P * 3 ^ (j + 1) := by
+    rw [gj_totient_3_16_add, gj_P_eq,
+      show 2 * 3 ^ 14 * 3 ^ (j + 1) = 2 * (3 ^ 14 * 3 ^ (j + 1)) from by ring,
+      ← Nat.pow_add, show 14 + (j + 1) = 15 + j from by omega]
+  rw [key] at hmod
+  have h1 : 1 % 3 ^ (16 + j) = 1 := Nat.mod_eq_of_lt
+    (lt_of_lt_of_le (by norm_num : (1 : Nat) < 3)
+      (Nat.pow_le_pow_right (by norm_num : (0 : Nat) < 3) (by omega : 1 ≤ 16 + j)))
+  have hm2 : 2 ^ (P * 3 ^ (j + 1)) % 3 ^ (16 + j) = 1 % 3 ^ (16 + j) := hmod
+  rw [h1] at hm2
+  exact hm2
+
+private theorem digit_shift_step (ρ y j : Nat) :
+    2 ^ (ρ + P * (y + 3 ^ (j + 1))) % 3 ^ (16 + j) =
+    2 ^ (ρ + P * y) % 3 ^ (16 + j) := by
+  have hadd : ρ + P * (y + 3 ^ (j + 1)) = (ρ + P * y) + P * 3 ^ (j + 1) := by ring
+  rw [hadd]
+  rw [Nat.pow_add 2 (ρ + P * y) (P * 3 ^ (j + 1))]
+  rw [Nat.mul_mod]
+  rw [two_pow_periodic_mod_3_pow j]
+  rw [Nat.mul_one]
+  exact Nat.mod_eq_of_lt (Nat.mod_lt _ (Nat.pow_pos (by omega)))
+
+/-- Locality of the G_j digits: q ≡ q' (mod 3^(j+1)) implies that digit 15+j of
+    2^(ρ+P·q) equals digit 15+j of 2^(ρ+P·q'). -/
+theorem digit_shift_locality (ρ q q' j : Nat)
+    (h : q % 3 ^ (j + 1) = q' % 3 ^ (j + 1)) :
+    digit₃ (2 ^ (ρ + P * q)) (15 + j) = digit₃ (2 ^ (ρ + P * q')) (15 + j) := by
+  have key : ∀ k x, 2 ^ (ρ + P * (x + 3 ^ (j + 1) * k)) % 3 ^ (16 + j) =
+      2 ^ (ρ + P * x) % 3 ^ (16 + j) := by
+    intro k; induction k with
+    | zero => intro x; rw [Nat.mul_zero, Nat.add_zero]
+    | succ k ih =>
+      intro x
+      rw [show 3 ^ (j + 1) * (k + 1) = 3 ^ (j + 1) * k + 3 ^ (j + 1) from by ring,
+          ← Nat.add_assoc x (3 ^ (j + 1) * k) (3 ^ (j + 1)),
+          digit_shift_step ρ (x + 3 ^ (j + 1) * k) j]
+      exact ih x
+  have heq_q : q = q % 3 ^ (j + 1) + 3 ^ (j + 1) * (q / 3 ^ (j + 1)) := by
+    rw [add_comm (q % 3 ^ (j + 1)) (3 ^ (j + 1) * (q / 3 ^ (j + 1))),
+        Nat.div_add_mod]
+  have heq_q' : q' = q' % 3 ^ (j + 1) + 3 ^ (j + 1) * (q' / 3 ^ (j + 1)) := by
+    rw [add_comm (q' % 3 ^ (j + 1)) (3 ^ (j + 1) * (q' / 3 ^ (j + 1))),
+        Nat.div_add_mod]
+  suffices hmod : 2 ^ (ρ + P * q) % 3 ^ (16 + j) = 2 ^ (ρ + P * q') % 3 ^ (16 + j) by
+    unfold digit₃
+    rw [digit_eq_of_modPow (2 ^ (ρ + P * q)) (15 + j) (16 + j) (by omega),
+        digit_eq_of_modPow (2 ^ (ρ + P * q')) (15 + j) (16 + j) (by omega),
+        hmod]
+  rw [heq_q, heq_q', h]
+  exact (key (q / 3 ^ (j + 1)) (q' % 3 ^ (j + 1))).trans
+    (key (q' / 3 ^ (j + 1)) (q' % 3 ^ (j + 1))).symm
+
+/-- Transition recurrence for the G_j states: with X_{j+1}(q) = 2^(ρ+P·q) mod 3^(17+j),
+    X_{j+1}(q + d·3^(j+1)) = X_{j+1}(q)·w^d mod 3^(17+j) where
+    w^d = ((2^P)^(3^(j+1)))^d mod 3^(17+j) (equal to (X_{j+1}(q)·w_j^d) mod 3^(17+j)
+    for w_j = (2^P)^(3^(j+1)) mod 3^(17+j), by Nat.mul_mod). -/
+theorem digit_shift_recurrence (ρ q d j : Nat) :
+    2 ^ (ρ + P * (q + d * 3 ^ (j + 1))) % 3 ^ (17 + j) =
+    2 ^ (ρ + P * q) % 3 ^ (17 + j) *
+      (((2 ^ P) ^ (3 ^ (j + 1))) ^ d % 3 ^ (17 + j)) % 3 ^ (17 + j) := by
+  have hadd : ρ + P * (q + d * 3 ^ (j + 1)) = (ρ + P * q) + P * (d * 3 ^ (j + 1)) := by ring
+  have hpow : 2 ^ (P * (d * 3 ^ (j + 1))) = ((2 ^ P) ^ (3 ^ (j + 1))) ^ d := by
+    rw [show P * (d * 3 ^ (j + 1)) = (P * 3 ^ (j + 1)) * d from by ring, pow_mul, pow_mul]
+  rw [hadd]
+  rw [Nat.pow_add 2 (ρ + P * q) (P * (d * 3 ^ (j + 1)))]
+  rw [hpow]
+  exact Nat.mul_mod _ _ _
+
+/-- Digit corollary of the recurrence: digit 16+j of 2^(ρ+P·(q+d·3^(j+1))) equals
+    digit 16+j of the residue product X_{j+1}(q)·w^d. -/
+theorem digit_shift_recurrence_digit (ρ q d j : Nat) :
+    digit₃ (2 ^ (ρ + P * (q + d * 3 ^ (j + 1)))) (16 + j) =
+    digit₃ (2 ^ (ρ + P * q) % 3 ^ (17 + j) *
+      (((2 ^ P) ^ (3 ^ (j + 1))) ^ d % 3 ^ (17 + j))) (16 + j) := by
+  have hi : 16 + j < 17 + j := by omega
+  unfold digit₃
+  rw [digit_eq_of_modPow (2 ^ (ρ + P * (q + d * 3 ^ (j + 1)))) (16 + j) (17 + j) hi]
+  rw [digit_eq_of_modPow (2 ^ (ρ + P * q) % 3 ^ (17 + j) *
+      (((2 ^ P) ^ (3 ^ (j + 1))) ^ d % 3 ^ (17 + j))) (16 + j) (17 + j) hi]
+  rw [digit_shift_recurrence]
+
 /-- Any digit-2 of 2^r below K_star r is a digit-2 of criticalGap r. -/
 private theorem criticalGap_digit2_of_digitMod (r j : Nat) (hj : j < K_star r)
     (hd : digitMod r j = 2) : ∃ i, digit₃ (criticalGap r) i = 2 := by
@@ -713,7 +818,7 @@ private theorem criticalGap_digit2_of_digitMod (r j : Nat) (hj : j < K_star r)
   rw [← digitMod_eq_digit₃]
   exact hd
 
-/-- For r >= P, positions 15..300 all lie below K_star r (3^301 <= 2^478 <= 2^P <= 2^r). -/
+/-- For r >= P, positions 5..300 all lie below K_star r (3^301 <= 2^478 <= 2^P <= 2^r). -/
 private theorem digit_window_lt_K_star (r : Nat) (hrP : r ≥ 162 * 59049)
     (hj : j ≤ 300) : j < K_star r := by
   have h3 : (3 : Nat) ^ 301 ≤ 2 ^ r := by
@@ -888,13 +993,16 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hc : memCantorNat (2 ^ r))
                       rw [hre, hq0, Nat.zero_mul, Nat.add_zero, huK6]
                       exact Nat.mod_lt r (by norm_num : (0 : Nat) < 486)
                     omega
-                  · rcases em (∃ j, 15 ≤ j ∧ j < 301 ∧ digitMod r j = 2)
-                      with ⟨j, hj15, hj61, hd⟩ | hclean
+                  · rcases em (∃ j, 5 ≤ j ∧ j < 301 ∧ digitMod r j = 2)
+                      with ⟨j, hj5, hj61, hd⟩ | hclean
                     · exact criticalGap_digit2_of_digitMod r j
                         (digit_window_lt_K_star r (by omega) (by omega)) hd
                     · -- RESIDUAL SORRY (scoped): rho >= 162, rho notin {0,2,8},
-                      -- rho mod 486 notin {0,2,8}, and every digit 15..300 of 2^r
-                      -- differs from 2 (no digit-2 in the window [15, 301)).
+                      -- rho mod 486 notin {0,2,8}, and every digit 5..300 of 2^r
+                      -- differs from 2 (no digit-2 in the window [5, 301)).
+                      -- Positions 5..14 subsume the rho<162 low-digit certificate
+                      -- (hN5 covers 0..4); G_j locality/recurrence (Part G6) are the
+                      -- route to eliminating the residual, not bounding it.
                       -- Empirically p(rho,q) <= 15 + floor(log3 q) + 13 (max excess 13
                       -- over ~10^5 q), so only adversarial long-clean-prefix q reach
                       -- this case; a full proof needs tail bound INV-2 (research:
