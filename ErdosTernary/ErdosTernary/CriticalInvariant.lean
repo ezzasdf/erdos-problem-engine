@@ -843,9 +843,13 @@ private theorem digit_window_lt_K_star (r : Nat) (hrP : r ≥ 162 * 59049)
     position. Formal barrier for the R2 residual: the branch goal (∃ i, digit₃(criticalGap r) i = 2)
     is refuted by hc alone, so that branch closes only by deriving False from its hypotheses.
     Prefix determinism pins q mod 3^287 but is satisfiable for every depth (gj_bfs: exactly
-    2^j survivors at level j); the contradiction needs the clean tail beyond position 300
-    up to K_star r — the INV-2 tail bound (RESEARCH, phase3-bridge.md D). Hence prefix
-    induction alone does NOT eliminate the residual sorry. -/
+    2^j survivors at level j). INV-2 (uniform first-2 location bound) was investigated and
+    is no longer considered a viable route: G8 proves exactly two clean extensions at every
+    finite prefix depth, exhaustive experiments show geometric tail behavior, and a uniform
+    first-2 location bound sufficient to close this residual would itself imply the
+    restricted Erdős instance. Hence prefix induction alone does NOT eliminate the residual
+    sorry; see phase3-bridge.md (INV-2 verdict) for the negative result and explicit
+    counterexamples. -/
 
 /-- The G_j digit at 15+j depends only on q mod 3^(j+1). -/
 theorem digit_shift_remainder (ρ q j : Nat) :
@@ -1064,10 +1068,15 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hc : memCantorNat (2 ^ r))
                       -- hc (memCantorNat) refutes the branch goal outright, so this
                       -- branch closes only by deriving False from its hypotheses;
                       -- digit_prefix_determinism pins the window to q's ternary
-                      -- prefix (satisfiable at every depth — gj_bfs survivors 2^j),
-                      -- and the clean tail beyond 300 up to K_star r is exactly the
-                      -- INV-2 tail bound (RESEARCH: phase3-bridge.md D). Prefix
-                      -- induction alone does not eliminate this sorry.
+                      -- prefix (satisfiable at every depth — gj_bfs survivors 2^j).
+                      -- INV-2 was investigated and is no longer considered a viable
+                      -- route: G8 proves exactly two clean extensions at every finite
+                      -- prefix depth, exhaustive experiments show geometric tail
+                      -- behavior, and a uniform first-2 location bound sufficient to
+                      -- close this residual would itself imply the restricted Erdős
+                      -- instance. See phase3-bridge.md for the negative result and
+                      -- explicit counterexamples. Prefix induction alone does not
+                      -- eliminate this sorry.
                       sorry
       · -- r not N5: low-digit obstruction
         obtain ⟨j, hjK, hj2⟩ := even_not_N5_digit2_below_K r hr48' hr_even hN5
@@ -1082,9 +1091,11 @@ propagates under cubing to the next level, and the digit in window position
 15+j of 2^(ρ + P·(q + d·3^j)) is affine in d modulo 3 with a unit step σ.
 Consequently each node of the G_j clean-prefix tree has EXACTLY TWO children
 whose digit equals 2: the clean tree is forced to be a full binary tree.
-Combined with the window-widening analysis (G7 / INV-2), this is why the
-window can never close the residual gap: at every depth the surviving set
-branches 2-way, matching the 2^j BFS survivors. -/
+Combined with the window-widening analysis (G7), this is why no finite window
+can close the residual gap: at every depth the surviving set branches 2-way,
+matching the 2^j BFS survivors. Exhaustive search shows the forced tail beyond
+each prefix is geometric with no archimedean cutoff, so INV-2 is retired as a
+proof strategy (phase3-bridge.md, INV-2 verdict). -/
 
 private theorem digit₃_add_mul_pow (a i x : Nat) :
     digit₃ (a + 3 ^ i * x) i = (digit₃ a i + x) % 3 := by
