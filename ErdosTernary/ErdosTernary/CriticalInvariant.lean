@@ -1073,6 +1073,211 @@ theorem criticalGap_has_digit2_of_gt8 (r : Nat) (hc : memCantorNat (2 ^ r))
         obtain ⟨j, hjK, hj2⟩ := even_not_N5_digit2_below_K r hr48' hr_even hN5
         exact ⟨j, by rw [digit₃_criticalGap_eq r j hjK]; exact hj2⟩
 
+/-! ## Part G8: The clean-prefix tree has exactly two clean children per node
+
+Formalizes the "exactly-2-clean-children" structural theorem (research ruling:
+phase3-bridge.md, G8). The binary-lifting identity
+  2^(2·3^k) = 1 + 3^(k+1)·c + 3^(k+2)·t   with 3 ∤ c
+propagates under cubing to the next level, and the digit in window position
+15+j of 2^(ρ + P·(q + d·3^j)) is affine in d modulo 3 with a unit step σ.
+Consequently each node of the G_j clean-prefix tree has EXACTLY TWO children
+whose digit equals 2: the clean tree is forced to be a full binary tree.
+Combined with the window-widening analysis (G7 / INV-2), this is why the
+window can never close the residual gap: at every depth the surviving set
+branches 2-way, matching the 2^j BFS survivors. -/
+
+private theorem digit₃_add_mul_pow (a i x : Nat) :
+    digit₃ (a + 3 ^ i * x) i = (digit₃ a i + x) % 3 := by
+  unfold digit₃
+  rw [Nat.add_mul_div_left a x (by positivity : 0 < 3 ^ i)]
+  rw [Nat.add_mod (a / 3 ^ i) x 3]
+  rw [Nat.add_mod (a / 3 ^ i % 3) x 3]
+  rw [Nat.mod_mod_of_dvd (a / 3 ^ i) (dvd_refl 3)]
+
+private theorem digit₃_eq_of_mod (n i M : Nat) (hi : i < M) :
+    digit₃ n i = digit₃ (n % 3 ^ M) i := by
+  unfold digit₃
+  exact digit_eq_of_modPow n i M hi
+
+private theorem mod_add_mul (x y n : Nat) : (x + n * y) % n = x % n := by
+  rw [Nat.add_mod, Nat.mul_mod, Nat.mod_self, Nat.zero_mul, Nat.zero_mod,
+    Nat.add_zero, Nat.mod_mod_of_dvd x (dvd_refl n)]
+
+private theorem mod_move (x y : Nat) : (x + y) % 3 = (x + y % 3) % 3 := by
+  rw [Nat.add_mod x y 3, Nat.add_mod x (y % 3) 3, Nat.mod_mod_of_dvd y (dvd_refl 3)]
+
+private theorem two_pow_mod_three_ne (n : Nat) : 2 ^ n % 3 ≠ 0 := by
+  intro h
+  have hdvd : (3 : Nat) ∣ 2 ^ n := Nat.dvd_of_mod_eq_zero h
+  have hp : Nat.Prime 3 := by norm_num
+  exact absurd (Nat.Prime.dvd_of_dvd_pow hp hdvd)
+    (by norm_num : ¬(3 : Nat) ∣ 2)
+
+private theorem two_pow_shape (k : Nat) :
+    ∃ c t : Nat, c % 3 ≠ 0 ∧
+      2 ^ (2 * 3 ^ k) = 1 + 3 ^ (k + 1) * c + 3 ^ (k + 2) * t := by
+  induction k with
+  | zero =>
+    refine ⟨1, 0, by norm_num, by norm_num⟩
+  | succ k ih =>
+    obtain ⟨c, t, hc, heq⟩ := ih
+    rw [show k + 1 + 1 = k + 2 from rfl, show k + 1 + 2 = k + 3 from rfl]
+    have hu : 3 ^ (k + 1) * c + 3 ^ (k + 2) * t = 3 ^ (k + 1) * (c + 3 * t) := by
+      rw [show 3 ^ (k + 2) = 3 ^ (k + 1) * 3 from by
+        rw [show k + 2 = (k + 1) + 1 from rfl, pow_succ]]
+      ring
+    have hc' : (c + 3 * t) % 3 ≠ 0 := by
+      rw [Nat.add_mod, Nat.mul_mod, Nat.mod_self, Nat.zero_mul, Nat.zero_mod,
+        Nat.add_zero, Nat.mod_mod_of_dvd c (dvd_refl 3)]
+      exact hc
+    have hcube : (2 ^ (2 * 3 ^ k)) ^ 3 = (1 + 3 ^ (k + 1) * c + 3 ^ (k + 2) * t) ^ 3 := by
+      rw [heq]
+    have hpow : (2 ^ (2 * 3 ^ k)) ^ 3 = 2 ^ (2 * 3 ^ (k + 1)) := by
+      rw [← pow_mul]
+      congr 1
+      ring
+    have key : ∀ u : Nat, (1 + u) ^ 3 = 1 + 3 * u + 3 * u ^ 2 + u ^ 3 := by
+      intro u; ring
+    have h31 : 3 * 3 ^ (k + 1) = 3 ^ (k + 2) := by
+      rw [mul_comm 3 (3 ^ (k + 1)), ← pow_succ, show k + 1 + 1 = k + 2 from by omega]
+    have h3 : 3 * (3 ^ (k + 1) * (c + 3 * t)) = 3 ^ (k + 2) * (c + 3 * t) := by
+      rw [← mul_assoc, h31]
+    have hsq : 3 * (3 ^ (k + 1)) ^ 2 = 3 ^ (k + 3) * 3 ^ k := by
+      rw [← pow_mul, ← pow_add, mul_comm 3 (3 ^ ((k + 1) * 2)), ← pow_succ,
+        show (k + 1) * 2 + 1 = (k + 3) + k from by omega]
+    have hsquared : 3 * (3 ^ (k + 1) * (c + 3 * t)) ^ 2 =
+        3 ^ (k + 3) * (3 ^ k * (c + 3 * t) ^ 2) := by
+      rw [mul_pow, ← mul_assoc, hsq]
+      ring
+    have hcubeu : (3 ^ (k + 1) * (c + 3 * t)) ^ 3 =
+        3 ^ (k + 3) * (3 ^ (2 * k) * (c + 3 * t) ^ 3) := by
+      rw [mul_pow]
+      have hcu : (3 ^ (k + 1)) ^ 3 = 3 ^ (k + 3) * 3 ^ (2 * k) := by
+        rw [← pow_mul, show (k + 1) * 3 = (k + 3) + 2 * k from by omega, pow_add]
+      rw [hcu]
+      ring
+    refine ⟨c + 3 * t, 3 ^ k * (c + 3 * t) ^ 2 + 3 ^ (2 * k) * (c + 3 * t) ^ 3,
+      hc', ?_⟩
+    rw [← hpow, hcube, Nat.add_assoc 1 (3 ^ (k + 1) * c) (3 ^ (k + 2) * t)]
+    rw [key, hu, h3, hsquared, hcubeu]
+    ring
+
+/-- The digit at window position 15+j of 2^(ρ + P·(q + d·3^j)) is affine in d
+modulo 3, with unit step σ ∈ {1,2}. -/
+theorem digit_extend_affine (ρ q j : Nat) :
+    ∃ σ, σ < 3 ∧ σ ≠ 0 ∧ ∀ d < 3,
+      digit₃ (2 ^ (ρ + P * (q + d * 3 ^ j))) (15 + j) =
+        (digit₃ (2 ^ (ρ + P * q)) (15 + j) + σ * d) % 3 := by
+  obtain ⟨c, t, hc, hshape⟩ := two_pow_shape (14 + j)
+  have hPj : P * 3 ^ j = 2 * 3 ^ (14 + j) := by
+    rw [gj_P_eq, pow_add]
+    ring
+  have h1 : 3 ^ (15 + j) = 3 ^ (14 + j + 1) := by
+    rw [show 15 + j = 14 + j + 1 from by omega]
+  have h2 : 3 ^ (16 + j) = 3 ^ (14 + j + 2) := by
+    rw [show 16 + j = 14 + j + 2 from by omega]
+  have hG : 2 ^ (P * 3 ^ j) = 1 + 3 ^ (15 + j) * c + 3 ^ (16 + j) * t := by
+    rw [hPj, h1, h2]
+    exact hshape
+  have hexp : ∀ d, ρ + P * (q + d * 3 ^ j) = (ρ + P * q) + P * 3 ^ j * d := by
+    intro d; ring
+  have hbase : 2 ^ (ρ + P * q) % 3 ≠ 0 := two_pow_mod_three_ne (ρ + P * q)
+  have hunit : 2 ^ (ρ + P * q) * c % 3 ≠ 0 := by
+    have e1 : 2 ^ (ρ + P * q) % 3 = 1 ∨ 2 ^ (ρ + P * q) % 3 = 2 := by omega
+    have e2 : c % 3 = 1 ∨ c % 3 = 2 := by omega
+    rcases e1 with h1 | h1 <;> rcases e2 with h2 | h2 <;>
+      rw [Nat.mul_mod, h1, h2] <;> omega
+  refine ⟨2 ^ (ρ + P * q) * c % 3, Nat.mod_lt _ (by omega), hunit, ?_⟩
+  intro d hd
+  rcases (by omega : d = 0 ∨ d = 1 ∨ d = 2) with rfl | rfl | rfl
+  · -- d = 0
+    rw [mul_zero, add_zero, Nat.zero_mul, add_zero]
+    exact (Nat.mod_eq_of_lt digit₃_lt_three).symm
+  · -- d = 1
+    rw [hexp 1, mul_one, Nat.pow_add 2 (ρ + P * q) (P * 3 ^ j), hG]
+    have hval : 2 ^ (ρ + P * q) * (1 + 3 ^ (15 + j) * c + 3 ^ (16 + j) * t) =
+        2 ^ (ρ + P * q) + 3 ^ (15 + j) * (2 ^ (ρ + P * q) * c) +
+          3 ^ (16 + j) * (2 ^ (ρ + P * q) * t) := by ring
+    rw [hval]
+    have hh : (2 ^ (ρ + P * q) + 3 ^ (15 + j) * (2 ^ (ρ + P * q) * c) +
+        3 ^ (16 + j) * (2 ^ (ρ + P * q) * t)) % 3 ^ (16 + j) =
+        (2 ^ (ρ + P * q) + 3 ^ (15 + j) * (2 ^ (ρ + P * q) * c)) % 3 ^ (16 + j) :=
+      mod_add_mul _ _ _
+    rw [digit₃_eq_of_mod _ (15 + j) (16 + j) (by omega), digit₃_eq_of_mod _ (15 + j) (16 + j) (by omega), hh]
+    rw [← digit₃_eq_of_mod _ (15 + j) (16 + j) (by omega)]
+    rw [← digit₃_eq_of_mod _ (15 + j) (16 + j) (by omega)]
+    rw [digit₃_add_mul_pow, mul_one, mod_move]
+  · -- d = 2
+    rw [hexp 2, Nat.pow_add 2 (ρ + P * q) (P * 3 ^ j * 2), pow_mul, hG]
+    have hsq : (3 ^ (15 + j)) ^ 2 = 3 ^ (16 + j) * 3 ^ (14 + j) := by
+      rw [← pow_mul, ← pow_add]
+      congr 1
+      omega
+    have hform : ∀ a b : Nat, (1 + a + b) ^ 2 = 1 + 2 * a + a ^ 2 + 2 * b + 2 * a * b + b ^ 2 := by
+      intro a b; ring
+    have haa : (3 ^ (15 + j) * c) ^ 2 = 3 ^ (16 + j) * (3 ^ (14 + j) * c ^ 2) := by
+      rw [mul_pow, hsq]; ring
+    have hbb : (3 ^ (16 + j) * t) ^ 2 = 3 ^ (16 + j) * (3 ^ (16 + j) * t ^ 2) := by
+      rw [mul_pow]; ring
+    rw [hform, haa, hbb]
+    have hval : 2 ^ (ρ + P * q) *
+        (1 + 2 * (3 ^ (15 + j) * c) + 3 ^ (16 + j) * (3 ^ (14 + j) * c ^ 2) +
+          2 * (3 ^ (16 + j) * t) + 2 * (3 ^ (15 + j) * c) * (3 ^ (16 + j) * t) +
+          3 ^ (16 + j) * (3 ^ (16 + j) * t ^ 2)) =
+        2 ^ (ρ + P * q) + 3 ^ (15 + j) * (2 ^ (ρ + P * q) * (c * 2)) +
+          3 ^ (16 + j) * (2 ^ (ρ + P * q) *
+            (2 * t + 3 ^ (14 + j) * c ^ 2 + 2 * 3 ^ (15 + j) * c * t +
+              3 ^ (16 + j) * t ^ 2)) := by ring
+    rw [hval]
+    have hh : (2 ^ (ρ + P * q) + 3 ^ (15 + j) * (2 ^ (ρ + P * q) * (c * 2)) +
+        3 ^ (16 + j) * (2 ^ (ρ + P * q) *
+          (2 * t + 3 ^ (14 + j) * c ^ 2 + 2 * 3 ^ (15 + j) * c * t + 3 ^ (16 + j) * t ^ 2))) %
+        3 ^ (16 + j) =
+        (2 ^ (ρ + P * q) + 3 ^ (15 + j) * (2 ^ (ρ + P * q) * (c * 2))) % 3 ^ (16 + j) :=
+      mod_add_mul _ _ _
+    rw [digit₃_eq_of_mod _ (15 + j) (16 + j) (by omega), digit₃_eq_of_mod _ (15 + j) (16 + j) (by omega), hh]
+    rw [← digit₃_eq_of_mod _ (15 + j) (16 + j) (by omega)]
+    rw [← digit₃_eq_of_mod _ (15 + j) (16 + j) (by omega)]
+    rw [digit₃_add_mul_pow]
+    have h2x : ∀ x : Nat, x * 2 % 3 = (x % 3 * 2) % 3 := by
+      intro x
+      rw [Nat.mul_mod, show (2 : Nat) % 3 = 2 from by omega]
+    have hm2 : 2 ^ (ρ + P * q) * (c * 2) % 3 = (2 ^ (ρ + P * q) * c % 3) * 2 % 3 := by
+      rw [← mul_assoc]
+      exact h2x (2 ^ (ρ + P * q) * c)
+    rw [mod_move, hm2, ← mod_move]
+
+private theorem exactly_one_two (σ x : Nat) (hσ0 : σ ≠ 0) (hσ3 : σ < 3) :
+    ∃ d₂ < 3, ∀ d < 3, ((x + σ * d) % 3 = 2) ↔ d = d₂ := by
+  have hσ : σ = 1 ∨ σ = 2 := by omega
+  rcases hσ with rfl | rfl
+  · rcases (by omega : x % 3 = 0 ∨ x % 3 = 1 ∨ x % 3 = 2) with h0 | h1 | h2
+    · exact ⟨2, by omega, fun d hd => ⟨by omega, by omega⟩⟩
+    · exact ⟨1, by omega, fun d hd => ⟨by omega, by omega⟩⟩
+    · exact ⟨0, by omega, fun d hd => ⟨by omega, by omega⟩⟩
+  · rcases (by omega : x % 3 = 0 ∨ x % 3 = 1 ∨ x % 3 = 2) with h0 | h1 | h2
+    · exact ⟨1, by omega, fun d hd => ⟨by omega, by omega⟩⟩
+    · exact ⟨2, by omega, fun d hd => ⟨by omega, by omega⟩⟩
+    · exact ⟨0, by omega, fun d hd => ⟨by omega, by omega⟩⟩
+
+/-- G8: every node of the G_j clean-prefix tree has exactly two clean children.
+The clean tree over the ternary window is forced to be a full binary tree. -/
+theorem clean_tree_two_children (ρ q j : Nat) :
+    ∃ d₂ < 3,
+      digit₃ (2 ^ (ρ + P * (q + d₂ * 3 ^ j))) (15 + j) = 2 ∧
+      ∀ d < 3, digit₃ (2 ^ (ρ + P * (q + d * 3 ^ j))) (15 + j) = 2 ↔ d = d₂ := by
+  obtain ⟨σ, hσ3, hσ0, haff⟩ := digit_extend_affine ρ q j
+  obtain ⟨d₂, hd₂3, hex⟩ := exactly_one_two σ
+    (digit₃ (2 ^ (ρ + P * q)) (15 + j)) hσ0 hσ3
+  refine ⟨d₂, hd₂3, ?_, fun d hd => ?_⟩
+  · rw [haff d₂ hd₂3]
+    exact (hex d₂ hd₂3).mpr rfl
+  · rw [haff d hd]
+    exact hex d hd
+
+#print axioms digit_extend_affine
+#print axioms clean_tree_two_children
+
 /-! ## Part H: Complete Conjecture -/
 
 private lemma small_r_check (r : Nat) (hr : r ≤ 8) (hc : memCantorNat (2 ^ r)) :
