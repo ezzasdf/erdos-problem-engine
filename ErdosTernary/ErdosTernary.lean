@@ -8,3 +8,7 @@ import ErdosTernary.LagariasHausdorff
 import ErdosTernary.OstrowskiFormLemma
 import ErdosTernary.BridgeCompute
 import ErdosTernary.Mass1Dynamics
+import ErdosTernary.Lemma41Finite
+import ErdosTernary.Lemma41
+import ErdosTernary.CantorMultiplier
+import ErdosTernary.TimeReversal
