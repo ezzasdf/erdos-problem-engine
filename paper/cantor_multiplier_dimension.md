@@ -410,14 +410,20 @@ Extremizer classification:
     Formalized and verified by the Lean 4 kernel: `ErdosTernary/TimeReversal.lean` (`time_reversal_transition_duality`,
     `boundary_case2_reversal_to_boundary_case1`, `charpoly_time_reversal_invariance`, and
     `boundary_case2_charpoly_eq_boundary_case1`), built cleanly with 0 sorry and 0 custom axioms.
-(iv) Interior Domain (a >= 2, b - a >= 2) [Prose-proved; Lean deferred via `h_gap`]:
+(iv) Interior Domain (a >= 2, b - a >= 2) [Prose-proved; Lean discrete dynamics verified]:
     Proved in prose via the Parry measure theorem on the universal 2b-periodic orbit
-    (Lean formalization deferred via the modular hypothesis `h_gap`).
+    (Lean formalization modular interface `h_gap`).
+    The discrete dynamical foundations of this step are kernel-verified in `ErdosTernary/PeriodicOrbit.lean`
+    (0 sorry, 0 custom axioms):
+    - Mutual reachability: 0^b <-> 1^b in b steps (`reachable_zero_to_one`, `reachable_one_to_zero`), placing them in the exact same SCC (`zero_and_one_in_same_scc`).
+    - Primitivity: 0^b self-loop establishes period 1 aperiodicity (`recurrent_component_has_period_one`).
+    - Universal 2b-periodic sequence: z_i = 1_{(i mod 2b) >= b} satisfies z_{i-b} = ! z_i, yielding z_i - z_{i-a} + z_{i-b} = 1 - z_{i-a} in {0,1} at every i in Z (`periodicSeq_constraint`).
+    - Witness embedding: both witness words w_* (0^b 1 and 0^{b-1} 1 1) occur as exact contiguous subwords of the periodic sequence (`witness_g_eq_1_occurs`, `witness_g_ge_2_occurs`).
 
     Status Summary across Non-Extremizers:
     - a = 1: Lean-verified (`Lemma41.lean`).
     - b - a = 1: Lean-verified (`TimeReversal.lean`).
-    - b - a >= 2: Fully proved in prose (Steps 8.1-8.4 below).
+    - b - a >= 2: Discrete orbit & component primitivity Lean-verified (`PeriodicOrbit.lean`); measure limit conditional on `h_gap`.
 
     Theorem 4.2 (Time-Reversal Duality of Chain SFT Transfer Matrices).
     Let 1 <= a < b and let M_{(a, b)} be the 2^b x 2^b transition matrix of the chain SFT Sigma_{(a, b)}.
@@ -549,6 +555,7 @@ each giving an infinite arithmetic progression of exact dimensions
 | Thm 3 classification | exhaustive, degree <= 7 | x2p_third_family.py (S1), ErdosTernary/CantorMultiplier.lean |
 | Thm 4 dimension bound & extremizers | formal bridge dim_growth <= log_3 phi; equality iff extremal safe M | ErdosTernary/CantorMultiplier.lean |
 | Thm 4.2 Time-Reversal Duality | P M_{(a,b)} P = M_{(b-a,b)}^T; b-a=1 reduction to a=1 | ErdosTernary/TimeReversal.lean (Lean-verified: 0 sorry, 0 custom axioms), SymPy |
+| Thm 4.3 Periodic Orbit & SFT Primitivity | 0^b <-> 1^b reachability, period 1, universal 2b-periodic orbit & witness embedding | ErdosTernary/PeriodicOrbit.lean (Lean-verified: 0 sorry, 0 custom axioms) |
 | Lemma 4.1 Steps 0,4,5 (growth, crux identities, bijection) | exact, a<8, b<10, n<16 | lemma41_check.py |
 | Lemma 4.1 Step 6 (H injection) | 957/957 instances, L<17; spot checks L in [17,20] | lemma41_hinject.py |
 | Lemma 4.1 Step 6 (tii-H leaf + Domino Chain + 48/24-config 5-constraint lemma) | 736/736 instances across 7 disjoint regimes, 0 unmapped, 0 collisions; 48/48 (13 vars, g<2a-1) & 24/24 (12 vars, g=2a-1) symbolic configs | lemma41_tii_proof.py, ErdosTernary/Lemma41Finite.lean |

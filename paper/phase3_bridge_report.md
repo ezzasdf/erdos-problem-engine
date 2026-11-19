@@ -2211,3 +2211,47 @@ The Lean 4 kernel was queried for every declaration in `ErdosTernary.TimeReversa
   3. Birkhoff's ergodic theorem for cylinder density limits.
   4. Recurrent orbit embedding of the universal $2b$-periodic trajectory.
   The paper honestly characterizes its formal state as "Lean-verified modulo `h_gap`", where `h_gap` cleanly separates the domain-specific arithmetic multiplier dynamics from general SFT ergodic theory.
+
+## Session 16: Track B — SFT Primitivity & Universal Periodic Orbit Formalization
+
+### 1. Mathematical Architecture in `ErdosTernary/PeriodicOrbit.lean`
+Module `ErdosTernary/PeriodicOrbit.lean` (335 lines, 0 `sorry`, 0 custom axioms) formalizes the discrete-dynamical foundations of Track B:
+1. **Self-Loops:**
+   - `allZeros_self_loop`: $0^b \to 0^b$ self-loop for all $1 \le a < b$.
+   - `allOnes_self_loop`: $1^b \to 1^b$ self-loop for all $1 \le a < b$.
+2. **Explicit Reachability Paths:**
+   - `state01_step_valid`: Appending 1s to $0^b$ yields valid steps $k \to k + 1$ because $1 - z_a + 0 = 1 - z_a \in \{0, 1\}$.
+   - `reachable_zero_to_one`: $0^b$ reaches $1^b$ in $b$ steps.
+   - `state10_step_valid`: Appending 0s to $1^b$ yields valid steps $k \to k + 1$ because $0 - z_a + 1 = 1 - z_a \in \{0, 1\}$.
+   - `reachable_one_to_zero`: $1^b$ reaches $0^b$ in $b$ steps.
+3. **Component Equivalence & Primitivity:**
+   - `zero_and_one_in_same_scc`: $0^b$ and $1^b$ are mutually reachable, placing them in the exact same Strongly Connected Component.
+   - `recurrent_component_has_period_one`: The presence of the length-1 self-loop at $0^b$ establishes that the recurrent component has period $\gcd(1, \dots) = 1$ (aperiodic).
+4. **Universal Alternating $2b$-Periodic Sequence:**
+   - `periodicSeq_shift_b`: $z_{i-b} = 1 - z_i$ identically for all $i \in \mathbb{Z}$.
+   - `validCons_not_cancel`: Algebraic cancellation `validCons x y (! x) = true` for all booleans $x, y$.
+   - `periodicSeq_constraint`: Universal admissibility $z_i - z_{i-a} + z_{i-b} = 1 - z_{i-a} \in \{0, 1\}$ at every $i \in \mathbb{Z}$.
+5. **Witness Word Embedding:**
+   - `witness_g_eq_1_occurs`: The witness word $0^b 1$ occurs at indices $0 \dots b$ of `periodicSeq`.
+   - `witness_g_ge_2_occurs`: The witness word $0^{b-1} 1 1$ occurs at indices $1 \dots b+1$ of `periodicSeq`.
+
+### 2. `#print axioms` Kernel Audit
+```text
+'ErdosTernary.PeriodicOrbit.allZeros_self_loop' depends on axioms: [propext, Quot.sound]
+'ErdosTernary.PeriodicOrbit.allOnes_self_loop' depends on axioms: [propext, Quot.sound]
+'ErdosTernary.PeriodicOrbit.state01_step_valid' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ErdosTernary.PeriodicOrbit.state10_step_valid' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ErdosTernary.PeriodicOrbit.reachable_zero_to_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ErdosTernary.PeriodicOrbit.reachable_one_to_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ErdosTernary.PeriodicOrbit.zero_and_one_in_same_scc' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ErdosTernary.PeriodicOrbit.recurrent_component_has_period_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ErdosTernary.PeriodicOrbit.validCons_not_cancel' does not depend on any axioms
+'ErdosTernary.PeriodicOrbit.periodicSeq_shift_b' depends on axioms: [propext, Quot.sound]
+'ErdosTernary.PeriodicOrbit.periodicSeq_constraint' depends on axioms: [propext, Quot.sound]
+'ErdosTernary.PeriodicOrbit.witness_g_eq_1_occurs' depends on axioms: [propext, Quot.sound]
+'ErdosTernary.PeriodicOrbit.witness_g_ge_2_occurs' depends on axioms: [propext, Quot.sound]
+```
+- Custom axioms: **0**.
+- `sorryAx`: **0**.
+- `native_decide`: **0**.
+
