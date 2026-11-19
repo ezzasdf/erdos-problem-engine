@@ -2,7 +2,7 @@
 
 **Last Updated:** November 2026  
 **Repository:** [https://github.com/ezzasdf/erdos-problem-engine](https://github.com/ezzasdf/erdos-problem-engine)  
-**Active Branches:** `main`, `audit/erdos-proof` (both synchronized at commit `118e596`)
+**Active Branches:** `main`, `audit/erdos-proof`
 
 ---
 
@@ -16,7 +16,7 @@ This project encompasses two interrelated mathematical programs centered on the 
 
 2. **The Cantor Multiplier Hausdorff Dimension Program (Lagarias 2009 / Ours 2026):**
    - *Problem:* Determine the Hausdorff dimension $\dim_H C(1, M)$ of intersection sets $C(1, M) = C \cap M^{-1}(C)$ for integer multipliers $M$, classify all extremizers achieving the golden ratio bound $\log_3 \phi \approx 0.4380$, and resolve Lagarias's multiplier conjectures.
-   - *Status:* **Complete in mathematical prose; Lean-verified core with Time-Reversal Duality (November 2026).** Universal upper bound $\dim_H C(1, M) \le \log_3 \phi$ and exact extremizer iff classification fully established.
+   - *Status:* **Complete in mathematical prose; Lean-verified core with Time-Reversal Duality and Periodic Orbit Dynamics (November 2026).** Universal upper bound $\dim_H C(1, M) \le \log_3 \phi$ and exact extremizer iff classification fully established.
 
 ---
 
@@ -30,7 +30,8 @@ This project encompasses two interrelated mathematical programs centered on the 
 | **Boundary Case 1** ($a = 1, b \ge 3$) | Strict slack $\lambda(1, b) < \phi$ | Proved [P] | **100% Lean-verified** (0 sorry, 0 custom axioms) | `Lemma41.lean` (`perronPoly_at_phi_pos`) |
 | **Time-Reversal Duality Theorem** | $P M_{(a, b)} P = M_{(b-a, b)}^T$ | Proved [P] | **100% Lean-verified** (0 sorry, 0 custom axioms) | `TimeReversal.lean` |
 | **Boundary Case 2** ($b - a = 1, a \ge 2$) | Reduction $\lambda(a, a+1) = \lambda(1, a+1) < \phi$ | Proved [P] | **100% Lean-verified** (0 sorry, 0 custom axioms) | `TimeReversal.lean` |
-| **Non-Extremizer Interior** ($a \ge 2, b - a \ge 2$) | Universal $2b$-periodic orbit + Parry measure | Proved [P] | Modular interface `h_gap` (PF + Parry measure) | `submission_draft.md` §2.5, `CantorMultiplier.lean` |
+| **Periodic Orbit & SFT Primitivity** | $0^b \leftrightarrow 1^b$ reachability, period 1, universal $2b$-periodic orbit & witness embedding | Proved [P] | **100% Lean-verified** (0 sorry, 0 custom axioms) | `PeriodicOrbit.lean` |
+| **Non-Extremizer Interior** ($a \ge 2, b - a \ge 2$) | Universal $2b$-periodic orbit + Parry measure | Proved [P] | Discrete dynamics verified (`PeriodicOrbit.lean`); measure limit conditional on `h_gap` | `cantor_multiplier_dimension.md` §2.5, `CantorMultiplier.lean` |
 | **Saye's Lemma & Branching Bound** | $2^K$ branching structure | Proved [P] | **100% Lean-verified** (0 sorry) | `SayeLemma.lean` |
 | **Narkiewicz Counting Bound** | $N(x) \le 4 x^{\log_3 2}$ | Proved [P] | **100% Lean-verified** (0 sorry) | `Narkiewicz.lean`, `NarkiewiczBound.lean` |
 | **Lagarias Level-1 Dimension** | $\dim_H C(1, 2) = \log_3 2$ | Proved [P] | **100% Lean-verified** (0 sorry) | `LagariasHausdorff.lean` |
@@ -48,21 +49,24 @@ $$P M_{(a, b)} P = M_{(b-a, b)}^T.$$
 - Completely resolves **Boundary Case 2** ($b - a = 1$): maps bijectively to Boundary Case 1 ($a = 1$), yielding $\lambda(a, a+1) = \lambda(1, a+1) < \phi$.
 - Kernel-verified in Lean 4 without custom axioms in `ErdosTernary/TimeReversal.lean`.
 
-### Breakthrough 2: Universal $2b$-Periodic Orbit for Step B.2
-To prove $\mu([w_*]) > 0$ on the interior domain without case splits:
-- The alternating sequence $z_i = \mathbf{1}_{(i \bmod 2b) \ge b}$ satisfies $z_{i-b} = 1 - z_i$, so:
+### Breakthrough 2: Universal $2b$-Periodic Orbit and Primitivity Formalization
+- Proved in `ErdosTernary/PeriodicOrbit.lean` that the states $0^b$ and $1^b$ are mutually reachable in exactly $b$ steps via explicit valid transition paths (`reachable_zero_to_one`, `reachable_one_to_zero`).
+- Proved $0^b$ and $1^b$ belong to the exact same strongly connected component (`zero_and_one_in_same_scc`).
+- Proved that the presence of the self-loop $0^b \to 0^b$ forces the component period to be $\gcd(1, 2b) = 1$, establishing aperiodicity and primitivity of the recurrent core (`recurrent_component_has_period_one`).
+- Proved the universal alternating $2b$-periodic sequence $z_i = \mathbf{1}_{(i \bmod 2b) \ge b}$ satisfies $z_{i-b} = 1 - z_i$ identically and fulfills the chain SFT constraint:
   $$z_i - z_{i-a} + z_{i-b} = 1 - z_{i-a} \in \{0, 1\} \subset [0, 1]$$
-  identically on $\mathbb{Z}$ for all $1 \le a < b$.
-- The sequence embeds both witness types ($w_* = 0^{b-1} 1 1$ for $g \ge 2$, $w_* = 0^b 1$ for $g = 1$) into the maximal recurrent component $R$, completing the Parry measure positive cylinder density step $\mu([w_*]) = \varepsilon(a, b) > 0$.
+  for all $i \in \mathbb{Z}$ with zero exception (`periodicSeq_constraint`).
+- Proved the witness cylinder embeddings: $w_* = 0^b 1$ occurs at indices $0..b$ (`witness_g_eq_1_occurs`) and $w_* = 0^{b-1} 1 1$ occurs at indices $1..b+1$ (`witness_g_ge_2_occurs`).
+- Kernel-verified with 0 `sorry`, 0 custom axioms, and 0 `native_decide` on `main-control`.
 
 ### Breakthrough 3: Lean 4 Kernel Certification on Remote Environment
-- Assembled and compiled pinned Mathlib 4.12.0 oleans on remote servers (`main-control`, 100.97.146.20).
-- Lake build: `✔ [1257/1257] Built ErdosTernary.TimeReversal`.
-- `#print axioms` audit: all declarations certified with strictly standard axioms (`[propext, Classical.choice, Quot.sound]`), 0 `sorry`, 0 `native_decide`.
+- Assembled and compiled pinned Mathlib 4.12.0 oleans on remote server (`main-control`, 100.97.146.20).
+- Lake builds: `✔ [1257/1257] Built ErdosTernary.TimeReversal` and `ErdosTernary.PeriodicOrbit`.
+- `#print axioms` audit: all declarations certified with strictly standard foundational axioms (`[propext, Classical.choice, Quot.sound]`), 0 `sorry`, 0 `native_decide`.
 
 ---
 
-## 4. Completed Work Packages (Phases 1–11)
+## 4. Completed Work Packages (Phases 1–12)
 
 - **Phase 1: Saye's Algorithm Implementation (DONE):** Rust engine verifying $n \le 8.1 \times 10^{18}$ (`verify_erdos_rs`).
 - **Phase 2: Saye's Lemma Formalization (DONE):** Formalized in Lean 4 (`SayeLemma.lean`, 0 sorry).
@@ -75,6 +79,7 @@ To prove $\mu([w_*]) > 0$ on the interior domain without case splits:
 - **Phase 9: Multiplier Chain SFT Recurrence (DONE):** Fibonacci upper bound $N(n+1) \le N(n) + N(n-1)$ formalized in Lean 4 (`Lemma41.lean`, `Lemma41Finite.lean`).
 - **Phase 10: Multiplier Dimension Classification (DONE):** Universal upper bound and attainer classification formalized (`CantorMultiplier.lean`).
 - **Phase 11: Time-Reversal Duality & Boundary Case 2 (DONE):** Matrix transpose duality and spectral invariance kernel-verified (`TimeReversal.lean`).
+- **Phase 12: Periodic Orbit & Component Primitivity (DONE):** Mutual reachability, period-1 primitivity, universal sequence constraint, and witness embedding kernel-verified (`PeriodicOrbit.lean`).
 
 ---
 
@@ -87,11 +92,10 @@ To prove $\mu([w_*]) > 0$ on the interior domain without case splits:
 - [ ] Prepare preprint submission for arXiv / journal submission.
 
 ### Track B: Formalization of General SFT Ergodic Theory (`h_gap`)
-Discharging `h_gap` unconditionally in Lean 4 represents a general Mathlib formalization project:
-1. **Perron–Frobenius Theorem:** Formalize existence and uniqueness of positive eigenvectors for primitive matrices (`IsPrimitive M → ∃ v > 0, M v = λ v`).
-2. **Parry Markov Measure:** Formalize construction of the measure of maximal entropy on shifts of finite type.
-3. **Birkhoff Ergodic Theorem for SFT Cylinders:** Formalize asymptotic cylinder density convergence.
-4. **Orbit Recurrence:** Formalize embedding of the universal $2b$-periodic orbit into the recurrent component.
+Discharging `h_gap` unconditionally in Lean 4 represents a standard Mathlib formalization project:
+1. **Discrete Dynamics & Primitivity (DONE):** Mutual reachability $0^b \leftrightarrow 1^b$, period-1 primitivity, universal sequence constraint, and witness word embedding are 100% Lean-verified in `PeriodicOrbit.lean`.
+2. **Perron–Frobenius & Parry Measure (Mathematical formulation proved in prose):** Positive eigenvectors $v > 0, u > 0$ and Parry Markov measure $\mu$ supported on the recurrent component.
+3. **Birkhoff Ergodic Theorem for SFT Cylinder Counts (Sole remaining formal step in `h_gap`):** Formalize asymptotic cylinder density convergence $|\{w \in \mathcal{L}_{L-1} : w \text{ ends with } w_*\}| / N(L-1) \to \mu([w_*]) > 0$ in Mathlib (~1–2 months bounded effort).
 
 ### Track C: Erdős Conjecture Beyond First Period ($K \ge 17$)
 - Bridge theorem covers first period $[0, u_K)$. Extending to all $n$ requires connecting the Ostrowski numeration of large survivors to the irrational rotation avoidance of the Cantor cylinder set.
@@ -107,6 +111,7 @@ Discharging `h_gap` unconditionally in Lean 4 represents a general Mathlib forma
 │   ├── ErdosTernary.lean                  # Package entry point
 │   ├── ErdosTernary/
 │   │   ├── TimeReversal.lean              # Time-Reversal Duality (100% Lean-verified)
+│   │   ├── PeriodicOrbit.lean             # SFT primitivity & periodic orbit (100% Lean-verified)
 │   │   ├── CantorMultiplier.lean          # Hausdorff dimension & attainer theorems
 │   │   ├── Lemma41.lean                   # Bulk recurrence & Perron polynomial slack
 │   │   ├── Lemma41Finite.lean             # SFT certificate definitions

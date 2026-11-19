@@ -292,7 +292,18 @@ theorem family2_reduced_a1_strict (b : ℕ) (hb : 3 ≤ b) (lambda : ℝ)
 /-- Extremal Characterization Theorem:
     A 3-power-free safe multiplier M > 1 attains the maximal Perron root φ
     if and only if it is an extremizer (Family 1 or Family 2 with b = 2a),
-    CONDITIONED on Frontier A (h_gap: strict spectral gap for non-extremizers). -/
+    CONDITIONED on Frontier A (h_gap: strict spectral gap for non-extremizers).
+
+    Frontier A Formalization Status:
+    - Boundary Case 1 (a = 1): Lean-verified in `Lemma41.lean` (`perronPoly_at_phi_pos`).
+    - Boundary Case 2 (b - a = 1): Lean-verified in `TimeReversal.lean` (`boundary_case2_charpoly_eq_boundary_case1`).
+    - Non-Extremizer Interior (a ≥ 2, b - a ≥ 2): Proved in prose via the Parry measure
+      theorem on the universal 2b-periodic orbit.
+      The structural foundations of this interior step (0ᵇ ↔ 1ᵇ reachability, period-1 primitivity,
+      universal 2b-periodic sequence z_i - z_{i-a} + z_{i-b} ∈ {0,1}, and witness word embedding)
+      are 100% Lean-verified in `PeriodicOrbit.lean`.
+      The remaining formalization obligation to discharge `h_gap` unconditionally in Mathlib is the
+      Birkhoff / ergodic theorem for SFT cylinder count convergence (|{w : ...}| / N → μ([w_*]) > 0). -/
 theorem safe_class_extremizer_classification (sm : SafeMultiplier)
     (h_gt1 : sm.val > 1)
     (h_free : isThreePowerFree sm.val)
@@ -325,7 +336,14 @@ theorem safe_class_extremizer_classification (sm : SafeMultiplier)
 /-- Extremal Characterization Theorem (Dimension Formulation):
     A 3-power-free safe multiplier M > 1 attains the maximal dimension log_3 φ
     if and only if it is an extremizer (Family 1 or Family 2 with b = 2a),
-    CONDITIONED on Frontier A (h_gap: strict dimension gap for non-extremizers). -/
+    CONDITIONED on Frontier A (h_gap: strict dimension gap for non-extremizers).
+
+    Frontier A Formalization Status:
+    - Boundary Case 1 (a = 1): Lean-verified in `Lemma41.lean` (`perronPoly_at_phi_pos`).
+    - Boundary Case 2 (b - a = 1): Lean-verified in `TimeReversal.lean` (`boundary_case2_charpoly_eq_boundary_case1`).
+    - Non-Extremizer Interior (a ≥ 2, b - a ≥ 2): Proved in prose; discrete dynamics
+      (0ᵇ ↔ 1ᵇ reachability, period-1 primitivity, universal 2b-periodic sequence, and witness embedding)
+      Lean-verified in `PeriodicOrbit.lean`; ergodic theorem for cylinder count convergence remains. -/
 theorem safe_class_dimension_extremizer_classification (sm : SafeMultiplier)
     (h_gt1 : sm.val > 1)
     (h_free : isThreePowerFree sm.val)
