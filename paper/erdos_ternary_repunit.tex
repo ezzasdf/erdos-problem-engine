@@ -43,7 +43,7 @@ In 1979, Paul Erd\H{o}s~\cite{Erdos1979} conjectured that $2^0 = 1$, $2^2 = 4$, 
 
 We formulate the problem through base-$4$ repunit coordinates $4^s = 3 R_s(4) + 1$, governed by the $3$-adic dynamical system $R_{s+1} = 4 R_s + 1$, building upon the repunit framework of Idowu (arXiv:2610.03789)~\cite{Idowu2026}. We prove that the rooted tree of repunit admissible residue classes is strictly isomorphic to the classical survivor tree of powers of $2$, establishing an exact level-by-level and branching correspondence. We establish the Archimedean--$3$-Adic Decoupling Theorem, which reduces the problem to an exact Diophantine target, and analyze the joint summability heuristic $\sum (2/3)^{1.26s} < \infty$, explaining why the summability heuristic alone does not yield a Borel--Cantelli argument.
 
-In a self-contained analysis of obstructions, we prove why elementary methods fail: we formalize the infinite modular barrier ($|N_K| = 2^{K-1}$), prove the mod-$8$ non-recurrence of carry-absorbing packets ($1 + 3^s \ne 2^k$ for $s \ge 2$), and contrast the positive-power case with the negative-power theorem $2^{-n}$, completely proved here via the mod-$8$ Gap Lemma. All structural theorems (including the rooted tree isomorphism, the Archimedean decoupling, the mod-$8$ carry non-recurrence, and the negative-power theorem) have been verified in the Lean~4 proof assistant (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with pure foundational axioms and zero \texttt{sorry} placeholders; the First-Period Bridge Theorem is a finite computation verified with \texttt{native\_decide} certificates.
+In a self-contained analysis of obstructions, we prove why elementary methods fail: we formalize the infinite modular barrier ($|N_K| = 2^{K-1}$), prove the mod-$8$ non-recurrence of carry-absorbing packets ($1 + 3^s \ne 2^k$ for $s \ge 2$), and contrast the positive-power case with the negative-power theorem $2^{-n}$, completely proved here via the mod-$8$ Gap Lemma. The principal structural and obstruction results are formalized and kernel-verified in the Lean~4 proof assistant (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with pure foundational axioms and zero \texttt{sorry} placeholders, while supporting number-theoretic arguments (including multiplicative order minimality and the algebraic repunit-lifting congruence) are proved analytically in the manuscript. The First-Period Bridge Theorem is verified by finite computation in the bridge modules using \texttt{native\_decide} certificates.
 \end{abstract}
 
 \maketitle
@@ -69,11 +69,11 @@ Despite extensive computational searches and partial density bounds, the conject
 
 \textbf{Our Contributions:} Our contribution is the mathematical synthesis, structural reduction, obstruction theory, and complete interactive formalization:
 \begin{enumerate}
-    \item \textbf{Rooted Tree Isomorphism Theorem (Theorem~\ref{thm:tree_iso}):} We prove that the repunit survivor tree $\Trep$ and the classical powers-of-two survivor tree $\Tpow$ are strictly isomorphic as rooted trees, establishing an exact level-by-level and branching correspondence.
+    \item \textbf{Rooted Tree Isomorphism Theorem (Theorem~\ref{thm:tree_iso}):} We prove that the repunit survivor tree $\Trep$ and the classical powers-of-two survivor tree $\Tpow$ are strictly isomorphic as rooted trees, establishing an exact level-by-level and branching correspondence (formalized at the level of bounded integer representatives in \texttt{RepunitTreeIso.lean}).
     \item \textbf{Archimedean--$3$-Adic Decoupling (Theorem~\ref{thm:decoupling}):} We decouple the continuous Archimedean quotient from the discrete $3$-adic tree, reducing the full Erd\H{o}s conjecture to an exact Diophantine target: the emptiness of the joint survivor set ($\mathrm{jointSurvivors} = \emptyset$).
     \item \textbf{First-Period Bridge Theorem (Theorem~\ref{thm:bridge}):} We extend computational verification certificates to $K \in \{5, \dots, 18\}$ (covering periods up to $u_{18} = 258,280,326$), certifying that every spurious survivor in the first period exhibits a forbidden digit $2$.
     \item \textbf{Obstruction Theory (Section~\ref{sec:obstructions}):} We formalize why elementary methods stall: the infinite modular sieve barrier ($|N_K| = 2^{K-1}$ with positive natural density), the mod-$8$ non-recurrence of carry packets, the spectral radius contrast ($\rho_{\mathrm{adic}} = 2$ vs. $\rho_{\mathrm{digit}} = \phi < 2$), and the sampling discrepancy between positive and negative powers (where the negative-power theorem is completely solved via the mod-$8$ Gap Lemma).
-    \item \textbf{Machine Verification (Section~\ref{sec:formalization}):} All structural, dynamical, and obstruction theorems are formalized and kernel-verified in Lean~4 with pure foundational axioms. The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified by finite computation in the bridge modules using \texttt{native\_decide} certificates, strictly quarantined from the structural theorems.
+    \item \textbf{Machine Verification (Section~\ref{sec:formalization}):} The principal structural and obstruction results are formalized and kernel-verified in Lean~4 with pure foundational axioms. Supporting number-theoretic steps (such as order minimality and algebraic lifting congruences) are proved analytically in the manuscript. The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified by finite computation in the bridge modules using \texttt{native\_decide} certificates, strictly quarantined from the structural theorems.
 \end{enumerate}
 
 ---
@@ -173,10 +173,8 @@ For the powers-of-two tree, any survivor must have an even exponent $n = 2s$, si
 
 Under this identification, $2^{2s} = 4^s = 3 R_s(4) + 1$. The least significant digit $d_0(4^s) = 1$ is always in $\{0, 1\}$, and the subsequent $m-1$ digits satisfy $d_{j+1}(4^s) = d_j(R_s(4))$ for all $0 \le j < m-1$. Thus the trailing $m$ digits of $2^{2s}$ belong to $\{0, 1\}^m$ if and only if the trailing $m-1$ digits of $R_s(4)$ belong to $\{0, 1\}^{m-1}$. 
 
-Under lifting to depth $m+1$, $s' = s + q \cdot 3^{m-1}$ maps to $n' = 2s' = 2s + q \cdot (2 \cdot 3^{m-1})$. The branch choice $q \in \{0, 1, 2\}$ in the repunit tree maps to the identical branch choice $q$ in the survivor tree. Hence $\Phi$ is an isomorphism of rooted trees.
+Under lifting to depth $m+1$, $s' = s + q \cdot 3^{m-1}$ maps to $n' = 2s' = 2s + q \cdot (2 \cdot 3^{m-1})$. The branch choice $q \in \{0, 1, 2\}$ in the repunit tree maps to the identical branch choice $q$ in the survivor tree. Hence $\Phi$ is an isomorphism of rooted trees. (In the formalization \texttt{RepunitTreeIso.lean}, this isomorphism is verified for bounded integer representatives $s < 3^m$ and $n < 2 \cdot 3^m$.)
 \end{proof}
-
----
 
 \section{Archimedean--3-Adic Decoupling and the Diophantine Target}\label{sec:decoupling}
 
@@ -295,7 +293,7 @@ Specifically, for each spurious survivor $n \in [0, u_K) \cap B_K \setminus \{0,
 {\sloppy While Theorem~\ref{thm:bridge} completely eliminates all spurious survivors in the first period $[0, u_K)$, it does not constrain the second period $[u_K, 2 u_K)$. The full proof chain is formalized across the Lean~4 bridge module suite (\texttt{Bridge.lean}, \texttt{BridgeCompute}, \texttt{BridgeMiddle}, \texttt{BridgeCandidates}, \texttt{BridgeK13}--\texttt{BridgeK18}, \texttt{BridgeCantorChunked}, and \texttt{BridgeUniform}).\par}
 
 \subsection{Carry Packets and the Mod-8 Non-Recurrence Lemma}
-An alternative approach tracks carry propagation in the self-overlap addition $R_{s+1} = R_s + 3 R_s + 1$. A localized configuration of digits that absorbs an incoming digit $2$ via carries without emitting an output digit $2$ is called a \emph{carry packet}. The canonical dyadically pure carry resolution occurs at:
+An alternative approach tracks carry propagation in the self-overlap addition $R_{s+1} = R_s + 3 R_s + 1$. A localized configuration of digits that absorbs an incoming digit $2$ via carries without emitting an output digit $2$ is called a \emph{carry packet}. The canonical dyadically pure carry configuration considered here occurs at:
 \begin{equation}
 2101_3 = 64 \quad (4^3 = 64), \quad \text{yielding} \quad 100111_3 = 256 \quad (4^4 = 256).
 \end{equation}
@@ -318,7 +316,7 @@ The carry automaton on Cantor inputs has transfer matrix $A = \begin{pmatrix} 1 
     \item \textbf{Modular Space (Exponent):} $\rho_{\mathrm{adic}} = 2$. The tree $\Trep$ is a full binary tree forever.
     \item \textbf{Digit Space (Stream):} $\rho_{\mathrm{digit}} = \phi < 2$. The language grows as $F_{n+2}$, forcing sub-exponential word growth.
 \end{itemize}
-However, because an integer $4^s$ is a single discrete path, $\phi < 2$ alone does not force the path to leave the language.
+However, because an integer $4^s$ is a single discrete path, $\phi < 2$ alone does not force the path to leave the language. The matrix transfer system and its Fibonacci growth $F_{n+2}$ are formalized in \texttt{RepunitCarryConnection.lean}; its link to the automaton transitions is an analytical comparison.
 
 \subsection{Negative-Power Duality and the Discrepancy Obstruction}
 For negative powers $2^{-n} = 1/2^n$, the Erd\H{o}s analogue is completely solved:
@@ -339,39 +337,40 @@ The consecutive elements of $\mathcal{S}_8$ alternate with gaps of $2$ and $6$ (
 \begin{equation}
 2^n - \left\lceil \frac{2^{n+1}}{3} \right\rceil \ge 2^n - \frac{2^{n+1} + 2}{3} = \frac{2^n - 2}{3} \ge \frac{32 - 2}{3} = 10 \ge 7.
 \end{equation}
+\enlargethispage{4\baselineskip}
 By the Gap Lemma, the target interval $J$ must contain an element of $\mathcal{S}_8 = \langle 3 \rangle$. Thus the orbit visits $J$, forcing the ternary expansion of $2^{-n}$ to contain the digit $2$ for all $n \ge 5$. Direct verification of $n \in \{1, 2, 3, 4\}$ completes the proof.
 \end{proof}
 
 \begin{remark}[Why the Negative-Power Method Fails for Positive Powers]
+\enlargethispage{7\baselineskip}
 For negative powers $2^{-n}$, the rational expansion is periodic of period $P = 2^{n-2}$, which equals the entire subgroup order. The digit stream \emph{samples the entire group uniformly}. For positive powers $2^n$, the number is an integer, the expansion is non-periodic, and $2^n$ samples only a \emph{single trajectory} rather than the entire group. This difference in sampling mechanisms explains why the negative-power theorem is elementary, while the positive-power conjecture is resistant to elementary methods.
 \end{remark}
 
-\enlargethispage{2\baselineskip}
 \section{Lean 4 Formalization}\label{sec:formalization}
 
-All theoretical results in this paper have been formalized and verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. The first nine modules listed below are pure foundational (no \texttt{native\_decide}). The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified separately in the bridge module suite (\texttt{Bridge.lean} through \texttt{BridgeK18.lean}) using \texttt{native\_decide} certificates for $K=5,\dots,18$; these are quarantined from the structural theorems. The complete machine-checked formalization, proofs, and verification scripts are openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
+The principal structural and obstruction results in this paper have been formalized and verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. Supporting number-theoretic arguments (including multiplicative order minimality and the algebraic repunit-lifting congruence) are proved analytically in the manuscript rather than fully formalized. The first nine modules listed below are pure foundational (no \texttt{native\_decide}). The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified separately in the bridge module suite (\texttt{Bridge.lean} through \texttt{BridgeK18.lean}) using \texttt{native\_decide} certificates for $K=5,\dots,18$; these are quarantined from the structural theorems. The complete machine-checked formalization, proofs, and verification scripts are openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
 {\sloppy
-\begin{itemize}\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
+\begin{itemize}\setlength{\itemsep}{0.5pt}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}
     \item \texttt{RepunitBase4.lean}: Formalizes $4^s = 3 R_s(4) + 1$ and the digit index shift.
     \item \texttt{RepunitDynamics.lean}: Formalizes the $3$-adic conjugacy recurrence of Section~\ref{subsec:conjugacy_recurrence}.
     \item \texttt{RepunitLifting.lean}: Formalizes the digit-level branching mechanics of Lemma~\ref{lem:modular_lifting}: lower-digit preservation under $3^m$ shifts (\texttt{digit3\_add\_mul\_lower}), the single-digit shift at index $m$ (\texttt{digit3\_add\_mul}), and the exact two-of-three admissibility count (\texttt{two\_admissible\_of\_three}, \texttt{one\_forbidden\_of\_three}). The algebraic lifting congruence and permutation property of $R_s(4) \bmod 3^m$ are proved in the text via binomial expansion.
-    \item \texttt{RepunitTreeIso.lean}: Proves Theorem~\ref{thm:tree_iso} (Rooted Tree Isomorphism), establishing the canonical bijection between the bounded repunit survivor domain $s < 3^m$ and the power-of-two survivor domain $n < 2 \cdot 3^m$.
+    \item \texttt{RepunitTreeIso.lean}: Proves the Rooted Tree Isomorphism (Theorem~\ref{thm:tree_iso}) at the level of bounded representatives ($s < 3^m$ and $n < 2 \cdot 3^m$), establishing the level-by-level bijection, even-exponent reduction, and branching equivalence; the quotient-tree formulation on projective residue-class systems is proved analytically in the text.
     \item \texttt{RepunitArchimedean.lean}: Proves Theorem~\ref{thm:decoupling} (Decoupling Theorem).
     \item \texttt{RepunitDiophantine.lean}: Proves Corollary~\ref{cor:reduction} (Equivalence of Erd\H{o}s to $\mathrm{jointSurvivors} = \emptyset$).
     \item \texttt{RepunitCarryPacket.lean}: Proves Lemma~\ref{lem:non_recurrence} (Mod-8 Non-Recurrence of the $64(1+3^s)$ Carry Packet).
     \item \texttt{NegativePower.lean}: Proves Theorem~\ref{thm:neg_power} (Negative-Power Theorem, LTE 2-adic lift, and Gap Lemma orbit surjectivity).
-    \item \texttt{RepunitCarryConnection.lean}: Formalizes the spectral and recurrence properties of the carry transfer matrix $A = \begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}$: characteristic polynomial equivalence to $M = 4$, Perron eigenvalue $\phi = (1+\sqrt{5})/2$, and the population recurrence matching the Golden Mean shift word count $F_{n+2}$.
+    \item \texttt{RepunitCarryConnection.lean}: Formalizes a Fibonacci recurrence comparison for the matrix transfer system $A = \begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}$: characteristic polynomial equivalence to $M = 4$, Perron eigenvalue $\phi = (1+\sqrt{5})/2$, and population growth $F_{n+2}$; the formal reduction from the automaton in \texttt{RepunitCarryPacket.lean} to this matrix system is an analytical comparison presented in Section~\ref{sec:obstructions}.
     \item \texttt{BridgeSuite}: The computational certificate suite for Theorem~\ref{thm:bridge} (First-Period Bridge), comprising modules \texttt{Bridge}, \texttt{BridgeCompute}, \texttt{BridgeMiddle}, \texttt{BridgeCandidates}, \texttt{BridgeK13}--\texttt{BridgeK18}, and \texttt{BridgeUniform}.
 \end{itemize}\par}
 
 \subsection{Trust Model and Axiom Inventory}
+\enlargethispage{7\baselineskip}
 We distinguish two precise verification tiers across the formalization:
-\begin{enumerate}
+\begin{enumerate}\setlength{\itemsep}{0.5pt}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}
     \item \textbf{Foundational Kernel Theorems:} Across the nine core theoretical modules (\texttt{RepunitBase4} through \texttt{RepunitCarryConnection}), \textbf{100\% of declarations are pure foundational}. They are checked strictly by the Lean~4 kernel, relying exclusively on standard foundational axioms \texttt{[propext, Classical.choice, Quot.sound]}, with zero unproved axioms (\texttt{sorryAx} / \texttt{sorry}) and no reliance on computational reflection or decision-procedure oracles (\texttt{Lean.ofReduceBool} / \texttt{native\_decide}).
     \item {\sloppy \textbf{Computational Verification Certificates:} The combinatorial searches establishing the finite First-Period Bridge Theorem ($K \in \{5, \dots, 18\}$ covering periods $u_K \le 258,280,326$ in \texttt{BridgeCandidates} and \texttt{BridgeK13}--\texttt{BridgeK18}) and the companion paper's \texttt{Lemma41Finite} certificates utilize native evaluation (\texttt{native\_decide} / \texttt{Lean.ofReduceBool}). While standard for finite computational claims, \texttt{native\_decide} compiles Lean definitions to executable bytecode/C++, extending the trusted computing base (TCB) beyond the foundational Lean kernel to include the Lean compiler and runtime environment. The unproved asymptotic behavior for $K > 18$ is cleanly isolated in \texttt{BridgeUniform} under an explicit hypothesis (\texttt{ostrowski\_invariant}), ensuring that the finite verification for $K \le 18$ remains completely free of asymptotic axioms. Crucially, \texttt{native\_decide} is strictly quarantined to these finite-certificate modules, and zero \texttt{sorry} placeholders exist across the entire repository.\par}
 \end{enumerate}
 
-\enlargethispage{4\baselineskip}
 \bibliographystyle{amsplain}
 \bibliography{references}
 
