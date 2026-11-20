@@ -40,6 +40,16 @@ theorem bridge_first_period_verified_ostrowski :
   fun K hK5 hK18 r hr hn0 hn2 hn8 =>
     bridge_first_period_verified K hK5 hK18 r (by rwa [computeNKFast_eq]) ⟨hn0, hn2, hn8⟩
 
+/-- The finite First-Period Bridge Theorem (Exact Set Equivalence / Iff Formulation):
+    For each 5 ≤ K ≤ 18, a power 2^r in the first period r ∈ computeNK K
+    belongs to the Cantor set if and only if r ∈ {0, 2, 8}. -/
+theorem bridge_first_period_iff_ostrowski :
+    ∀ K, 5 ≤ K → K ≤ 18 →
+    ∀ r, r ∈ computeNK K →
+    (memCantorNat (2 ^ r) ↔ (r = 0 ∨ r = 2 ∨ r = 8)) :=
+  fun K hK5 hK18 r hr =>
+    bridge_first_period_iff K hK5 hK18 r (by rwa [computeNKFast_eq])
+
 /-- The conditional full bridge theorem for all K ≥ 5.
     Combines verified computations for K ≤ 18 with the explicit
     `ostrowski_invariant` axiom for K > 18. -/

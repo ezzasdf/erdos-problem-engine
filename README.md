@@ -65,10 +65,13 @@ erdos-problem-engine/
         ├── BridgeMiddle.lean           # Middle digit window $[K, 50)$ certificates ($K=10..12$)
         ├── BridgeMiddle16.lean         # Middle window certificates for higher scales
         ├── BridgeCandidates.lean       # Filtered modular residue candidates
-        ├── BridgeK13.lean..BridgeK18.lean # Finite candidate verification ($K=13..18$)
-        ├── BridgeCantorChunkedProofs.lean # Range-chunked parallel certificates ($K=15..17$)
-        ├── BridgeUniform.lean          # First-period bridge aggregation ($K=5..18$)
-        ├── BridgeOstrowskiInvariant.lean # Re-export with explicit asymptotic hypothesis
+        ├── BridgeK13.lean..BridgeK17.lean # Finite candidate verification (K=13..17)
+        ├── BridgeK18.lean              # Period u_18 = 258,280,326 certificate aggregator
+        ├── BridgeK18Part1.lean..Part3.lean # 162 chunk certificates for K=18
+        ├── BridgeCantorChunked.lean    # Chunked parallel range-checking framework
+        ├── BridgeCantorChunkedProofs.lean # Range-chunked certificates (K=15..17)
+        ├── BridgeUniform.lean          # First-period bridge verification (5 ≤ K ≤ 18)
+        ├── BridgeOstrowskiInvariant.lean # Re-export of verified iff theorem & asymptotic axiom
         ├── CantorMultiplier.lean       # Safe multipliers & Golden Mean shift bound
         ├── TimeReversal.lean           # Matrix similarity $P M_{(a,b)} P = M_{(b-a,b)}^T$
         ├── PeriodicOrbit.lean          # Recurrent component primitivity & $2b$-periodic orbit
@@ -134,7 +137,7 @@ There is **zero reliance** on `sorryAx` / `sorry`, unverified axioms, or decisio
 ### 2. Computational Certificates (TCB Extended to Lean Compiler/VM)
 Finite combinatorial certificates (such as the First-Period Bridge certificates in `BridgeCompute.lean`, `BridgeMiddle.lean`, `BridgeK13.lean`–`BridgeK18.lean`, `BridgeCantorChunkedProofs.lean`, and `Lemma41Finite.lean`) use `native_decide` and `Lean.ofReduceBool`. 
 - `native_decide` compiles Lean deciders to native executable bytecode and runs them within the Lean runtime environment.
-- This extends the Trusted Computing Base (TCB) beyond the foundational Lean kernel to include the Lean compiler and C++ runtime evaluator, enabling verified exhaustive search over candidate sets with period $u_K \le 2.87 \times 10^7$.
+- This extends the Trusted Computing Base (TCB) beyond the foundational Lean kernel to include the Lean compiler and C++ runtime evaluator, enabling verified exhaustive search over candidate sets with period $u_K \le 258,280,326$ ($5 \le K \le 18$).
 - For $K \in \{5, \dots, 9\}$, the witness digit 2 is verified within the leading 30 digits (`hasLeadingDigit2`).
 - For $K \in \{10, 11, 12\}$, the witness digit 2 is verified within the middle window $[K, 50)$ modulo $3^{50}$.
 - For $K \in \{13, \dots, 18\}$, the witness digit 2 is verified within the lowest 50 digits modulo $3^{50}$.

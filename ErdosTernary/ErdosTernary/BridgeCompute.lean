@@ -5,12 +5,11 @@
   For each K, we compute N_K (trailing 2-free residues) and verify that
   for all r ∈ N_K \ {0,2,8}, the first L=30 digits of 2^r contain a digit 2.
 
-  K=10..11 are not feasible with native_decide because:
-  1. hasLeadingDigit2 requires computing 2^r as a full big integer (r ~39000 → ~12000 digits)
-  2. This OOMs the kernel during native_decide evaluation
-
-  The full bridge theorem for ALL K ≥ 5 is proved in BridgeUniform.lean
-  via the r < 48 / r ≥ 48 split, independent of these native_decide results.
+  For K ≥ 10, big-integer full expansion of 2^r is replaced by modular window
+  verifications:
+  - K=10..12: BridgeMiddle.lean (middle-window check on mod 3^50)
+  - K=13..18: BridgeK13-K18, BridgeCandidates, BridgeCantorChunkedProofs (mod 3^50)
+  - Unified finite theorem for 5 ≤ K ≤ 18: BridgeUniform.lean
 -/
 
 import Mathlib.Tactic

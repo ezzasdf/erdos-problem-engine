@@ -1,20 +1,14 @@
 /-
-  Bridge Theorem: Leading/Trailing Orbit Intersection
+  Bridge Theorem: Leading/Trailing Orbit Intersection & Trailing Filters
 
-  Sorry-free: B_K(n) for n = 0, 2, 8; quantitative bound.
-  BridgeCompute.lean: K=5..9 proved by native_decide (zero sorry).
-  Axioms: bridge theorem, Erdős conjecture (pending full induction proof).
+  Formalizes the trailing 2-free condition B_K(n) for n = 0, 2, 8 and
+  expected survivor bounds.
 
-  Key insight (2026-08-21): The bridge theorem for ALL n is false
-  (equidistribution shows orbit visits φ⁻¹(C_L) infinitely often).
-  But the FIRST-PERIOD result (n ∈ [0, u_K)) is true and sufficient:
-  - For n ∈ [0, u_K), verified by native_decide (K=5..9) and
-    computational check (K=10..15, bridge_induction_check.py)
-  - For n ≥ u_K, Saye recursion ensures intersection of all N_K = {0,2,8}
-
-  Reference: verify_middle/BRIDGE_RIGOROUS_PROOF.md
-  Induction check: verify_middle/bridge_induction_check.py
-  Computational proofs: ErdosTernary/BridgeCompute.lean
+  The First-Period Bridge Theorem is computationally verified for 5 ≤ K ≤ 18:
+  - K = 5..9: BridgeCompute.lean (native_decide)
+  - K = 10..12: BridgeMiddle.lean (middle-window certificates on mod 3^50)
+  - K = 13..18: BridgeK13-K18, BridgeCandidates, BridgeCantorChunkedProofs (mod 3^50)
+  - Uniform aggregation: BridgeUniform.lean and BridgeOstrowskiInvariant.lean
 -/
 
 import Mathlib.Tactic
@@ -128,12 +122,11 @@ theorem expectedCount_K15_L30 : expectedCount 15 30 < 1 := by
 
 /-! ## Part 3: Bridge Theorem (Eliminated) -/
 
--- The 4 axioms that were here (bridge_theorem, bridge_theorem_first_period,
--- saye_intersection, erdos_conjecture) have been removed.
--- None were used by any theorem in the project. The actual bridge proof uses:
+-- The actual First-Period Bridge Theorem is proved without unverified axioms:
 --   BridgeCompute.lean: K=5..9 by native_decide
---   BridgeMiddle.lean: K=10..12 by native_decide on mod 3^50
---   BridgeUniform.lean: K>=13 via ostrowski_invariant axiom
---   BridgeOstrowskiInvariant.lean: re-exports the full result
+--   BridgeMiddle.lean: K=10..12 by native_decide on middle window mod 3^50
+--   BridgeK13.lean..BridgeK18.lean: K=13..18 by native_decide on low 50 mod 3^50
+--   BridgeUniform.lean: aggregates finite verification for 5 ≤ K ≤ 18
+--   BridgeOstrowskiInvariant.lean: re-exports the verified finite and iff theorems
 
 end ErdosTernary.Bridge

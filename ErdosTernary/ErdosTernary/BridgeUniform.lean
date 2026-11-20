@@ -168,11 +168,11 @@ private theorem bridge_K18_not_cantor (r : Nat)
   checkBridgeCantorPow2_imp_not_cantor 18 checkBridgeCantorPow2_K18 r hr hSpecial
 
 /-- Ostrowski Invariant Hypothesis for K > 18:
-    For K ≥ 18, all survivors r ∈ computeNKFast K \ {0, 2, 8} satisfy 2^r ∉ Cantor.
+    For K > 18, all survivors r ∈ computeNKFast K \ {0, 2, 8} satisfy 2^r ∉ Cantor.
     This formalizes the open asymptotic hypothesis for K > 18 beyond the
     finitely verified levels K ∈ {5, ..., 18}. -/
 axiom ostrowski_invariant :
-  ∀ K, K ≥ 18 →
+  ∀ K, K > 18 →
   ∀ r, r ∈ computeNKFast K → r ≠ 0 → r ≠ 2 → r ≠ 8 →
   ¬(memCantorNat (2 ^ r))
 
@@ -453,7 +453,25 @@ theorem bridge_first_period_all (K : Nat) (hK : K ≥ 5) (r : Nat)
   by_cases h18 : K ≤ 18
   · exact bridge_first_period_verified K hK h18 r hr hSpecial
   · push_neg at h18
-    exact ostrowski_invariant K (by omega) r hr hSpecial.1 hSpecial.2.1 hSpecial.2.2
+    exact ostrowski_invariant K h18 r hr hSpecial.1 hSpecial.2.1 hSpecial.2.2
+
+/-- First-Period Bridge Theorem (Exact Set Equivalence):
+    For each 5 ≤ K ≤ 18, a power 2^r in the first period r ∈ computeNKFast K
+    belongs to the Cantor set if and only if r ∈ {0, 2, 8}. -/
+theorem bridge_first_period_iff (K : Nat) (hK5 : 5 ≤ K) (hK18 : K ≤ 18) (r : Nat)
+    (hr : r ∈ computeNKFast K) :
+    memCantorNat (2 ^ r) ↔ (r = 0 ∨ r = 2 ∨ r = 8) := by
+  constructor
+  · intro hc
+    by_contra h_neq
+    push_neg at h_neq
+    have h_not : ¬(memCantorNat (2 ^ r)) :=
+      bridge_first_period_verified K hK5 hK18 r hr h_neq
+    exact h_not hc
+  · rintro (rfl | rfl | rfl)
+    · exact pow2_0_mem_cantor
+    · exact pow2_2_mem_cantor
+    · exact pow2_8_mem_cantor
 
 theorem bridge_all_K_digit2 (K : Nat) (hK : K ≥ 5) (r : Nat)
     (hr : r ∈ computeNKFast K) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
