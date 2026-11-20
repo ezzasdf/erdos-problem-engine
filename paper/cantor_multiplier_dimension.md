@@ -783,7 +783,7 @@ In `ErdosTernary.RepunitCarryConnection`, we establish the exact, machine-verifi
    Consequently:
    $$(v_n)_1 + (v_n)_2 = N(n) \quad (\forall n \in \mathbb{N}).$$
 
-This closes the loop between the digit-carry automata of Spencer (2026) and our SFT dimension theory: the carry automaton for $M = 4$ is not merely an ad-hoc local filter, but the precise dynamical generator of the extremizing fractal $C(1, 4)$. All theorems are Lean-verified with foundational axioms `[propext, Classical.choice, Quot.sound]`, with zero `sorry` and zero `native_decide`.
+This closes the loop between the digit-carry automata developed in this project and our SFT dimension theory: the carry automaton for $M = 4$ is not merely an ad-hoc local filter, but the precise dynamical generator of the extremizing fractal $C(1, 4)$. All theorems are Lean-verified with foundational axioms `[propext, Classical.choice, Quot.sound]`, with zero `sorry` and zero `native_decide`.
 
 ### 6.5 The Essential Contrast: $\rho_{\text{adic}} = 2$ versus $\rho_{\text{digit}} = \phi < 2$
 

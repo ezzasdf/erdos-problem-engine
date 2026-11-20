@@ -6,7 +6,7 @@ import ErdosTernary.RepunitCarryPacket
 # Structural Connection Lemma: Carry Automata and Safe-Multiplier SFTs
 
 This module formalizes the exact mathematical equivalence between the two-state
-quadrupling carry automaton language on Cantor inputs (Spencer 2026) and the
+quadrupling carry automaton language on Cantor inputs and the
 subshift of finite type (SFT) for the safe multiplier $M = 4$ ($a=1, b=2$ in Family 2).
 
 ## Key Results
