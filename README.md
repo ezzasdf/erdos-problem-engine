@@ -13,7 +13,7 @@
 ## Overview
 
 This repository contains the complete interactive Lean 4 formalizations, computational certificates, and AMS-LaTeX research papers investigating:
-1. **The Erdős Ternary Digit Conjecture (1978):** Reducing the classical question of powers of 2 omitting digit 2 in base 3 to a machine-verified Diophantine target via base-4 repunit 3-adic dynamics, rooted tree isomorphisms, and obstruction analysis.
+1. **The Erdős Ternary Digit Conjecture (1979):** Reducing the classical question of powers of 2 omitting digit 2 in base 3 (posed by Paul Erdős in *Mathematics Magazine*, 1979) to a machine-verified Diophantine target via base-4 repunit 3-adic dynamics, rooted tree isomorphisms, and obstruction analysis.
 2. **The Extremal Hausdorff Dimension of Cantor Multiplier Intersections:** A classification of Hausdorff dimensions $\dim_H C(1, M) = \dim_H (\Sigma \cap M^{-1} \Sigma)$ for digitwise-safe multipliers, discovering a second infinite family of Golden Mean Shift extremizers attaining $\log_3 \phi \approx 0.438018$, with a formalized Time-Reversal Duality.
 
 ---
@@ -61,8 +61,14 @@ erdos-problem-engine/
         ├── NegativePower.lean          # Negative-power theorem & mod-8 Gap Lemma
         ├── RepunitCarryConnection.lean # Carry automaton ≅ SFT $C(1, 4)$ isomorphism
         ├── Bridge.lean                 # Trailing filter $B_K$ & leading filter $A_L$
-        ├── BridgeCandidates.lean       # Finite-window candidate certificates ($K=13..16$)
-        ├── BridgeCompute.lean          # Reflexive decision procedure proofs
+        ├── BridgeCompute.lean          # Leading-digit deciders ($K=5..9$) & low-50 evaluators
+        ├── BridgeMiddle.lean           # Middle digit window $[K, 50)$ certificates ($K=10..12$)
+        ├── BridgeMiddle16.lean         # Middle window certificates for higher scales
+        ├── BridgeCandidates.lean       # Filtered modular residue candidates
+        ├── BridgeK13.lean..BridgeK18.lean # Finite candidate verification ($K=13..18$)
+        ├── BridgeCantorChunkedProofs.lean # Range-chunked parallel certificates ($K=15..17$)
+        ├── BridgeUniform.lean          # First-period bridge aggregation ($K=5..18$)
+        ├── BridgeOstrowskiInvariant.lean # Re-export with explicit asymptotic hypothesis
         ├── CantorMultiplier.lean       # Safe multipliers & Golden Mean shift bound
         ├── TimeReversal.lean           # Matrix similarity $P M_{(a,b)} P = M_{(b-a,b)}^T$
         ├── PeriodicOrbit.lean          # Recurrent component primitivity & $2b$-periodic orbit
@@ -106,20 +112,33 @@ lake env lean ErdosTernary/RepunitTreeIso.lean
 
 # Verify the Time-Reversal Duality Theorem:
 lake env lean ErdosTernary/TimeReversal.lean
+
+# Verify the First-Period Bridge Theorem:
+lake env lean ErdosTernary/BridgeUniform.lean
 ```
 
 ---
 
-## Axiom Audit
+## Trust Model & Axiom Audit
 
-All core theoretical modules in this repository are **100% pure foundational**, depending exclusively on standard Lean core axioms:
+We maintain a strict distinction between foundational mathematical proofs and computational decision procedures:
+
+### 1. Foundational Kernel Theorems (TCB = Lean 4 Kernel)
+All core theoretical modules (`RepunitBase4.lean` through `RepunitCarryConnection.lean`) are **100% pure foundational**. They are checked strictly by the Lean 4 kernel, depending exclusively on standard foundation axioms:
 - `propext` (Propositional Extensionality)
 - `Classical.choice` (Axiom of Choice)
 - `Quot.sound` (Quotient Soundness)
 
-There is **zero reliance** on `sorryAx` / `sorry` or unverified axioms anywhere in the proofs.
+There is **zero reliance** on `sorryAx` / `sorry`, unverified axioms, or decision procedure oracles in these theorems.
 
-Finite combinatorial certificates (in `BridgeCandidates.lean` for the First-Period Bridge, and `Lemma41Finite.lean` for $C(1, M)$ bounds) utilize standard reflexive kernel evaluation (`native_decide` / `Lean.ofReduceBool`), fully quarantined from the pure foundational modules.
+### 2. Computational Certificates (TCB Extended to Lean Compiler/VM)
+Finite combinatorial certificates (such as the First-Period Bridge certificates in `BridgeCompute.lean`, `BridgeMiddle.lean`, `BridgeK13.lean`–`BridgeK18.lean`, `BridgeCantorChunkedProofs.lean`, and `Lemma41Finite.lean`) use `native_decide` and `Lean.ofReduceBool`. 
+- `native_decide` compiles Lean deciders to native executable bytecode and runs them within the Lean runtime environment.
+- This extends the Trusted Computing Base (TCB) beyond the foundational Lean kernel to include the Lean compiler and C++ runtime evaluator, enabling verified exhaustive search over candidate sets with period $u_K \le 2.87 \times 10^7$.
+- For $K \in \{5, \dots, 9\}$, the witness digit 2 is verified within the leading 30 digits (`hasLeadingDigit2`).
+- For $K \in \{10, 11, 12\}$, the witness digit 2 is verified within the middle window $[K, 50)$ modulo $3^{50}$.
+- For $K \in \{13, \dots, 18\}$, the witness digit 2 is verified within the lowest 50 digits modulo $3^{50}$.
+- The open asymptotic conjecture for $K > 18$ is quarantined in `BridgeUniform.lean` and `BridgeOstrowskiInvariant.lean` under an explicit hypothesis (`axiom ostrowski_invariant`), ensuring the verified finite theorem for $K \le 18$ depends on zero unproved axioms.
 
 ---
 

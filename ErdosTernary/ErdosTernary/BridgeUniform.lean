@@ -167,30 +167,14 @@ private theorem bridge_K18_not_cantor (r : Nat)
     ¬(memCantorNat (2 ^ r)) :=
   checkBridgeCantorPow2_imp_not_cantor 18 checkBridgeCantorPow2_K18 r hr hSpecial
 
-private theorem ostrowski_invariant (K : Nat) (hK : K ≥ 18) (r : Nat)
-    (hr : r ∈ computeNKFast K) (h0 : r ≠ 0) (h2 : r ≠ 2) (h8 : r ≠ 8) :
-    ¬(memCantorNat (2 ^ r)) := by
-  have h18le : 18 ≤ K := hK
-  have hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8 := ⟨h0, h2, h8⟩
-  by_cases hr18 : r < uK 18
-  · exact bridge_K18_not_cantor r (NK_mono h18le hr18 hr) hSpecial
-  · push_neg at hr18
-    have hrK : r < uK K := by
-      rw [computeNKFast_eq] at hr
-      unfold computeNK at hr
-      simp only [List.mem_filter, Finset.mem_range] at hr
-      exact hr.1
-    by_cases hr1001 : r < 1001
-    · exact bridge_small_n K (by omega) r hr hSpecial hr1001
-    · have hr9 : r ≥ 9 := NK_excludes_small K (by omega) r hr hSpecial
-      have hrbig : r ≥ 1001 := by omega
-      have hgap : r ≥ uK 18 := hr18
-      have hKgt18 : K > 18 := by omega
-      exact absurd (bridge_K18_not_cantor r (by
-        have h18le' : 18 ≤ K := hK
-        exact NK_mono h18le' (by omega) hr) hSpecial) (by
-        intro h
-        exact h hc)
+/-- Ostrowski Invariant Hypothesis for K > 18:
+    For K ≥ 18, all survivors r ∈ computeNKFast K \ {0, 2, 8} satisfy 2^r ∉ Cantor.
+    This formalizes the open asymptotic hypothesis for K > 18 beyond the
+    finitely verified levels K ∈ {5, ..., 18}. -/
+axiom ostrowski_invariant :
+  ∀ K, K ≥ 18 →
+  ∀ r, r ∈ computeNKFast K → r ≠ 0 → r ≠ 2 → r ≠ 8 →
+  ¬(memCantorNat (2 ^ r))
 
 def hasDigit2UpTo (val maxDigits : Nat) : Bool :=
   (List.range maxDigits).any fun i => (val / 3 ^ i) % 3 == 2
@@ -428,13 +412,18 @@ private theorem bridge_cantor_K (K : Nat) (hK : K ≤ 9) (hK5 : K ≥ 5) :
   · exact bridge_K8_cantor
   · exact bridge_K9_cantor
 
-theorem bridge_all_K_digit2 (K : Nat) (hK : K ≥ 5) (r : Nat)
+/-- The finite First-Period Bridge Theorem: computationally verified for all 5 ≤ K ≤ 18.
+    Combines:
+    - K=5..9: BridgeCompute.lean (checkBridgeCantor by native_decide)
+    - K=10..12: BridgeMiddle.lean (middle-window check on mod 3^50)
+    - K=13..18: BridgeK13-K18, BridgeCandidates, BridgeCantorChunkedProofs (low-50 check on mod 3^50) -/
+theorem bridge_first_period_verified (K : Nat) (hK5 : K ≥ 5) (hK18 : K ≤ 18) (r : Nat)
     (hr : r ∈ computeNKFast K) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
     ¬(memCantorNat (2 ^ r)) := by
-  have h_cases : K ≤ 9 ∨ (K ≥ 10 ∧ K ≤ 12) ∨ K ≥ 13 := by omega
+  have h_cases : K ≤ 9 ∨ (K ≥ 10 ∧ K ≤ 12) ∨ (K ≥ 13 ∧ K ≤ 18) := by omega
   cases h_cases with
   | inl h9 =>
-    have h2 := checkBridgeCantor_extract (bridge_cantor_K K h9 hK) hr hSpecial
+    have h2 := checkBridgeCantor_extract (bridge_cantor_K K h9 hK5) hr hSpecial
     exact hasDigit2UpTo_not_cantor h2
   | inr h_rest =>
     cases h_rest with
@@ -444,20 +433,32 @@ theorem bridge_all_K_digit2 (K : Nat) (hK : K ≥ 5) (r : Nat)
       have hr' : r ∈ NK_K_for K := by
         rw [computeNKFast_eq_NK_K_for_local K hK'] at hr; exact hr
       exact bridge_middle_not_cantor K hK' r hr' hSpecial
-    | inr h13 =>
-      have hcases : K = 13 ∨ K = 14 ∨ K = 15 ∨ K = 16 ∨ K = 17 ∨ K ≥ 18 := by omega
-      rcases hcases with rfl | rfl | rfl | rfl | rfl | h18
+    | inr h18 =>
+      obtain ⟨h13, h18'⟩ := h18
+      have hcases : K = 13 ∨ K = 14 ∨ K = 15 ∨ K = 16 ∨ K = 17 ∨ K = 18 := by omega
+      rcases hcases with rfl | rfl | rfl | rfl | rfl | rfl
       · exact bridge_K13_not_cantor r hr hSpecial
       · exact bridge_K14_not_cantor r hr hSpecial
       · exact bridge_K15_not_cantor r hr hSpecial
       · exact bridge_K16_not_cantor r hr hSpecial
       · exact bridge_K17_not_cantor r hr hSpecial
-      · exact ostrowski_invariant K h18 r hr hSpecial.1 hSpecial.2.1 hSpecial.2.2
+      · exact bridge_K18_not_cantor r hr hSpecial
 
+/-- Full bridge theorem for all K ≥ 5:
+    Uses verified computational certificates for K ≤ 18 and
+    the ostrowski_invariant hypothesis for K > 18. -/
 theorem bridge_first_period_all (K : Nat) (hK : K ≥ 5) (r : Nat)
     (hr : r ∈ computeNKFast K) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
+    ¬(memCantorNat (2 ^ r)) := by
+  by_cases h18 : K ≤ 18
+  · exact bridge_first_period_verified K hK h18 r hr hSpecial
+  · push_neg at h18
+    exact ostrowski_invariant K (by omega) r hr hSpecial.1 hSpecial.2.1 hSpecial.2.2
+
+theorem bridge_all_K_digit2 (K : Nat) (hK : K ≥ 5) (r : Nat)
+    (hr : r ∈ computeNKFast K) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
     ¬(memCantorNat (2 ^ r)) :=
-  bridge_all_K_digit2 K hK r hr hSpecial
+  bridge_first_period_all K hK r hr hSpecial
 
 theorem bridge_middle_digit_K10_12 (K : Nat) (hK : K = 10 ∨ K = 11 ∨ K = 12)
     (r : Nat) (hr : r ∈ NK_K_for K) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :

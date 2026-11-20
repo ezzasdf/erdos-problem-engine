@@ -1,11 +1,12 @@
 /-
-  Bridge Theorem: Uniform Proof for All K ≥ 5 (Re-export)
+  Bridge Theorem: Verification for K ∈ [5, 18] and Uniform Extension (Re-export)
 
-  This file re-exports the bridge theorem from BridgeUniform.lean,
-  which uses the Ostrowski invariant axiom instead of erdos_conjecture.
-
-  The erdos_conjecture axiom is kept as an isolated placeholder for the
-  full conjecture (n > 8 ⟹ 2^n has digit 2). It is NOT used in this bridge proof.
+  This file re-exports the bridge theorem from BridgeUniform.lean:
+  1. `bridge_first_period_verified_ostrowski`: Unconditionally verified for all
+     5 ≤ K ≤ 18 via computational certificates (native_decide).
+  2. `bridge_first_period_all_ostrowski`: Full bridge theorem for all K ≥ 5,
+     relying on verified computations for K ≤ 18 and the explicit `ostrowski_invariant`
+     axiom for the open asymptotic range K > 18.
 -/
 
 import Mathlib.Tactic
@@ -26,13 +27,22 @@ theorem computeNK_eq_NK_K_for (K : Nat) (hK : K = 10 ∨ K = 11 ∨ K = 12) :
   · native_decide
   · native_decide
 
-/-- The full bridge theorem for all K ≥ 5.
+/-- The finite bridge theorem computationally verified for all 5 ≤ K ≤ 18.
     Combines:
     - K=5..9: BridgeCompute.lean (native_decide)
-    - K=10..12: BridgeMiddle.lean (native_decide on mod 3^50)
-    - K≥13: Ostrowski invariant (axiom, verified computationally for K=13..15)
+    - K=10..12: BridgeMiddle.lean (native_decide on middle window mod 3^50)
+    - K=13..18: BridgeK13-K18, BridgeCandidates, BridgeCantorChunkedProofs (native_decide on low 50 mod 3^50)
+    Uses zero unproved axioms (purely kernel + native_decide certificates). -/
+theorem bridge_first_period_verified_ostrowski :
+    ∀ K, 5 ≤ K → K ≤ 18 →
+    ∀ r, r ∈ computeNK K → r ≠ 0 → r ≠ 2 → r ≠ 8 →
+    ¬(memCantorNat (2 ^ r)) :=
+  fun K hK5 hK18 r hr hn0 hn2 hn8 =>
+    bridge_first_period_verified K hK5 hK18 r (by rwa [computeNKFast_eq]) ⟨hn0, hn2, hn8⟩
 
-    Note: erdos_conjecture axiom is NOT used in this proof. -/
+/-- The conditional full bridge theorem for all K ≥ 5.
+    Combines verified computations for K ≤ 18 with the explicit
+    `ostrowski_invariant` axiom for K > 18. -/
 theorem bridge_first_period_all_ostrowski :
     ∀ K, K ≥ 5 →
     ∀ r, r ∈ computeNK K → r ≠ 0 → r ≠ 2 → r ≠ 8 →

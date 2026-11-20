@@ -52,8 +52,8 @@ In a self-contained analysis of obstructions, we prove why elementary methods fa
 
 \section{Introduction}
 
-In 1978, Paul Erd\H{o}s~\cite{Erdos1978} posed the following fundamental question regarding the digits of powers of $2$:
-\begin{conjecture}[Erd\H{o}s 1978]\label{conj:erdos}
+In 1979, Paul Erd\H{o}s~\cite{Erdos1979} posed the following fundamental question regarding the digits of powers of $2$:
+\begin{conjecture}[Erd\H{o}s 1979]\label{conj:erdos}
 The only powers of $2$ whose base-$3$ expansion contains no digit $2$ are:
 \begin{equation}
 2^0 = 1 = 1_{(3)}, \quad 2^2 = 4 = 11_{(3)}, \quad 2^8 = 256 = 100111_{(3)}.
@@ -228,33 +228,51 @@ In this section, we analyze the specific mathematical barriers that cause elemen
 \subsection{The Modular Sieve Barrier}
 The classical trailing-digit approach tests whether $2^n \bmod 3^K$ has digits in $\{0, 1\}$. By Theorem~\ref{thm:tree_iso}, the number of surviving residue classes at level $K$ is $|N_K| = 2^{K-1}$. Since $B_K(n)$ is strictly periodic with period $u_K = 2 \cdot 3^{K-1}$, the set of integers satisfying the modular test has positive density in $\N$. For every depth $K$, there exist infinitely many integers $n \ge u_K$ that pass the trailing test. Thus, trailing-digit modular sieving alone \emph{can never establish finiteness}.
 
-\subsection{The First-Period Bridge Theorem}
-Within the fundamental period $[0, u_K)$, however, the survivors are finite. We pair the trailing modular conditions with leading-digit bounds:
+\subsection{The First-Period Bridge Theorem}\label{subsec:bridge}
+To investigate whether small depths $K$ can eliminate spurious survivors, we analyze the interaction between modular trailing constraints and ternary digit distributions of $2^n$.
 
-\begin{definition}[Trailing Filter $B_K$ and Leading Filter $A_L$]\label{def:filters}
+\begin{definition}[Trailing Filter $B_K$ and Cantor Integer Set $\mathcal{C}_{\mathbb{N}}$]\label{def:filters}
 For depths $K \ge 1$ and precision $L \ge 1$:
 \begin{enumerate}
-    \item \textbf{Trailing Filter $B_K$:} The set of non-negative integers $n$ whose trailing $K$ ternary digits contain no digit $2$:
+    \item \textbf{Trailing Modular Filter $B_K$:} The set of non-negative integers $n$ whose trailing $K$ ternary digits contain no digit $2$:
     \begin{equation}
     B_K = \left\{ n \in \N : d_j(2^n) \in \{0, 1\} \text{ for all } 0 \le j < K \right\}.
     \end{equation}
-    By Lemma~\ref{lem:saye_period}, $n \in B_K$ is determined strictly by the residue class $n \bmod u_K$, where $u_K = 2 \cdot 3^{K-1}$.
-    \item \textbf{Leading Filter $A_L$:} The set of non-negative integers $n$ whose leading $L$ ternary digits contain no digit $2$. Letting $M_n = \lfloor n \log_3 2 \rfloor$ denote the most significant ternary digit index of $2^n$:
+    By Lemma~\ref{lem:saye_period}, membership $n \in B_K$ is purely periodic, determined strictly by the residue class $n \bmod u_K$, where $u_K = 2 \cdot 3^{K-1}$.
+    \item \textbf{Cantor Integer Set $\mathcal{C}_{\mathbb{N}}$:} The set of all integers whose complete ternary expansion omits the digit $2$:
     \begin{equation}
-    A_L = \left\{ n \in \N : d_{M_n - j}(2^n) \in \{0, 1\} \text{ for all } 0 \le j < \min(L, M_n + 1) \right\}.
+    \mathcal{C}_{\mathbb{N}} = \left\{ n \in \N : 2^n = \sum_{j=0}^{M_n} d_j(2^n) 3^j, \quad d_j(2^n) \in \{0, 1\} \text{ for all } j \ge 0 \right\}.
     \end{equation}
-    The leading digits are governed by the continuous orbit of the fractional part $\{ n \log_3 2 \} = n \log_3 2 - \lfloor n \log_3 2 \rfloor$ on the circle $\mathbb{T} = \R / \Z$.
+    \item \textbf{Leading Prefix Filter $A_L$:} The set of integers $n$ whose leading $L$ ternary digits contain no digit $2$:
+    \begin{equation}
+    A_L = \left\{ n \in \N : d_{M_n - j}(2^n) \in \{0, 1\} \text{ for all } 0 \le j < \min(L, M_n + 1) \right\},
+    \end{equation}
+    where $M_n = \lfloor n \log_3 2 \rfloor$. The leading digits are governed by the continuous orbit of the fractional part $\{ n \log_3 2 \} = n \log_3 2 - \lfloor n \log_3 2 \rfloor$ on the circle $\mathbb{T} = \R / \Z$.
 \end{enumerate}
 \end{definition}
 
-By pairing trailing modular filters $B_K$ with leading-digit bounds $A_L$, we verified by machine computation and formalized in Lean~4 (in modules \texttt{Bridge.lean}, \texttt{BridgeCompute.lean}, and \texttt{BridgeCandidates.lean}):
+Clearly, $\mathcal{C}_{\mathbb{N}} \subseteq A_L$ for every $L \ge 1$, so exhibiting any digit $2$ (whether in the leading prefix, in a middle window, or in trailing blocks) establishes $2^n \notin \mathcal{C}$ and excludes $n$ from $\mathcal{C}_{\mathbb{N}}$. 
+
+For small depths $K \in \{5, \dots, 9\}$, $2^n$ can be computed as a full big integer; direct evaluation verifies that every candidate $n \in [0, u_K) \cap B_K \setminus \{0, 2, 8\}$ exhibits a digit $2$ among its leading $L = 30$ digits ($n \notin A_{30}$). For larger depths $K \in \{10, \dots, 16\}$, evaluating $2^n$ as full arbitrary-precision integers ($n \approx 10^7$) is computationally prohibitive. Instead, the formalization verifies Cantor non-membership via efficient modular windows modulo $3^{50}$:
+\begin{itemize}
+    \item For $K \in \{10, 11, 12\}$, verified via the middle digit window $[K, 50)$ modulo $3^{50}$ in module \texttt{BridgeMiddle.lean};
+    \item For $K \in \{13, \dots, 16\}$, verified by checking for a forbidden digit $2$ within the lowest $50$ ternary digits modulo $3^{50}$ across modular candidates in modules \texttt{BridgeCandidates}, \texttt{BridgeMiddle16}, \texttt{BridgeK13}--\texttt{BridgeK16}, and \texttt{BridgeCantorChunkedProofs}.
+\end{itemize}
+
 \begin{theorem}[First-Period Bridge Theorem]\label{thm:bridge}
-For each $K \in \{5, \dots, 16\}$ and leading precision $L = 30$ (and thus for all $L \ge 30$):
+For each $K \in \{5, \dots, 16\}$, the only powers of $2$ in the first period $[0, u_K)$ that survive the trailing filter $B_K$ and belong to the Cantor set are the trivial solutions:
 \begin{equation}
-n \in [0, u_K) \cap B_K \cap A_L \iff n \in \{0, 2, 8\}.
+n \in [0, u_K) \cap B_K \quad \text{and} \quad 2^n \in \mathcal{C} \iff n \in \{0, 2, 8\}.
 \end{equation}
+Specifically, for each spurious survivor $n \in [0, u_K) \cap B_K \setminus \{0, 2, 8\}$, a witness digit $2$ is certified:
+\begin{enumerate}
+    \item in the leading $30$ digits ($n \notin A_{30}$) for $K \in \{5, \dots, 9\}$;
+    \item in the middle window $\{K, \dots, 49\}$ for $K \in \{10, 11, 12\}$;
+    \item within the lowest $50$ ternary digit positions for $K \in \{13, \dots, 16\}$.
+\end{enumerate}
 \end{theorem}
-Since $A_L$ is monotone decreasing in $L$ (increasing precision imposes a strictly stronger prefix digit constraint) and $\{0, 2, 8\} \subseteq A_L$ for all $L \ge 1$ (as their ternary expansions contain no digit $2$), the verification at $L = 30$ implies the result for all $L \ge 30$. While this completely eliminates all spurious survivors in the first period, it does not constrain the second period $[u_K, 2 u_K)$.
+
+{\sloppy While Theorem~\ref{thm:bridge} completely eliminates all spurious survivors in the first period $[0, u_K)$, it does not constrain the second period $[u_K, 2 u_K)$. The full proof chain is formalized across the Lean~4 bridge module suite (\texttt{Bridge.lean}, \texttt{BridgeCompute}, \texttt{BridgeMiddle}, \texttt{BridgeCandidates}, \texttt{BridgeK13}--\texttt{BridgeK18}, and \texttt{BridgeUniform}).\par}
 
 \subsection{Carry Packets and the Mod-8 Non-Recurrence Lemma}
 An alternative approach tracks carry propagation in the self-overlap addition $R_{s+1} = R_s + 3 R_s + 1$. A localized configuration of digits that absorbs an incoming digit $2$ via carries without emitting an output digit $2$ is called a \emph{carry packet}. In this work, we analyze the local carry dynamics and prove that the unique dyadically pure carry packet capable of resolving an input digit $2$ occurs at:
@@ -312,7 +330,7 @@ For negative powers $2^{-n}$, the rational expansion is periodic of period $P = 
 
 \section{Lean 4 Formalization}\label{sec:formalization}
 
-All theoretical results in this paper have been formalized and kernel-verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. The complete machine-checked formalization, proofs, and verification scripts are openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
+All theoretical results in this paper have been formalized and verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. The complete machine-checked formalization, proofs, and verification scripts are openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
 \begin{itemize}
     \item \texttt{RepunitBase4.lean}: Formalizes $4^s = 3 R_s(4) + 1$ and the digit index shift.
     \item \texttt{RepunitLifting.lean}: Proves Lemma~\ref{lem:modular_lifting} and the two-of-three branching rule.
@@ -322,9 +340,15 @@ All theoretical results in this paper have been formalized and kernel-verified i
     \item \texttt{RepunitCarryPacket.lean}: Proves Lemma~\ref{lem:non_recurrence} (Carry-Packet Non-Recurrence).
     \item \texttt{NegativePower.lean}: Proves Theorem~\ref{thm:neg_power} (Negative-Power Theorem and Gap Lemma).
     \item \texttt{RepunitCarryConnection.lean}: Proves the polynomial, spectral, and orbit isomorphism to $C(1, 4)$.
-    \item \texttt{Bridge.lean}, \texttt{BridgeCompute.lean}, and \texttt{BridgeCandidates.lean}: Formalize Theorem~\ref{thm:bridge} (First-Period Bridge Theorem).
+    \item \sloppy \texttt{BridgeSuite}: The formalization suite for Theorem~\ref{thm:bridge} (First-Period Bridge Theorem), comprising modules \texttt{Bridge}, \texttt{BridgeCompute}, \texttt{BridgeMiddle}, \texttt{BridgeCandidates}, \texttt{BridgeK13}--\texttt{BridgeK18}, and \texttt{BridgeUniform}.
 \end{itemize}
-Across the eight core theoretical modules (\texttt{RepunitBase4.lean} through \texttt{RepunitCarryConnection.lean}), \textbf{100\% of the declarations are pure foundational}, depending exclusively on standard Lean foundational axioms \texttt{[propext, Classical.choice, Quot.sound]}, with zero reliance on unproven axioms (\texttt{sorryAx} / \texttt{sorry}) and no reliance on computational reflection or decision-procedure oracles (\texttt{Lean.ofReduceBool} / \texttt{native\_decide}). The finite computational certificates in \texttt{BridgeCandidates.lean} (for Theorem~\ref{thm:bridge}) and in the companion paper's \texttt{Lemma41Finite.lean} (for $C(1, M)$ certificates) utilize standard reflexive kernel evaluation (\texttt{native\_decide}) to verify finite candidate arrays. None of the $88$ \texttt{native\_decide} declarations from the companion paper's \texttt{Lemma41Finite.lean} are used in any theorem of this paper.
+
+\subsection{Trust Model and Axiom Inventory}
+We distinguish two precise verification tiers across the formalization:
+\begin{enumerate}
+    \item \textbf{Foundational Kernel Theorems:} Across the eight core theoretical modules (\texttt{RepunitBase4} through \texttt{RepunitCarryConnection}), \textbf{100\% of declarations are pure foundational}. They are checked strictly by the Lean~4 kernel, relying exclusively on standard foundational axioms \texttt{[propext, Classical.choice, Quot.sound]}, with zero unproved axioms (\texttt{sorryAx} / \texttt{sorry}) and no reliance on computational reflection or decision-procedure oracles (\texttt{Lean.ofReduceBool} / \texttt{native\_decide}).
+    \item \textbf{Computational Verification Certificates:} The combinatorial searches establishing the finite First-Period Bridge Theorem ($K \in \{5, \dots, 18\}$ in \texttt{BridgeCandidates} and \texttt{BridgeK13}--\texttt{BridgeK18}) and the multiplier certificates in the companion paper's \texttt{Lemma41Finite} utilize native evaluation (\texttt{native\_decide} / \texttt{Lean.ofReduceBool}). While standard for finite computational claims, \texttt{native\_decide} compiles Lean definitions to executable bytecode/C++, extending the trusted computing base (TCB) beyond the foundational Lean kernel to include the Lean compiler and runtime environment. The unproved asymptotic behavior for $K > 18$ is cleanly isolated in \texttt{BridgeUniform} under an explicit hypothesis (\texttt{ostrowski\_invariant}), ensuring that the finite verification for $K \le 18$ remains completely free of asymptotic axioms. None of the $88$ \texttt{native\_decide} declarations from \texttt{Lemma41Finite} are used in this paper.
+\end{enumerate}
 
 \bibliographystyle{amsplain}
 \bibliography{references}
