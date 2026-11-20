@@ -683,7 +683,7 @@ Under independent distribution of the 3-adic prefix and the Archimedean quotient
 $$\mathbb{P}(s \text{ survives}) \approx \rho_{\text{adic}}(s) \cdot \rho_{\text{arch}}(s) = (2/3)^{s + 0.26186 s} = (2/3)^{1.26186 s}.$$
 Because the base $2/3 < 1$ and the exponent exceeds 1, this heuristic sum converges rapidly:
 $$\sum_{s=1}^\infty (2/3)^{1.26186 s} = \frac{(2/3)^{1.26186}}{1 - (2/3)^{1.26186}} \approx 1.498 < \infty.$$
-By the first Borel-Cantelli lemma, this provides a rigorous heuristic explanation for why only finitely many solutions ($s \in \{0, 1, 4\}$) can exist.
+This motivates the finiteness conjecture but does not prove it: Borel-Cantelli requires independence, which the deterministic orbit does not have. The non-averaged target below is what would turn the heuristic into a proof.
 
 #### The Exact Non-Averaged Target
 In `ErdosTernary.RepunitDiophantine`, we prove that the Erdős conjecture is logically equivalent to the emptiness of the joint survivor set:
@@ -698,7 +698,95 @@ Establishing this non-averaged equidistribution bound for the deterministic orbi
 
 ---
 
-## 6. References
+## 6. The Carry-Packet Obstruction: Combinatorial Shadow, Non-Recurrence, and Spectral Contrast
+
+An alternative perspective on ternary digit omission emerges from the study of **carry propagation** in base-3 arithmetic. Rather than viewing the avoidance of digit 2 purely through 3-adic topology or Diophantine fractional parts, one tracks the local propagation of carries generated when integers are multiplied by 2 or 4 in base 3.
+
+### 6.1 Mechanics: Carry Cascades in the Ternary Self-Overlap
+
+Because odd powers of 2 satisfy $2^n \equiv 2 \pmod 3$, any admissible integer must have an even exponent $n = 2s$, so $2^n = 4^s = 3 R_s(4) + 1$. The transition between successive exponents is governed by the ternary self-overlap recurrence:
+$$R_{s+1}(4) = 4R_s(4) + 1 = R_s(4) + 3R_s(4) + 1.$$
+In base 3, evaluating $R_s(4) + 3R_s(4) + 1$ corresponds to the digit-by-digit addition of $R_s(4)$ with its 1-trit left shift $3R_s(4)$, subject to the classical carry recurrence:
+$$s_k = (a_k + a_{k-1} + c_k) \bmod 3, \quad c_{k+1} = \lfloor(a_k + a_{k-1} + c_k) / 3\rfloor,$$
+where $a_k \in \{0, 1\}$ are the base-3 digits of $R_s(4)$ and $c_k \in \{0, 1\}$ are the incoming carries.
+
+Whenever an unshielded adjacent block of two ones ($a_k = 1, a_{k-1} = 1$) enters without an incoming carry ($c_k = 0$), the raw sum is $1 + 1 + 0 = 2 < 3$. This forces an unabsorbed output digit $s_k = 2$ and produces zero outgoing carry ($c_{k+1} = 0$), immediately destroying admissibility in the next power.
+
+### 6.2 Carry Packets and the Elementary Non-Recurrence Lemma
+
+A **carry packet** is a localized block of carries and non-Cantor trits (such as input digit 2) that successfully collapses under self-overlap addition via carry cascading ($2 + 1 + 0 = 3 \equiv 0 \pmod 3$, emitting $c = 1$), leaving output digits exclusively in $\{0, 1\}$.
+
+A systematic classification of carry-absorbing configurations reveals:
+1. **Non-Dyadic Cofactors:** Localized carry-absorbing patterns in base 3 that eliminate an incoming digit 2 universally introduce persistent non-dyadic prime factors ($p \in \{5, 7, 11, 41, 61, \dots\}$) that cannot be cleared by ternary shifts.
+2. **The Unique Dyadic Packet:** The unique dyadically pure configuration capable of resolving an input digit 2 without generating an output digit 2 is:
+   $$2101_3 = 64 \quad (4^3 = 64),$$
+   which under quadrupling produces $100111_3 = 256$ ($4^4 = 256$).
+
+To determine whether this local mechanism can recur infinitely often, we prove that this packet cannot be embedded at any higher separated ternary scale $64(1 + 3^s)$.
+
+> **Theorem (Non-Recurrence of Carry Packets, Lean 4 Verified).** For all integers $s \ge 2$ and all $k \in \mathbb{N}$:
+> $$1 + 3^s \ne 2^k.$$
+> Consequently, for all $s \ge 2$, $64(1 + 3^s)$ is never a power of 2.
+
+*Proof (Elementary 2-Adic / Modular Obstruction).*
+Modulo 8, powers of 3 alternate strictly between 1 and 3:
+$$3^s \bmod 8 = \begin{cases} 1 & \text{if } s \text{ is even}, \\ 3 & \text{if } s \text{ is odd}. \end{cases}$$
+Hence, for all $s \ge 0$, $(1 + 3^s) \bmod 8 \in \{2, 4\}$, which is never $0 \pmod 8$.
+On the other hand, for any $k \ge 3$, $2^k \equiv 0 \pmod 8$. Thus $1 + 3^s = 2^k$ forces $k < 3$, which implies $2^k \le 4$.
+However, for $s \ge 2$, $1 + 3^s \ge 1 + 3^2 = 10 > 4 \ge 2^k$, yielding an immediate contradiction.
+If $64(1 + 3^s) = 2^k$, then $k \ge 6$ (since $64(1 + 3^s) \ge 640 > 2^6$), which implies $1 + 3^s = 2^{k-6}$, contradicting the above. $\square$
+
+This theorem has been formalized in `ErdosTernary.RepunitCarryPacket` without `sorry` or `native_decide`, depending only on Lean's foundational axioms `[propext, Classical.choice, Quot.sound]`.
+
+### 6.3 Transfer Matrix and Spectral Radius of the Quadrupling Automaton
+
+When restricted to Cantor inputs $x \in \mathcal{C}_3$ whose quadruple $4x = x + 3x$ also belongs to $\mathcal{C}_3$, the carry-propagation automaton operates on states $(c, p) \in \{0, 1\} \times \{0, 1\}$, where $c$ is the incoming carry and $p$ is the previous input bit:
+- State $s_{00} = (0, 0)$: input $0 \to s_{00}$ (sum 0), input $1 \to s_{01}$ (sum 1).
+- State $s_{01} = (0, 1)$: input $0 \to s_{00}$ (sum 1), input $1 \to \text{illegal}$ (sum 2).
+- State $s_{10} = (1, 0)$: input $0 \to s_{00}$ (sum 1), input $1 \to \text{illegal}$ (sum 2).
+- State $s_{11} = (1, 1)$: input $0 \to \text{illegal}$ (sum 2), input $1 \to s_{11}$ (sum 3, carry 1).
+
+In `ErdosTernary.RepunitCarryPacket`, we prove `step_preserves_reachable`: starting from initial state $s_{00}$, states $s_{10}$ and $s_{11}$ are **completely unreachable**. The reachable sub-automaton is supported entirely on $\{s_{00}, s_{01}\}$, with transfer matrix:
+$$M = \begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}.$$
+The characteristic polynomial of $M$ is:
+$$\det(t I - M) = t^2 - t - 1 = 0,$$
+and its Perron eigenvalue (spectral radius) is the golden ratio:
+$$\rho_{\text{digit}} = \phi = \frac{1 + \sqrt{5}}{2} \approx 1.6180339887 < 2.$$
+
+Because the number of admissible digit strings of length $L$ grows as the Fibonacci sequence $N(L) \sim \frac{1}{\sqrt{5}} \phi^{L+2}$, the language of words avoiding digit 2 grows strictly sub-exponentially relative to the full binary alphabet $\{0, 1\}^L$ ($2^L$).
+
+### 6.4 The Essential Contrast: $\rho_{\text{adic}} = 2$ versus $\rho_{\text{digit}} = \phi < 2$
+
+This comparison clarifies why the Erdős conjecture cannot be settled by local or modular analysis alone:
+
+```
++-----------------------------------------------------------------------------------------+
+|                  THE DICHOTOMY: MODULAR TREE vs. DIGIT CARRY AUTOMATON                  |
++------------------------------------+----------------------------------------------------+
+| 3-Adic Modular Tree (Exponent)     | Digit Carry Automaton (Digit Stream)               |
++------------------------------------+----------------------------------------------------+
+| Tree depth m in Z/3^m Z             | Digit word length L                                |
+| Branching factor: exactly 2 of 3   | Admissible transitions: Fibonacci growth           |
+| Cardinality: |N_K| = 2^{K-1}        | Word count: N(L) ~ (1/√5) φ^{L+2}                  |
+| Spectral radius: ρ_adic = 2        | Spectral radius: ρ_digit = φ ≈ 1.618 < 2           |
+| Barrier: Full binary tree forever  | Dimension: dim_H C(1, 4) = log_3 φ < log_3 2       |
++------------------------------------+----------------------------------------------------+
+```
+
+- In **3-adic residue space**, the lifting tree $\mathcal{T}_{\text{rep}}$ exhibits exact binary branching $\rho_{\text{adic}} = 2$ indefinitely (as formalized in `CriticalInvariant.lean` and `RepunitLifting.lean`). Modular lifting cannot prune branches because every admissible residue mod $3^m$ possesses exactly two admissible lifts mod $3^{m+1}$.
+- In **digit space**, the carry automaton exhibits sub-binary spectral radius $\rho_{\text{digit}} = \phi < 2$, confirming that the topological entropy and Hausdorff dimension of the multiplier intersection $C(1, 4)$ are strictly bounded by $\log_3 \phi \approx 0.438018 < 1/2$.
+
+### 6.5 The Non-Averaged Gap: Why $\rho < 2$ Leaves Erdős Open
+
+The fact that $\rho_{\text{digit}} = \phi < 2$ proves that the set of infinite ternary expansions $x \in \mathcal{C}_3$ with $4x \in \mathcal{C}_3$ is extremely thin, having Hausdorff dimension strictly less than that of the full Cantor set $\mathcal{C}_3$.
+
+However, this **does not prove** that the deterministic integer sequence $\{4^s\}_{s \ge 5}$ must leave the set. An integer $4^s$ corresponds to a single deterministic path of length $L_s \approx s \log_3 4$. Proving that this specific trajectory eventually avoids the language of the carry automaton is precisely the non-averaged Diophantine problem formulated in §5.6. 
+
+The carry-packet framework provides the exact **combinatorial shadow** of the Diophantine condition: avoiding carry cascades is the discrete equivalent of avoiding the critical interval for fractional parts $\{s \log_3 4\}$. The non-averaged target remains the fundamental mathematical barrier separating heuristic bounds from a complete proof of the Erdős conjecture.
+
+---
+
+## 7. References
 
 1. **R. Bowen**, *Equilibrium States and the Ergodic Theory of Anosov Diffeomorphisms*, Lecture Notes in Mathematics, vol. 470, Springer-Verlag, Berlin, 1975.
 2. **P. Erdős**, *Problems and results in number theory*, Proc. Ninth Southeastern Conf. on Combinatorics, Graph Theory, and Computing, Congressus Numerantium XXI, Utilitas Math., Winnipeg, 1978, pp. 29–40.
