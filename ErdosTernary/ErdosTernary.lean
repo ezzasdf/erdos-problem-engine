@@ -19,3 +19,4 @@ import ErdosTernary.RepunitDynamics
 import ErdosTernary.RepunitDiophantine
 import ErdosTernary.RepunitCarryPacket
 import ErdosTernary.NegativePower
+import ErdosTernary.RepunitCarryConnection

@@ -553,6 +553,9 @@ The table below delineates the machine-checked status of each component of the p
 | **Decoupling**| Archimedean-Adic Decoupling & Reduction | `ErdosTernary/RepunitArchimedean.lean` (`erdos_ternary_reduction`, `repunit4_div_three_pow_pos`) | **[Lean]** | `[propext, Classical.choice, Quot.sound]` |
 | **Dynamics** | 3-Adic Conjugacy Recurrence $R_{s+1} = 4R_s + 1$ | `ErdosTernary/RepunitDynamics.lean` (`repunit4_succ`, `repunit4_eq_iterate_T`, `repunit4_mod_compat`) | **[Lean]** | `[propext, Quot.sound]` |
 | **Target**   | Non-Averaged Diophantine Target & Finiteness | `ErdosTernary/RepunitDiophantine.lean` (`erdos_conjecture_iff_jointSurvivors_empty`, `finite_powers_of_two_of_finite_joint`) | **[Lean]** | `[propext, Classical.choice, Quot.sound]` |
+| **Carry Packet** | 2-Adic Non-Recurrence & 4-State Carry Automaton | `ErdosTernary/RepunitCarryPacket.lean` (`pow3_add_one_ne_pow2`, `charMatrix_det`, `phi_lt_two`) | **[Lean]** | `[propext, Classical.choice, Quot.sound]` |
+| **Neg Power**| Negative-Power Erdős Theorem & Mod-8 Gap Lemma | `ErdosTernary/NegativePower.lean` (`exists_coset13_between`, `threshold_add_six_le_pred_pow2`, `digit3_two_at_n4`) | **[Lean]** | `[propext, Classical.choice, Quot.sound]` |
+| **Connection**| Carry Automaton $\cong$ SFT Loop Connection Lemma | `ErdosTernary/RepunitCarryConnection.lean` (`phi_eq`, `carry_charpoly_eq_perronPoly`, `orbitCount_sum_eq_goldenWordCount`) | **[Lean]** | `[propext, Classical.choice, Quot.sound]` |
 | **Interior** | Interior Domain ($a \ge 2, b - a \ge 2$) Ergodic Gap | §2.5 Steps 8.1–8.4 (Proved in prose; Lean-verified modulo `h_gap`) | **[P] / [Lean*]** | Modular `h_gap` (Birkhoff ergodic theorem) |
 | **Lemma 4.1** | Finite Injectivity Certificates (957 instances) | `scripts/cantor_multiplier/lemma41_hinject.py`, `Lemma41Finite.lean` | **[E]** | Exhaustive symbolic SAT / certificate scan |
 | **Table** | Exact Dimension Table ($M \le 300$) | `scripts/cantor_multiplier/x2p_dim_table.py` | **[E]** | SymPy algebraic charpoly factorization |
@@ -755,7 +758,34 @@ $$\rho_{\text{digit}} = \phi = \frac{1 + \sqrt{5}}{2} \approx 1.6180339887 < 2.$
 
 Because the number of admissible digit strings of length $L$ grows as the Fibonacci sequence $N(L) \sim \frac{1}{\sqrt{5}} \phi^{L+2}$, the language of words avoiding digit 2 grows strictly sub-exponentially relative to the full binary alphabet $\{0, 1\}^L$ ($2^L$).
 
-### 6.4 The Essential Contrast: $\rho_{\text{adic}} = 2$ versus $\rho_{\text{digit}} = \phi < 2$
+### 6.4 The Structural Connection Lemma: Carry Automata and Safe-Multiplier SFTs (Lean 4 Verified)
+
+A crucial insight of this paper is that the 2-state quadrupling carry automaton on Cantor inputs and the subshift of finite type (SFT) for the safe multiplier $M = 4$ ($a=1, b=2$ in Family 2) describe the **exact same symbolic dynamical system**: the classical Golden Mean Shift $\Sigma_{\text{gold}}$ (alphabet $\{0, 1\}$, forbidden block $\{11\}$).
+
+In `ErdosTernary.RepunitCarryConnection`, we establish the exact, machine-verified bridge between these two independent formalizations:
+
+1. **Identity of the Golden Ratio (`phi_eq`):**
+   The algebraic definitions of the golden ratio in the multiplier theory and carry automaton theory coincide by definition:
+   $$\text{CantorMultiplier.phi} = \text{RepunitCarryPacket.phi} = \frac{1 + \sqrt{5}}{2}.$$
+
+2. **Characteristic Polynomial Coincidence (`carry_charpoly_eq_perronPoly`):**
+   For all $t \in \mathbb{R}$, the determinant of the carry automaton characteristic matrix $t I - A$ equals the Perron polynomial of the safe multiplier $M = 4$ ($b = 2$):
+   $$\det(t I - A) = t^2 - t - 1 = \text{perronPoly}(2, t).$$
+
+3. **Equality of Dominant Eigenvalues (`lambda_SFT_one_two_eq_carry_phi`):**
+   The single-column Perron root $\lambda_{\text{SFT}}(1, 2)$ of the safe multiplier $M = 4$ coincides identically with the carry automaton spectral radius $\phi$:
+   $$\lambda_{\text{SFT}}(1, 2) = \phi \approx 1.6180339887.$$
+
+4. **Component-Wise Orbit and Word Count Isomorphism (`orbitCount_sum_eq_goldenWordCount`):**
+   Defining the two-state population vector recurrence $v_{n+1} = A v_n$ starting from $v_0 = (1, 0)$, we prove by induction:
+   $$v_n = (\text{fib}(n + 1), \text{fib}(n)) \quad \text{and} \quad v_n.1 + v_n.2 = \text{fib}(n + 2).$$
+   Simultaneously, the Golden Mean shift word recurrence $N(0) = 1, N(1) = 2, N(n+2) = N(n+1) + N(n)$ satisfies $N(n) = \text{fib}(n + 2)$ (`goldenWordCount_eq_fib`).
+   Consequently:
+   $$(v_n)_1 + (v_n)_2 = N(n) \quad (\forall n \in \mathbb{N}).$$
+
+This closes the loop between the digit-carry automata of Spencer (2026) and our SFT dimension theory: the carry automaton for $M = 4$ is not merely an ad-hoc local filter, but the precise dynamical generator of the extremizing fractal $C(1, 4)$. All theorems are Lean-verified with foundational axioms `[propext, Classical.choice, Quot.sound]`, with zero `sorry` and zero `native_decide`.
+
+### 6.5 The Essential Contrast: $\rho_{\text{adic}} = 2$ versus $\rho_{\text{digit}} = \phi < 2$
 
 This comparison clarifies why the Erdős conjecture cannot be settled by local or modular analysis alone:
 
@@ -776,7 +806,7 @@ This comparison clarifies why the Erdős conjecture cannot be settled by local o
 - In **3-adic residue space**, the lifting tree $\mathcal{T}_{\text{rep}}$ exhibits exact binary branching $\rho_{\text{adic}} = 2$ indefinitely (as formalized in `CriticalInvariant.lean` and `RepunitLifting.lean`). Modular lifting cannot prune branches because every admissible residue mod $3^m$ possesses exactly two admissible lifts mod $3^{m+1}$.
 - In **digit space**, the carry automaton exhibits sub-binary spectral radius $\rho_{\text{digit}} = \phi < 2$, confirming that the topological entropy and Hausdorff dimension of the multiplier intersection $C(1, 4)$ are strictly bounded by $\log_3 \phi \approx 0.438018 < 1/2$.
 
-### 6.5 The Non-Averaged Gap: Why $\rho < 2$ Leaves Erdős Open
+### 6.6 The Non-Averaged Gap: Why $\rho < 2$ Leaves Erdős Open
 
 The fact that $\rho_{\text{digit}} = \phi < 2$ proves that the set of infinite ternary expansions $x \in \mathcal{C}_3$ with $4x \in \mathcal{C}_3$ is extremely thin, having Hausdorff dimension strictly less than that of the full Cantor set $\mathcal{C}_3$.
 
