@@ -1,4 +1,7 @@
 \documentclass[11pt,reqno]{amsart}
+\usepackage[T1]{fontenc}
+\usepackage{mathpazo}
+\renewcommand{\ttdefault}{lmtt}
 \usepackage{amsmath,amssymb,amsthm,mathtools}
 \usepackage[utf8]{inputenc}
 \usepackage{booktabs}
@@ -47,9 +50,11 @@ In a self-contained analysis of obstructions, we prove why elementary methods fa
 \end{abstract}
 
 \maketitle
-\enlargethispage{2\baselineskip}
 
+
+\newpage
 \tableofcontents
+\vspace{1em}
 
 \section{Introduction}
 
@@ -70,7 +75,8 @@ Despite extensive computational searches and partial density bounds, the conject
 
 \textbf{Our Contributions:} Our contribution is the mathematical synthesis, structural reduction, obstruction theory, and interactive Lean~4 formalization of the principal results:
 \begin{enumerate}
-    \item \textbf{Rooted Tree Correspondence (Proposition~\ref{prop:rep_tree_iso} and Theorem~\ref{thm:tree_iso}):} We establish the correspondence between repunit survivors and powers-of-two survivors: the level-by-level and branching correspondence on bounded integer representatives is formalized and kernel-verified in \texttt{RepunitTreeIso.lean}, while the full projective/quotient rooted-tree isomorphism over residue-class systems is proved analytically in the text.
+    \item \textbf{Rooted Tree Correspondence (Proposition~\ref{prop:rep_tree_iso} and Theorem~\ref{thm:tree_iso}):} We establish the correspondence between repunit survivors and powers-of-two survivors: the level-by-level and branching correspondence on bounded integer representatives is formalized and kernel-verified in
+\texttt{RepunitTreeIso.lean}, while the full projective rooted-tree isomorphism over residue classes is proved analytically in the text.
     \item \textbf{Archimedean--$3$-Adic Decoupling (Theorem~\ref{thm:decoupling}):} We decouple the continuous Archimedean quotient from the discrete $3$-adic tree, reducing the full Erd\H{o}s conjecture to an exact Diophantine target: the emptiness of the joint survivor set ($\mathrm{jointSurvivors} = \emptyset$).
     \item \textbf{First-Period Bridge Theorem (Theorem~\ref{thm:bridge}):} We extend computational verification certificates to $K \in \{5, \dots, 18\}$ (covering periods up to $u_{18} = 258,280,326$), certifying that every spurious survivor in the first period exhibits a forbidden digit $2$.
     \item \textbf{Obstruction Theory (Section~\ref{sec:obstructions}):} We formalize why elementary methods stall: the infinite modular sieve barrier ($|N_K| = 2^{K-1}$ with positive natural density), the mod-$8$ non-recurrence of carry packets, the spectral radius contrast ($\rho_{\mathrm{adic}} = 2$ vs. $\rho_{\mathrm{digit}} = \phi < 2$), and the sampling discrepancy between positive and negative powers (where the negative-power theorem is completely solved via the mod-$8$ Gap Lemma).
@@ -120,7 +126,8 @@ By the binomial expansion of $(1 + 3)^{3^m}$,
 4^{3^m} &= 1 + 3^m \cdot 3 + \binom{3^m}{2} 3^2 + \dots \equiv 1 + 3^{m+1} \pmod{3^{m+2}}, \\
 R_{3^m}(4) &= \frac{4^{3^m} - 1}{3} \equiv 3^m \pmod{3^{m+1}}.
 \end{align}
-For any lift $s = r + q \cdot 3^m$, the repunit identity $R_{a+b}(4) = R_a(4) + 4^a R_b(4)$ gives $R_s(4) = R_r(4) + 4^r R_{q \cdot 3^m}(4)$. Since $4 \equiv 1 \pmod 3$, $4^r \equiv 1 \pmod 3$. Furthermore, $R_{q \cdot 3^m}(4) \equiv q R_{3^m}(4) \equiv q \cdot 3^m \pmod{3^{m+1}}$, establishing $R_{r + q \cdot 3^m}(4) \equiv R_r(4) + q \cdot 3^m \pmod{3^{m+1}}$. Dividing by $3^m$ modulo $3$ gives $d_m(R_{r + q \cdot 3^m}(4)) = (d_m(R_r(4)) + q) \bmod 3$. As $q$ ranges over $\{0, 1, 2\}$, this affine shift permutes $\{0, 1, 2\}$ bijectively.
+For any lift $s = r + q \cdot 3^m$, the repunit identity $R_{a+b}(4) = R_a(4) + 4^a R_b(4)$ gives $R_s(4) = R_r(4) + 4^r R_{q \cdot 3^m}(4)$. Since $4 \equiv 1 \pmod 3$, $4^r \equiv 1 \pmod 3$. Furthermore, $R_{q \cdot 3^m}(4) \equiv q R_{3^m}(4) \equiv q \cdot 3^m \pmod{3^{m+1}}$, establishing
+the congruence $R_{r + q \cdot 3^m}(4) \equiv R_r(4) + q \cdot 3^m \pmod{3^{m+1}}$. Dividing by $3^m$ modulo $3$ yields $d_m(R_{r + q \cdot 3^m}(4)) = (d_m(R_r(4)) + q) \bmod 3$. As $q$ ranges over $\{0, 1, 2\}$, this affine shift permutes $\{0, 1, 2\}$ bijectively.
 \end{proof}
 
 \begin{corollary}[Exact Two-of-Three Branching (Idowu~\cite{Idowu2026}, Saye~\cite{Saye2022})]\label{cor:two_of_three}
@@ -223,7 +230,7 @@ The product heuristic yields:
 \sum_{s=1}^\infty \rho_{\mathrm{adic}}(s) \rho_{\mathrm{arch}}(s) \approx \sum_{s=1}^\infty \left(\frac{2}{3}\right)^{1.26186 s} \approx 1.498 < \infty.
 \end{equation}
 
-\begin{remark}[The Summability Heuristic and Why Borel--Cantelli Does Not Apply]\label{rem:borel_cantelli}
+\begin{remark}[The Summability Heuristic and Borel--Cantelli Obstruction]\label{rem:borel_cantelli}
 We emphasize that the convergence of the heuristic series $\sum (2/3)^{1.26186 s} < \infty$ does \emph{not} constitute a proof of Conjecture~\ref{conj:erdos}.
 
 First, the first Borel--Cantelli lemma states that if $\sum_{s=1}^\infty \mathbb{P}(E_s) < \infty$, then the probability of infinitely many events $E_s$ occurring is zero (a standard result that requires no independence). However, the powers of two $\{4^s\}_{s \ge 1}$ form a single deterministic integer sequence rather than a random process on a probability space. The quantities $\rho_{\mathrm{adic}}(s) = (2/3)^s$ and $\rho_{\mathrm{arch}}(s) \approx (2/3)^{0.26186 s}$ represent combinatorial densities in residue classes and quotient intervals, not actual probabilities of measurable events governing the deterministic orbit $s \mapsto 4^s$.
@@ -305,7 +312,7 @@ An alternative approach tracks carry propagation in the self-overlap addition $R
 \end{equation}
 Could this configuration recur at higher separated ternary scales $64(1 + 3^s)$? We prove:
 \begin{lemma}[Mod-8 Non-Recurrence of the $64(1+3^s)$ Carry Packet]\label{lem:non_recurrence}
-\enlargethispage{12\baselineskip}
+
 For all integers $s \ge 2$ and all $k \in \N$:
 \begin{equation}
 1 + 3^s \ne 2^k.
@@ -340,16 +347,16 @@ v_2(3^{2^{n-3}} - 1) = v_2(3 - 1) + v_2(3 + 1) + (n - 3) - 1 = 1 + 2 + n - 4 = n
 \end{equation}
 Hence $3^{2^{n-3}} \not\equiv 1 \pmod{2^n}$, while $3^{2^{n-2}} \equiv 1 \pmod{2^n}$ (for $n = 3$, $3^2 \equiv 1 \pmod 8$ directly). Thus the multiplicative order of $3$ modulo $2^n$ is exactly $2^{n-2}$ for all $n \ge 3$. Modulo $8$, $3 \equiv 3$, so powers of $3$ alternate strictly between $1$ and $3 \pmod 8$. Thus $\langle 3 \rangle \subseteq \mathcal{S}_8$, where $\mathcal{S}_8 = \{ x \in [0, 2^n) : x \equiv 1 \text{ or } 3 \pmod 8 \}$. Since $[0, 2^n)$ contains $2^{n-3}$ integers congruent to $1 \pmod 8$ and $2^{n-3}$ integers congruent to $3 \pmod 8$, we have $|\mathcal{S}_8| = 2 \cdot 2^{n-3} = 2^{n-2} = |\langle 3 \rangle|$. Therefore, $\langle 3 \rangle = \mathcal{S}_8$ identically: the orbit of $3^k \bmod 2^n$ traverses the entire set $\mathcal{S}_8$.
 
-The consecutive elements of $\mathcal{S}_8$ alternate with gaps of $2$ and $6$ (namely, $1, 3, 9, 11, 17, 19, \dots$). Consequently, any interval of integers containing at least $7$ consecutive integers contains at least one element of $\mathcal{S}_8$ (\textbf{The Gap Lemma}). For $n \ge 5$, the target interval $J = [\lceil 2^{n+1} / 3 \rceil, 2^n - 1]$ where digit $2$ is produced contains $(2^n - 1) - \lceil 2^{n+1}/3 \rceil + 1$ integers. Since $\lceil 2^{n+1}/3 \rceil \le (2^{n+1} + 2)/3$, the interval $J$ contains at least $2^n - (2^{n+1}+2)/3 = (2^n - 2)/3 \ge (32 - 2)/3 = 10 \ge 7$ integers. By the Gap Lemma, $J$ must contain an element of $\mathcal{S}_8 = \langle 3 \rangle$. Thus the orbit visits $J$, forcing the ternary expansion of $2^{-n}$ to contain the digit $2$ for all $n \ge 5$. Direct verification of $n \in \{1, 2, 3, 4\}$ completes the proof.
+The consecutive elements of $\mathcal{S}_8$ alternate with gaps of $2$ and $6$
+(namely, $1, 3, 9, 11, 17, 19, \dots$). Consequently, any interval of integers containing at least $7$ consecutive integers contains at least one element of $\mathcal{S}_8$ (\textbf{The Gap Lemma}). For $n \ge 5$, the target interval $J = [\lceil 2^{n+1} / 3 \rceil, 2^n - 1]$ where digit $2$ is produced contains $(2^n - 1) - \lceil 2^{n+1}/3 \rceil + 1$ integers. Since $\lceil 2^{n+1}/3 \rceil \le (2^{n+1} + 2)/3$, the interval $J$ contains at least $2^n - (2^{n+1}+2)/3 = (2^n - 2)/3 \ge (32 - 2)/3 = 10 \ge 7$ integers. By the Gap Lemma, $J$ must contain an element of $\mathcal{S}_8 = \langle 3 \rangle$. Thus the orbit visits $J$, forcing the ternary expansion of $2^{-n}$ to contain the digit $2$ for all $n \ge 5$. Direct verification of $n \in \{1, 2, 3, 4\}$ completes the proof.
 \end{proof}
 
 \begin{remark}[Why the Negative-Power Method Fails for Positive Powers]
 For negative powers $2^{-n}$, the rational expansion is periodic of period $P = 2^{n-2}$, which equals the entire subgroup order. The digit stream \emph{samples the entire group uniformly}. For positive powers $2^n$, the number is an integer, the expansion is non-periodic, and $2^n$ samples only a \emph{single trajectory} rather than the entire group. This difference in sampling mechanisms explains why the negative-power theorem is elementary, while the positive-power conjecture is resistant to elementary methods.
 \end{remark}
 
-\newpage
 \section{Lean 4 Formalization}\label{sec:formalization}
-\enlargethispage{5\baselineskip}
+
 
 The principal results in this paper are supported by Lean~4 formalizations (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. Foundational formalizations cover the bounded-representative survivor correspondence, Archimedean decoupling, carry-packet mod-$8$ non-recurrence, and the negative-power theorem. Supporting number-theoretic arguments (including Saye's multiplicative-order calculation and the binomial repunit-lifting congruence) and structural comparisons (the projective quotient-tree isomorphism and carry-automaton SFT path count) are proved analytically in the manuscript. The first nine modules listed below are pure foundational (no \texttt{native\_decide}). The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified separately in the bridge module suite (\texttt{Bridge.lean} through \texttt{BridgeK18.lean}) using \texttt{native\_decide} certificates for $K=5,\dots,18$, strictly quarantined from the structural theorems. The formalization repository is openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
 {\sloppy
@@ -366,9 +373,8 @@ The principal results in this paper are supported by Lean~4 formalizations (vers
     \item \texttt{BridgeSuite}: The computational certificate suite for Theorem~\ref{thm:bridge} (First-Period Bridge), comprising modules \texttt{Bridge}, \texttt{BridgeCompute}, \texttt{BridgeMiddle}, \texttt{BridgeCandidates}, \texttt{BridgeK13}--\texttt{BridgeK18}, and \texttt{BridgeUniform}.
 \end{itemize}\par}
 
-\newpage
 \subsection{Trust Model and Axiom Inventory}
-\enlargethispage{6\baselineskip}
+
 We distinguish two precise verification tiers across the formalization:
 \begin{enumerate}\setlength{\itemsep}{0.5pt}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}
     \item \textbf{Foundational Kernel Theorems:} Across the nine core theoretical modules (\texttt{RepunitBase4} through \texttt{RepunitCarryConnection}), \textbf{100\% of declarations are pure foundational}. They are checked strictly by the Lean~4 kernel, relying exclusively on standard foundational axioms \texttt{[propext, Classical.choice, Quot.sound]}, with zero unproved axioms (\texttt{sorryAx} / \texttt{sorry}) and no reliance on computational reflection or decision-procedure oracles (\texttt{Lean.ofReduceBool} / \texttt{native\_decide}).
