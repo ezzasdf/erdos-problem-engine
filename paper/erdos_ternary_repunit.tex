@@ -159,7 +159,7 @@ Under lifting to depth $m+1$, $s' = s + q \cdot 3^{m-1}$ maps to $n' = 2s' = 2s 
 
 \section{Archimedean--3-Adic Decoupling and the Diophantine Target}\label{sec:decoupling}
 
-The total length of the base-$3$ expansion of $R_s(4)$ is $L_s = \lfloor s \log_3 4 \rfloor$. For $s \ge 1$, $L_s > s$. We partition the ternary digits of $R_s(4)$ into two disjoint segments:
+The total length of the base-$3$ expansion of $R_s(4)$ is $L_s = \lfloor s \log_3 4 \rfloor$. For all $s \ge 1$, $L_s \ge s$, with strict inequality $L_s > s$ for all $s \ge 4$. (For $s \le 3$, $L_s = s$, so the leading quotient $\lfloor R_s(4)/3^s \rfloor = 0 \in \C_3$ is non-restrictive.) We partition the ternary digits of $R_s(4)$ into two disjoint segments:
 \begin{enumerate}
     \item \textbf{Trailing $s$ Digits ($3$-Adic):} $R_s(4) \bmod 3^s$.
     \item \textbf{Leading $L_s - s$ Digits (Archimedean):} $\lfloor R_s(4) / 3^s \rfloor$.
@@ -191,7 +191,7 @@ Let $\mathrm{jointSurvivors} = \{ s \ge 5 : s \bmod 3^s \in \Trep(s+1) \text{ an
 \subsection{The Non-Averaged Target vs. The Summability Heuristic}
 The asymptotic densities of both conditions under uniform measure are:
 \begin{equation}
-\rho_{\mathrm{adic}}(s) = \left(\frac{2}{3}\right)^s, \quad \rho_{\mathrm{arch}}(s) \approx \left(\frac{2}{3}\right)^{(\log_3 4 - 1) s} \approx \left(\frac{2}{3}\right)^{0.26186 s}.
+\rho_{\mathrm{adic}}(s) = \left(\frac{2}{3}\right)^s, \quad \rho_{\mathrm{arch}}(s) \approx \left(\frac{2}{3}\right)^{(\log_3 4 - 1) \cdot s} \approx \left(\frac{2}{3}\right)^{0.26186 s}.
 \end{equation}
 The product heuristic yields:
 \begin{equation}
@@ -223,7 +223,7 @@ For each $K \in \{5, \dots, 16\}$ and leading precision $L = 30$ (and thus for a
 n \in [0, u_K) \cap B_K \cap A_L \iff n \in \{0, 2, 8\}.
 \end{equation}
 \end{theorem}
-While this completely eliminates all spurious survivors in the first period, it does not constrain the second period $[u_K, 2 u_K)$.
+Since $A_L$ is monotone decreasing in $L$ (increasing precision imposes a strictly stronger prefix digit constraint) and $\{0, 2, 8\} \subseteq A_L$ for all $L \ge 1$ (as their ternary expansions contain no digit $2$), the verification at $L = 30$ implies the result for all $L \ge 30$. While this completely eliminates all spurious survivors in the first period, it does not constrain the second period $[u_K, 2 u_K)$.
 
 \subsection{Carry Packets and the Mod-8 Non-Recurrence Lemma}
 An alternative approach tracks carry propagation in the self-overlap addition $R_{s+1} = R_s + 3 R_s + 1$. A localized configuration of digits that absorbs an incoming digit $2$ via carries without emitting an output digit $2$ is called a \emph{carry packet}. In this work, we analyze the local carry dynamics and prove that the unique dyadically pure carry packet capable of resolving an input digit $2$ occurs at:
@@ -292,7 +292,7 @@ All theoretical results in this paper have been formalized and kernel-verified i
     \item \texttt{NegativePower.lean}: Proves Theorem~\ref{thm:neg_power} (Negative-Power Theorem and Gap Lemma).
     \item \texttt{RepunitCarryConnection.lean}: Proves the polynomial, spectral, and orbit isomorphism to $C(1, 4)$.
 \end{itemize}
-Across all modules contributing to the results of this paper, \textbf{100\% of the declarations are pure foundational}, depending exclusively on standard Lean axioms \texttt{[propext, Classical.choice, Quot.sound]}, with zero reliance on unproven axioms (\texttt{sorryAx} / \texttt{sorry}) and no reliance on computational reflection or decision-procedure oracles (\texttt{Lean.ofReduceBool} / \texttt{native\_decide}). (Here, as standard in formal mathematics, ``pure foundational'' denotes proofs derived within the calculus of inductive constructions using only Lean's core logic and standard axioms \texttt{propext}, \texttt{Quot.sound}, and \texttt{Classical.choice}, without foreign function calls or unverified kernel extensions.)
+Across all modules contributing to the results of this paper, \textbf{100\% of the declarations are pure foundational}, depending exclusively on standard Lean axioms \texttt{[propext, Classical.choice, Quot.sound]}, with zero reliance on unproven axioms (\texttt{sorryAx} / \texttt{sorry}) and no reliance on computational reflection or decision-procedure oracles (\texttt{Lean.ofReduceBool} / \texttt{native\_decide}). (Here, as standard in formal mathematics, ``pure foundational'' denotes proofs derived within the calculus of inductive constructions using only Lean's core logic and standard axioms \texttt{propext}, \texttt{Quot.sound}, and \texttt{Classical.choice}, without foreign function calls or unverified kernel extensions. The $88$ \texttt{native\_decide} declarations reported in the project-wide axiom audit belong exclusively to \texttt{Lemma41Finite.lean}, the finite certificate verification module for the companion paper on safe Cantor multipliers $C(1, M)$~\cite{Lagarias2009}, and are not imported or utilized in any theorem of this paper.)
 
 \bibliographystyle{amsplain}
 \bibliography{references}
