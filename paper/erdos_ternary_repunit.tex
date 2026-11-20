@@ -60,7 +60,7 @@ The only powers of $2$ whose base-$3$ expansion contains no digit $2$ are:
 \end{equation}
 \end{conjecture}
 
-Despite extensive computational searches and partial density bounds, the conjecture remains open. Gupta (1979) verified the conjecture for $n \le 4,373$. Narkiewicz~\cite{Narkiewicz1980} proved the counting bound $N(x) \le 1.62 \cdot x^{\log_3 2}$. Vardi (1991) extended verification to $n \le 7 \times 10^9$. In a landmark study, Lagarias~\cite{Lagarias2009} formulated the Hausdorff dimension of Cantor multiplier intersections and established structural links between ternary digit distributions and $3$-adic analysis. Saye~\cite{Saye2022} developed a hierarchical trailing-digit algorithm extending computational verification to $n \le 5.9 \times 10^{21}$. Recently, Idowu~\cite{Idowu2026} introduced base-$4$ repunit coordinates, exposing a canonical connection between ternary digit omission and $3$-adic dynamical systems.
+Despite extensive computational searches and partial density bounds, the conjecture remains open. Gupta~\cite{Gupta1978} verified the conjecture for $n \le 4,373$. Narkiewicz~\cite{Narkiewicz1980} proved the counting bound $N(x) \le 1.62 \cdot x^{\log_3 2}$. Vardi~\cite{Vardi1991} extended verification to $n \le 7 \times 10^9$. In a landmark study, Lagarias~\cite{Lagarias2009} formulated the Hausdorff dimension of Cantor multiplier intersections and established structural links between ternary digit distributions and $3$-adic analysis. Saye~\cite{Saye2022} developed a hierarchical trailing-digit algorithm extending computational verification to $n \le 5.9 \times 10^{21}$ ($n < 2 \cdot 3^{45}$). Recently, Idowu~\cite{Idowu2026} introduced base-$4$ repunit coordinates, exposing a canonical connection between ternary digit omission and $3$-adic dynamical systems.
 
 \subsection{Scope and Open Status}
 We emphasize at the outset: \textbf{we do not prove Conjecture~\ref{conj:erdos}}. Rather, our contribution is a complete, machine-verified mathematical reduction and obstruction theory:
@@ -203,12 +203,20 @@ The product heuristic yields:
 \sum_{s=1}^\infty \rho_{\mathrm{adic}}(s) \rho_{\mathrm{arch}}(s) \approx \sum_{s=1}^\infty \left(\frac{2}{3}\right)^{1.26186 s} \approx 1.498 < \infty.
 \end{equation}
 
-\begin{remark}[Why Borel--Cantelli Does Not Apply]\label{rem:borel_cantelli}
-We emphasize that the convergence of the series $\sum (2/3)^{1.26 s} < \infty$ does \emph{not} constitute a proof of Conjecture~\ref{conj:erdos}. The Borel--Cantelli lemma requires an infinite sequence of independent events under a probability measure. Here, the sequence $\{4^s\}_{s \ge 1}$ is a single deterministic integer orbit, and the leading and trailing digits of $4^s$ are coupled through the deterministic dynamics of multiplication. To turn this heuristic into a rigorous proof, one must establish a non-averaged Diophantine discrepancy estimate:
+\begin{remark}[The Summability Heuristic and Why Borel--Cantelli Does Not Apply]\label{rem:borel_cantelli}
+We emphasize that the convergence of the heuristic series $\sum (2/3)^{1.26186 s} < \infty$ does \emph{not} constitute a proof of Conjecture~\ref{conj:erdos}.
+
+First, the first Borel--Cantelli lemma states that if $\sum_{s=1}^\infty \mathbb{P}(E_s) < \infty$, then the probability of infinitely many events $E_s$ occurring is zero (a standard result that requires no independence). However, the powers of two $\{4^s\}_{s \ge 1}$ form a single deterministic integer sequence rather than a random process on a probability space. The quantities $\rho_{\mathrm{adic}}(s) = (2/3)^s$ and $\rho_{\mathrm{arch}}(s) \approx (2/3)^{0.26186 s}$ represent combinatorial densities in residue classes and quotient intervals, not actual probabilities of measurable events governing the deterministic orbit $s \mapsto 4^s$.
+
+Second, even establishing that the counting function of joint survivors satisfies a sublinear bound,
 \begin{equation}
-\# \left\{ s \le N : s \bmod 3^s \in \Trep(s+1), \, \left\lfloor \frac{R_s(4)}{3^s} \right\rfloor \in \C_3 \right\} = O(N^{1 - \delta}) \quad (\delta > 0).
+\# \left\{ s \le N : s \bmod 3^s \in \Trep(s+1), \, \left\lfloor \frac{R_s(4)}{3^s} \right\rfloor \in \C_3 \right\} = O(N^{1 - \delta}) \quad (\delta > 0),
 \end{equation}
-This non-averaged estimate is the exact mathematical open problem.
+would only prove that the set of joint survivors has natural density zero in $\N$. Zero natural density is strictly insufficient to prove finiteness: infinite sets (such as the powers of two themselves, with counting function $O(\log N)$) routinely have zero natural density. To establish the Erd\H{o}s conjecture via this reduction, one requires an effective Diophantine cutoff (e.g., via linear forms in logarithms or $S$-unit equations) demonstrating that no joint survivors exist beyond an effective finite threshold $s_0$:
+\begin{equation}
+\mathrm{jointSurvivors} \cap (s_0, \infty) = \emptyset.
+\end{equation}
+The absence of such an effective separation between the Archimedean quotient and the $3$-adic residue is the central open Diophantine barrier.
 \end{remark}
 
 ---
@@ -221,7 +229,25 @@ In this section, we analyze the specific mathematical barriers that cause elemen
 The classical trailing-digit approach tests whether $2^n \bmod 3^K$ has digits in $\{0, 1\}$. By Theorem~\ref{thm:tree_iso}, the number of surviving residue classes at level $K$ is $|N_K| = 2^{K-1}$. Since $B_K(n)$ is strictly periodic with period $u_K = 2 \cdot 3^{K-1}$, the set of integers satisfying the modular test has positive density in $\N$. For every depth $K$, there exist infinitely many integers $n \ge u_K$ that pass the trailing test. Thus, trailing-digit modular sieving alone \emph{can never establish finiteness}.
 
 \subsection{The First-Period Bridge Theorem}
-Within the fundamental period $[0, u_K)$, however, the survivors are finite. By pairing trailing modular filters $B_K$ with leading-digit Ostrowski numeration bounds $A_L$, we verified by exhaustive machine computation and formalized in Lean~4:
+Within the fundamental period $[0, u_K)$, however, the survivors are finite. We pair the trailing modular conditions with leading-digit bounds:
+
+\begin{definition}[Trailing Filter $B_K$ and Leading Filter $A_L$]\label{def:filters}
+For depths $K \ge 1$ and precision $L \ge 1$:
+\begin{enumerate}
+    \item \textbf{Trailing Filter $B_K$:} The set of non-negative integers $n$ whose trailing $K$ ternary digits contain no digit $2$:
+    \begin{equation}
+    B_K = \left\{ n \in \N : d_j(2^n) \in \{0, 1\} \text{ for all } 0 \le j < K \right\}.
+    \end{equation}
+    By Lemma~\ref{lem:saye_period}, $n \in B_K$ is determined strictly by the residue class $n \bmod u_K$, where $u_K = 2 \cdot 3^{K-1}$.
+    \item \textbf{Leading Filter $A_L$:} The set of non-negative integers $n$ whose leading $L$ ternary digits contain no digit $2$. Letting $M_n = \lfloor n \log_3 2 \rfloor$ denote the most significant ternary digit index of $2^n$:
+    \begin{equation}
+    A_L = \left\{ n \in \N : d_{M_n - j}(2^n) \in \{0, 1\} \text{ for all } 0 \le j < \min(L, M_n + 1) \right\}.
+    \end{equation}
+    The leading digits are governed by the continuous orbit of the fractional part $\{ n \log_3 2 \} = n \log_3 2 - \lfloor n \log_3 2 \rfloor$ on the circle $\mathbb{T} = \R / \Z$.
+\end{enumerate}
+\end{definition}
+
+By pairing trailing modular filters $B_K$ with leading-digit bounds $A_L$, we verified by machine computation and formalized in Lean~4 (in modules \texttt{Bridge.lean}, \texttt{BridgeCompute.lean}, and \texttt{BridgeCandidates.lean}):
 \begin{theorem}[First-Period Bridge Theorem]\label{thm:bridge}
 For each $K \in \{5, \dots, 16\}$ and leading precision $L = 30$ (and thus for all $L \ge 30$):
 \begin{equation}
@@ -271,9 +297,9 @@ v_2(3^{2^{n-3}} - 1) = v_2(3 - 1) + v_2(3 + 1) + (n - 3) - 1 = 1 + 2 + n - 4 = n
 \end{equation}
 Hence $3^{2^{n-3}} \not\equiv 1 \pmod{2^n}$, while $3^{2^{n-2}} \equiv 1 \pmod{2^n}$. Thus the multiplicative order of $3$ modulo $2^n$ is exactly $2^{n-2}$. Modulo $8$, $3 \equiv 3$, so powers of $3$ alternate strictly between $1$ and $3 \pmod 8$. Thus $\langle 3 \rangle \subseteq \mathcal{S}_8$, where $\mathcal{S}_8 = \{ x \in [0, 2^n) : x \equiv 1 \text{ or } 3 \pmod 8 \}$. Since $[0, 2^n)$ contains $2^{n-3}$ integers congruent to $1 \pmod 8$ and $2^{n-3}$ integers congruent to $3 \pmod 8$, we have $|\mathcal{S}_8| = 2 \cdot 2^{n-3} = 2^{n-2} = |\langle 3 \rangle|$. Therefore, $\langle 3 \rangle = \mathcal{S}_8$ identically: the orbit of $3^k \bmod 2^n$ traverses the entire set $\mathcal{S}_8$.
 
-The consecutive elements of $\mathcal{S}_8$ alternate with gaps of $2$ and $6$ (namely, $1, 3, 9, 11, 17, 19, \dots$). Consequently, any interval of integers of length at least $6$ contains at least one element of $\mathcal{S}_8$ (\textbf{The Gap Lemma}). For $n \ge 5$, the target interval $J = [\lceil 2 \cdot 2^n / 3 \rceil, 2^n - 1]$ where digit $2$ is produced has length:
+The consecutive elements of $\mathcal{S}_8$ alternate with gaps of $2$ and $6$ (namely, $1, 3, 9, 11, 17, 19, \dots$). Consequently, any interval of integers containing at least $7$ consecutive integers contains at least one element of $\mathcal{S}_8$ (\textbf{The Gap Lemma}). For $n \ge 5$, the target interval $J = [\lceil 2^{n+1} / 3 \rceil, 2^n - 1]$ where digit $2$ is produced contains $(2^n - 1) - \lceil 2^{n+1}/3 \rceil + 1$ integers. Since $\lceil 2^{n+1}/3 \rceil \le (2^{n+1} + 2)/3$, the number of integers in $J$ satisfies:
 \begin{equation}
-(2^n - 1) - \left\lceil \frac{2 \cdot 2^n}{3} \right\rceil \ge \frac{2^n}{3} - 1 \ge \frac{32}{3} - 1 > 9 > 6.
+2^n - \left\lceil \frac{2^{n+1}}{3} \right\rceil \ge 2^n - \frac{2^{n+1} + 2}{3} = \frac{2^n - 2}{3} \ge \frac{32 - 2}{3} = 10 \ge 7.
 \end{equation}
 By the Gap Lemma, the target interval $J$ must contain an element of $\mathcal{S}_8 = \langle 3 \rangle$. Thus the orbit visits $J$, forcing the ternary expansion of $2^{-n}$ to contain the digit $2$ for all $n \ge 5$. Direct verification of $n \in \{1, 2, 3, 4\}$ completes the proof.
 \end{proof}
@@ -296,8 +322,9 @@ All theoretical results in this paper have been formalized and kernel-verified i
     \item \texttt{RepunitCarryPacket.lean}: Proves Lemma~\ref{lem:non_recurrence} (Carry-Packet Non-Recurrence).
     \item \texttt{NegativePower.lean}: Proves Theorem~\ref{thm:neg_power} (Negative-Power Theorem and Gap Lemma).
     \item \texttt{RepunitCarryConnection.lean}: Proves the polynomial, spectral, and orbit isomorphism to $C(1, 4)$.
+    \item \texttt{Bridge.lean}, \texttt{BridgeCompute.lean}, and \texttt{BridgeCandidates.lean}: Formalize Theorem~\ref{thm:bridge} (First-Period Bridge Theorem).
 \end{itemize}
-Across all modules contributing to the results of this paper, \textbf{100\% of the declarations are pure foundational}, depending exclusively on standard Lean axioms \texttt{[propext, Classical.choice, Quot.sound]}, with zero reliance on unproven axioms (\texttt{sorryAx} / \texttt{sorry}) and no reliance on computational reflection or decision-procedure oracles (\texttt{Lean.ofReduceBool} / \texttt{native\_decide}). (Here, as standard in formal mathematics, ``pure foundational'' denotes proofs derived within the calculus of inductive constructions using only Lean's core logic and standard axioms \texttt{propext}, \texttt{Quot.sound}, and \texttt{Classical.choice}, without foreign function calls or unverified kernel extensions. The $88$ \texttt{native\_decide} declarations reported in the project-wide axiom audit belong exclusively to \texttt{Lemma41Finite.lean}, the finite certificate verification module for the companion paper on safe Cantor multipliers $C(1, M)$~\cite{Lagarias2009}, and are not imported or utilized in any theorem of this paper.)
+Across the eight core theoretical modules (\texttt{RepunitBase4.lean} through \texttt{RepunitCarryConnection.lean}), \textbf{100\% of the declarations are pure foundational}, depending exclusively on standard Lean foundational axioms \texttt{[propext, Classical.choice, Quot.sound]}, with zero reliance on unproven axioms (\texttt{sorryAx} / \texttt{sorry}) and no reliance on computational reflection or decision-procedure oracles (\texttt{Lean.ofReduceBool} / \texttt{native\_decide}). The finite computational certificates in \texttt{BridgeCandidates.lean} (for Theorem~\ref{thm:bridge}) and in the companion paper's \texttt{Lemma41Finite.lean} (for $C(1, M)$ certificates) utilize standard reflexive kernel evaluation (\texttt{native\_decide}) to verify finite candidate arrays. None of the $88$ \texttt{native\_decide} declarations from the companion paper's \texttt{Lemma41Finite.lean} are used in any theorem of this paper.
 
 \bibliographystyle{amsplain}
 \bibliography{references}
