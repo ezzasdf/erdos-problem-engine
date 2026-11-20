@@ -349,7 +349,7 @@ For negative powers $2^{-n}$, the rational expansion is periodic of period $P = 
 \enlargethispage{2\baselineskip}
 \section{Lean 4 Formalization}\label{sec:formalization}
 
-All theoretical results in this paper have been formalized and verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. The eight repunit modules (\texttt{RepunitBase4}--\texttt{RepunitCarryConnection}) are 100\% pure foundational. The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified by finite computation in the bridge modules, which use \texttt{native\_decide} (hence \texttt{Lean.ofReduceBool}) for the $K = 13\dots 18$ certificates; these are quarantined from the structural theorems and are explicitly listed below. The complete machine-checked formalization, proofs, and verification scripts are openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
+All theoretical results in this paper have been formalized and verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. The eight modules listed below are pure foundational (no \texttt{native\_decide}). The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified separately in the bridge module suite (\texttt{Bridge.lean} through \texttt{BridgeK18.lean}) using \texttt{native\_decide} certificates for $K=13,\dots,18$; these are quarantined from the structural theorems. The complete machine-checked formalization, proofs, and verification scripts are openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
 {\sloppy
 \begin{itemize}\setlength{\itemsep}{2pt}
     \item \texttt{RepunitBase4.lean}: Formalizes $4^s = 3 R_s(4) + 1$ and the digit index shift.
