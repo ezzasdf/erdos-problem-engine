@@ -39,11 +39,11 @@
 \begin{document}
 
 \begin{abstract}
-In 1978, Paul Erd\H{o}s conjectured that $2^0 = 1$, $2^2 = 4$, and $2^8 = 256$ are the only powers of $2$ whose base-$3$ (ternary) expansion contains no digit $2$. \textbf{The Erd\H{o}s conjecture remains open.} In this paper, we do not prove the Erd\H{o}s conjecture; rather, we reduce it to a clean, machine-verified condition: the conjecture is equivalent to the statement that the joint survivor set of base-$4$ repunit $3$-adic tree depth-$s$ survivors whose leading Archimedean quotient avoids digit $2$ is empty ($\text{Erd\H{o}s} \iff \mathrm{jointSurvivors} = \emptyset$). 
+In 1978, Paul Erd\H{o}s conjectured that $2^0 = 1$, $2^2 = 4$, and $2^8 = 256$ are the only powers of $2$ whose base-$3$ (ternary) expansion contains no digit $2$. \textbf{The Erd\H{o}s conjecture remains open.} In this paper, we do not prove the Erd\H{o}s conjecture; rather, we reduce it to a clean, machine-verified condition: the conjecture is equivalent to the statement that the joint survivor set --- those $s \ge 5$ that survive the $3$-adic tree to depth $s$ while their leading quotient avoids digit $2$ --- is empty ($\text{Erd\H{o}s} \iff \mathrm{jointSurvivors} = \emptyset$). 
 
-We formulate the problem through base-$4$ repunit coordinates $4^s = 3 R_s(4) + 1$, governed by the $3$-adic dynamical system $R_{s+1} = 4 R_s + 1$, building upon the repunit framework of Idowu (arXiv:2610.03789). We prove that the rooted tree of repunit admissible residue classes is strictly isomorphic to the classical survivor tree of powers of $2$, establishing an exact level-by-level and branching correspondence. We establish the Archimedean--$3$-Adic Decoupling Theorem, which reduces the problem to an exact Diophantine target, and analyze the joint summability heuristic $\sum (2/3)^{1.26s} < \infty$, explaining why Borel--Cantelli does not apply to deterministic integer orbits.
+We formulate the problem through base-$4$ repunit coordinates $4^s = 3 R_s(4) + 1$, governed by the $3$-adic dynamical system $R_{s+1} = 4 R_s + 1$, building upon the repunit framework of Idowu (arXiv:2610.03789)~\cite{Idowu2026}. We prove that the rooted tree of repunit admissible residue classes is strictly isomorphic to the classical survivor tree of powers of $2$, establishing an exact level-by-level and branching correspondence. We establish the Archimedean--$3$-Adic Decoupling Theorem, which reduces the problem to an exact Diophantine target, and analyze the joint summability heuristic $\sum (2/3)^{1.26s} < \infty$, explaining why Borel--Cantelli does not apply to deterministic integer orbits.
 
-In a self-contained analysis of obstructions, we prove why elementary methods fail: we formalize the infinite modular barrier ($|N_K| = 2^{K-1}$), prove the $2$-adic non-recurrence of carry-absorbing packets ($1 + 3^s \ne 2^k$ for $s \ge 2$), and contrast the positive-power case with the negative-power theorem $2^{-n}$, completely proved here via the mod-$8$ Gap Lemma. All structural theorems have been verified in the Lean~4 proof assistant (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with foundational axioms and zero \texttt{sorry} placeholders.
+In a self-contained analysis of obstructions, we prove why elementary methods fail: we formalize the infinite modular barrier ($|N_K| = 2^{K-1}$), prove the mod-$8$ non-recurrence of carry-absorbing packets ($1 + 3^s \ne 2^k$ for $s \ge 2$), and contrast the positive-power case with the negative-power theorem $2^{-n}$, completely proved here via the mod-$8$ Gap Lemma. All structural theorems have been verified in the Lean~4 proof assistant (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with foundational axioms and zero \texttt{sorry} placeholders.
 \end{abstract}
 
 \maketitle
@@ -67,7 +67,7 @@ We emphasize at the outset: \textbf{we do not prove Conjecture~\ref{conj:erdos}}
 \begin{enumerate}
     \item We prove the exact Rooted Tree Isomorphism between repunit admissible residues and powers-of-two survivors;
     \item We prove the Archimedean--$3$-Adic Decoupling Theorem, which reduces Conjecture~\ref{conj:erdos} to the precise statement $\mathrm{jointSurvivors} = \emptyset$;
-    \item We formalize the precise mathematical barriers that prevent elementary approaches from resolving the conjecture (the $2^{K-1}$ modular sieve barrier, the $2$-adic non-recurrence of carry packets, and the failure of negative-power full-period sampling to transfer to positive powers);
+    \item We formalize the precise mathematical barriers that prevent elementary approaches from resolving the conjecture (the $2^{K-1}$ modular sieve barrier, the mod-$8$ non-recurrence of carry packets, and the failure of negative-power full-period sampling to transfer to positive powers);
     \item We verify all algebraic and dynamical theorems in Lean~4 with pure foundational axioms.
 \end{enumerate}
 
@@ -108,6 +108,10 @@ d_m(R_{r + q \cdot 3^m}(4)) = (d_m(R_r(4)) + q) \bmod 3.
 As $q$ ranges over $\{0, 1, 2\}$, the output digit visits each element of $\{0, 1, 2\}$ exactly once.
 \end{lemma}
 
+\begin{proof}
+By the binomial theorem, $4^{3^m} = (1 + 3)^{3^m} = 1 + 3^m \cdot 3 + \binom{3^m}{2} 3^2 + \dots \equiv 1 + 3^{m+1} \pmod{3^{m+2}}$. Subtracting $1$ and dividing by $3$ gives $R_{3^m}(4) = (4^{3^m} - 1)/3 \equiv 3^m \pmod{3^{m+1}}$. For any lift $s = r + q \cdot 3^m$, the repunit identity $R_{a+b}(4) = R_a(4) + 4^a R_b(4)$ gives $R_s(4) = R_r(4) + 4^r R_{q \cdot 3^m}(4)$. Since $4 \equiv 1 \pmod 3$, $4^r \equiv 1 \pmod 3$. Furthermore, $R_{q \cdot 3^m}(4) \equiv q R_{3^m}(4) \equiv q \cdot 3^m \pmod{3^{m+1}}$, establishing $R_{r + q \cdot 3^m}(4) \equiv R_r(4) + q \cdot 3^m \pmod{3^{m+1}}$. Dividing by $3^m$ modulo $3$ gives $d_m(R_{r + q \cdot 3^m}(4)) = (d_m(R_r(4)) + q) \bmod 3$. As $q$ ranges over $\{0, 1, 2\}$, this affine shift permutes $\{0, 1, 2\}$ bijectively.
+\end{proof}
+
 \begin{corollary}[Exact Two-of-Three Branching]\label{cor:two_of_three}
 For each admissible residue $r \bmod 3^m$, exactly two of the three lifts $q \in \{0, 1, 2\}$ yield an output digit in $\{0, 1\}$. Thus, every admissible node has exactly $2$ admissible children at depth $m+1$.
 \end{corollary}
@@ -116,7 +120,17 @@ For each admissible residue $r \bmod 3^m$, exactly two of the three lifts $q \in
 
 \section{The Rooted Tree Isomorphism Theorem}\label{sec:tree_isomorphism}
 
-Let $\Trep$ denote the rooted tree whose vertices at depth $m$ are residue classes $s \bmod 3^m$ such that the trailing $m$ ternary digits of $R_s(4)$ belong to $\{0, 1\}^m$. Let $\Tpow$ denote the rooted survivor tree whose vertices at depth $m$ are residue classes $n \bmod (2 \cdot 3^{m-1})$ such that the trailing $m$ ternary digits of $2^n$ belong to $\{0, 1\}^m$.
+To establish the structural equivalence between the repunit and power-of-two representations, we first formalize the trailing-digit period of powers of $2$.
+
+\begin{lemma}[Saye's Periodicity Lemma~\cite{Saye2022}]\label{lem:saye_period}
+For every integer $m \ge 1$, the multiplicative order of $2$ in $(\Z / 3^m \Z)^\times$ is $u_m = 2 \cdot 3^{m-1}$. Consequently, the trailing $m$ ternary digits of $2^n$ depend solely on the residue class $n \bmod (2 \cdot 3^{m-1})$.
+\end{lemma}
+
+\begin{proof}
+For $m = 1$, $2^1 \equiv 2 \pmod 3$ and $2^2 \equiv 1 \pmod 3$, so the order mod $3$ is $2 = 2 \cdot 3^0$. By lifting the exponent, $v_3(2^{2 \cdot 3^{m-1}} - 1) = v_3(4^{3^{m-1}} - 1) = v_3(4 - 1) + v_3(3^{m-1}) = 1 + (m - 1) = m$. Thus $2^{2 \cdot 3^{m-1}} \equiv 1 \pmod{3^m}$, and no strictly smaller exponent achieves $1 \pmod{3^m}$. Hence the residue $2^n \bmod 3^m$ is periodic in $n$ with fundamental period $2 \cdot 3^{m-1}$. Since the trailing $m$ ternary digits of any integer are uniquely determined by its residue modulo $3^m$, the trailing $m$ ternary digits of $2^n$ depend solely on $n \bmod (2 \cdot 3^{m-1})$.
+\end{proof}
+
+Let $\Trep$ denote the rooted tree whose vertices at depth $m \ge 1$ are residue classes $s \bmod 3^{m-1}$ such that the trailing $m-1$ ternary digits of $R_s(4)$ belong to $\{0, 1\}^{m-1}$. Let $\Tpow$ denote the rooted survivor tree whose vertices at depth $m \ge 1$ are residue classes $n \bmod (2 \cdot 3^{m-1})$ such that the trailing $m$ ternary digits of $2^n$ belong to $\{0, 1\}^m$ (with $n$ even, $n = 2s$).
 
 \begin{theorem}[Rooted Tree Isomorphism]\label{thm:tree_iso}
 The map defined level-by-level by:
@@ -125,18 +139,20 @@ The map defined level-by-level by:
 \end{equation}
 is an exact isomorphism of rooted trees. Specifically:
 \begin{enumerate}
-    \item $\Phi_m$ is a bijection for every depth $m \ge 1$;
+    \item $\Phi_m$ is a bijection between $\Trep(m)$ and $\Tpow(m)$ for every depth $m \ge 1$, with $|\Trep(m)| = |\Tpow(m)| = 2^{m-1}$;
     \item $\Phi_{m+1}$ respects the tree structure: $\pi(\Phi_{m+1}(s')) = \Phi_m(\pi(s'))$, where $\pi$ is the canonical parent projection;
     \item The branching choices $q \in \{0, 1, 2\}$ correspond identically under the lift $s' = s + q \cdot 3^{m-1} \mapsto n' = 2s' = n + q \cdot (2 \cdot 3^{m-1})$.
 \end{enumerate}
 \end{theorem}
 
 \begin{proof}
-By Lemma~\ref{lem:modular_lifting}, $s \bmod 3^{m-1} \mapsto R_s(4) \bmod 3^{m-1}$ is a bijection on $\Z / 3^{m-1} \Z$. The admissibility condition requires $d_j(R_s(4)) \in \{0, 1\}$ for all $j < m-1$. There are exactly $2^{m-1}$ such sequences of digits in $\{0, 1\}^{m-1}$. Hence $|\Trep(m)| = 2^{m-1}$.
+By Lemma~\ref{lem:modular_lifting}, the map $s \bmod 3^{m-1} \mapsto R_s(4) \bmod 3^{m-1}$ is a bijection on $\Z / 3^{m-1} \Z$. The admissibility condition for $\Trep(m)$ requires $d_j(R_s(4)) \in \{0, 1\}$ for all $0 \le j < m-1$. There are exactly $2^{m-1}$ such sequences of digits in $\{0, 1\}^{m-1}$. Hence $|\Trep(m)| = 2^{m-1}$.
 
-For the powers-of-two tree, any survivor must have an even exponent $n = 2s$. By Saye's Lemma~\cite{Saye2022}, the trailing $m$ ternary digits of $2^n$ depend only on $n \bmod (2 \cdot 3^{m-1})$. Since $\gcd(2, 3^{m-1}) = 1$, the map $s \bmod 3^{m-1} \mapsto 2s \bmod (2 \cdot 3^{m-1})$ is an isomorphism of abelian groups. 
+For the powers-of-two tree, any survivor must have an even exponent $n = 2s$, since for odd $n$, $2^n \equiv 2 \pmod 3$, forcing the lowest digit $d_0(2^n) = 2$. By Lemma~\ref{lem:saye_period}, the trailing $m$ ternary digits of $2^n$ depend only on $n \bmod (2 \cdot 3^{m-1})$. Since $\gcd(2, 3^{m-1}) = 1$, the map $s \bmod 3^{m-1} \mapsto 2s \bmod (2 \cdot 3^{m-1})$ is an isomorphism of abelian groups between $\Z / 3^{m-1} \Z$ and the even residue classes in $\Z / (2 \cdot 3^{m-1} \Z)$.
 
-Because $2^{2s} = 4^s = 3 R_s(4) + 1$, the trailing digits of $2^{2s}$ omit $2$ if and only if the trailing digits of $R_s(4)$ omit $2$. Under lifting, $s' = s + q \cdot 3^{m-1}$ implies $2s' = 2s + q \cdot (2 \cdot 3^{m-1})$, so the branch choice $q$ in the repunit tree maps to the exact same branch choice $q$ in the survivor tree. Thus $\Phi$ is an isomorphism of rooted trees.
+Under this identification, $2^{2s} = 4^s = 3 R_s(4) + 1$. The least significant digit $d_0(4^s) = 1$ is always in $\{0, 1\}$, and the subsequent $m-1$ digits satisfy $d_{j+1}(4^s) = d_j(R_s(4))$ for all $0 \le j < m-1$. Thus the trailing $m$ digits of $2^{2s}$ belong to $\{0, 1\}^m$ if and only if the trailing $m-1$ digits of $R_s(4)$ belong to $\{0, 1\}^{m-1}$. 
+
+Under lifting to depth $m+1$, $s' = s + q \cdot 3^{m-1}$ maps to $n' = 2s' = 2s + q \cdot (2 \cdot 3^{m-1})$. The branch choice $q \in \{0, 1, 2\}$ in the repunit tree maps to the identical branch choice $q$ in the survivor tree. Hence $\Phi$ is an isomorphism of rooted trees.
 \end{proof}
 
 ---
@@ -152,7 +168,7 @@ The total length of the base-$3$ expansion of $R_s(4)$ is $L_s = \lfloor s \log_
 \begin{theorem}[Archimedean--$3$-Adic Decoupling]\label{thm:decoupling}
 For every integer $s \ge 1$, the base-$3$ expansion of $4^s$ omits the digit $2$ if and only if the following two conditions hold simultaneously:
 \begin{enumerate}
-    \item \textbf{Trailing (3-Adic) Condition:} $s \bmod 3^s$ is an admissible vertex of $\Trep$ at depth $s$;
+    \item \textbf{Trailing (3-Adic) Condition:} The trailing $s$ ternary digits of $R_s(4)$ belong to $\{0, 1\}^s$ (equivalently, $s \bmod 3^s \in \Trep(s+1)$);
     \item \textbf{Leading (Archimedean) Condition:} The integer quotient satisfies:
     \begin{equation}
     \left\lfloor \frac{R_s(4)}{3^s} \right\rfloor \in \C_3,
@@ -162,11 +178,11 @@ For every integer $s \ge 1$, the base-$3$ expansion of $4^s$ omits the digit $2$
 \end{theorem}
 
 \begin{proof}
-By Euclidean division, $R_s(4) = 3^s \lfloor R_s(4)/3^s \rfloor + (R_s(4) \bmod 3^s)$. The digits at indices $j < s$ are precisely the base-$3$ digits of $R_s(4) \bmod 3^s$, which omit $2$ iff $s$ survives to depth $s$ in $\Trep$. The digits at indices $j \ge s$ are the digits of $\lfloor R_s(4)/3^s \rfloor$, which omit $2$ iff the quotient lies in $\C_3$. Since $4^s = 3 R_s(4) + 1$ with $d_0 = 1$, all digits of $4^s$ omit $2$ iff both components omit $2$.
+By Euclidean division, $R_s(4) = 3^s \lfloor R_s(4)/3^s \rfloor + (R_s(4) \bmod 3^s)$. The digits at indices $j < s$ are precisely the base-$3$ digits of $R_s(4) \bmod 3^s$, which omit $2$ if and only if $s \bmod 3^s \in \Trep(s+1)$. The digits at indices $j \ge s$ are the digits of $\lfloor R_s(4)/3^s \rfloor$, which omit $2$ if and only if the quotient lies in $\C_3$. Since $4^s = 3 R_s(4) + 1$ with lowest digit $d_0 = 1 \in \{0, 1\}$ and $d_{j+1}(4^s) = d_j(R_s(4))$, all digits of $4^s$ omit $2$ if and only if both conditions hold simultaneously.
 \end{proof}
 
 \begin{corollary}[Reduction of the Erd\H{o}s Conjecture]\label{cor:reduction}
-Let $\mathrm{jointSurvivors} = \{ s \ge 5 : s \bmod 3^s \in \Trep(s) \text{ and } \lfloor R_s(4)/3^s \rfloor \in \C_3 \}$. Then:
+Let $\mathrm{jointSurvivors} = \{ s \ge 5 : s \bmod 3^s \in \Trep(s+1) \text{ and } \lfloor R_s(4)/3^s \rfloor \in \C_3 \}$. Then:
 \begin{equation}
 \text{Conjecture~\ref{conj:erdos} holds} \iff \mathrm{jointSurvivors} = \emptyset.
 \end{equation}
@@ -185,7 +201,7 @@ The product heuristic yields:
 \begin{remark}[Why Borel--Cantelli Does Not Apply]\label{rem:borel_cantelli}
 We emphasize that the convergence of the series $\sum (2/3)^{1.26 s} < \infty$ does \emph{not} constitute a proof of Conjecture~\ref{conj:erdos}. The Borel--Cantelli lemma requires an infinite sequence of independent events under a probability measure. Here, the sequence $\{4^s\}_{s \ge 1}$ is a single deterministic integer orbit, and the leading and trailing digits of $4^s$ are coupled through the deterministic dynamics of multiplication. To turn this heuristic into a rigorous proof, one must establish a non-averaged Diophantine discrepancy estimate:
 \begin{equation}
-\left| \left\{ s \le N : s \in \Trep(s) \text{ and } \left\lfloor \frac{R_s(4)}{3^s} \right\rfloor \in \C_3 \right\} \right| = O(N^{1 - \delta}) \quad (\text{for some } \delta > 0).
+\# \left\{ s \le N : s \bmod 3^s \in \Trep(s+1), \, \left\lfloor \frac{R_s(4)}{3^s} \right\rfloor \in \C_3 \right\} = O(N^{1 - \delta}) \quad (\delta > 0).
 \end{equation}
 This non-averaged estimate is the exact mathematical open problem.
 \end{remark}
@@ -200,22 +216,22 @@ In this section, we analyze the specific mathematical barriers that cause elemen
 The classical trailing-digit approach tests whether $2^n \bmod 3^K$ has digits in $\{0, 1\}$. By Theorem~\ref{thm:tree_iso}, the number of surviving residue classes at level $K$ is $|N_K| = 2^{K-1}$. Since $B_K(n)$ is strictly periodic with period $u_K = 2 \cdot 3^{K-1}$, the set of integers satisfying the modular test has positive density in $\N$. For every depth $K$, there exist infinitely many integers $n \ge u_K$ that pass the trailing test. Thus, trailing-digit modular sieving alone \emph{can never establish finiteness}.
 
 \subsection{The First-Period Bridge Theorem}
-Within the fundamental period $[0, u_K)$, however, the survivors are finite. By pairing trailing modular filters with leading-digit Ostrowski numeration bounds, we proved and verified in Lean~4:
+Within the fundamental period $[0, u_K)$, however, the survivors are finite. By pairing trailing modular filters $B_K$ with leading-digit Ostrowski numeration bounds $A_L$, we verified by exhaustive machine computation and formalized in Lean~4:
 \begin{theorem}[First-Period Bridge Theorem]\label{thm:bridge}
-For all $K \in \{5, 6, \dots, 16\}$ and leading precision $L \ge 30$:
+For each $K \in \{5, \dots, 16\}$ and leading precision $L = 30$ (and thus for all $L \ge 30$):
 \begin{equation}
 n \in [0, u_K) \cap B_K \cap A_L \iff n \in \{0, 2, 8\}.
 \end{equation}
 \end{theorem}
 While this completely eliminates all spurious survivors in the first period, it does not constrain the second period $[u_K, 2 u_K)$.
 
-\subsection{Carry Packets and the Non-Recurrence Lemma}
+\subsection{Carry Packets and the Mod-8 Non-Recurrence Lemma}
 An alternative approach tracks carry propagation in the self-overlap addition $R_{s+1} = R_s + 3 R_s + 1$. A localized configuration of digits that absorbs an incoming digit $2$ via carries without emitting an output digit $2$ is called a \emph{carry packet}. In this work, we analyze the local carry dynamics and prove that the unique dyadically pure carry packet capable of resolving an input digit $2$ occurs at:
 \begin{equation}
 2101_3 = 64 \quad (4^3 = 64), \quad \text{yielding} \quad 100111_3 = 256 \quad (4^4 = 256).
 \end{equation}
 Could this packet recur at higher separated ternary scales $64(1 + 3^s)$? We prove:
-\begin{lemma}[Non-Recurrence of Carry Packets]\label{lem:non_recurrence}
+\begin{lemma}[Mod-8 Non-Recurrence of Carry Packets]\label{lem:non_recurrence}
 For all integers $s \ge 2$ and all $k \in \N$:
 \begin{equation}
 1 + 3^s \ne 2^k.
@@ -242,7 +258,19 @@ For all $n \ge 4$, the ternary expansion of $2^{-n} = 1/2^n$ contains the digit 
 \end{theorem}
 
 \begin{proof}[Proof via the Mod-8 Gap Lemma]
-The ternary digits of $1/2^n$ are generated by $x_{k+1} = 3 x_k \bmod 2^n$. The digit $2$ appears whenever $x_k \ge \lceil 2 \cdot 2^n / 3 \rceil$. The multiplier $3$ generates a cyclic subgroup of $(\Z / 2^n \Z)^\times$ of order $2^{n-2}$ which coincides identically with the coset $\mathcal{S}_8 = \{ x \in [0, 2^n) : x \equiv 1 \text{ or } 3 \pmod 8 \}$. The gaps between consecutive elements of $\mathcal{S}_8$ alternate between $2$ and $6$, so any interval of length at least $6$ contains an element of $\mathcal{S}_8$ (\textbf{The Gap Lemma}). For $n \ge 5$, the target interval has length $(2^n - 1) - \lceil 2 \cdot 2^n / 3 \rceil \ge 2^n / 3 - 1 > 6$. Therefore, the orbit must visit the target interval, forcing the appearance of digit $2$.
+The ternary digits of $1/2^n$ are generated by the shift map $x_{k+1} = 3 x_k \bmod 2^n$ starting from $x_0 = 1$. The digit $2$ appears at step $k$ whenever the residue satisfies $x_k \ge \lceil 2 \cdot 2^n / 3 \rceil$. 
+
+To analyze the orbit of $x_k = 3^k \bmod 2^n$, consider the cyclic subgroup $\langle 3 \rangle \le (\Z / 2^n \Z)^\times$. By the Lifting-the-Exponent Lemma (LTE), for any $n \ge 3$:
+\begin{equation}
+v_2(3^{2^{n-3}} - 1) = v_2(3 - 1) + v_2(3 + 1) + (n - 3) - 1 = 1 + 2 + n - 4 = n - 1.
+\end{equation}
+Hence $3^{2^{n-3}} \not\equiv 1 \pmod{2^n}$, while $3^{2^{n-2}} \equiv 1 \pmod{2^n}$. Thus the multiplicative order of $3$ modulo $2^n$ is exactly $2^{n-2}$. Modulo $8$, $3 \equiv 3$, so powers of $3$ alternate strictly between $1$ and $3 \pmod 8$. Thus $\langle 3 \rangle \subseteq \mathcal{S}_8$, where $\mathcal{S}_8 = \{ x \in [0, 2^n) : x \equiv 1 \text{ or } 3 \pmod 8 \}$. Since $[0, 2^n)$ contains $2^{n-3}$ integers congruent to $1 \pmod 8$ and $2^{n-3}$ integers congruent to $3 \pmod 8$, we have $|\mathcal{S}_8| = 2 \cdot 2^{n-3} = 2^{n-2} = |\langle 3 \rangle|$. Therefore, $\langle 3 \rangle = \mathcal{S}_8$ identically: the orbit of $3^k \bmod 2^n$ traverses the entire set $\mathcal{S}_8$.
+
+The consecutive elements of $\mathcal{S}_8$ alternate with gaps of $2$ and $6$ (namely, $1, 3, 9, 11, 17, 19, \dots$). Consequently, any interval of integers of length at least $6$ contains at least one element of $\mathcal{S}_8$ (\textbf{The Gap Lemma}). For $n \ge 5$, the target interval $J = [\lceil 2 \cdot 2^n / 3 \rceil, 2^n - 1]$ where digit $2$ is produced has length:
+\begin{equation}
+(2^n - 1) - \left\lceil \frac{2 \cdot 2^n}{3} \right\rceil \ge \frac{2^n}{3} - 1 \ge \frac{32}{3} - 1 > 9 > 6.
+\end{equation}
+By the Gap Lemma, the target interval $J$ must contain an element of $\mathcal{S}_8 = \langle 3 \rangle$. Thus the orbit visits $J$, forcing the ternary expansion of $2^{-n}$ to contain the digit $2$ for all $n \ge 5$. Direct verification of $n \in \{1, 2, 3, 4\}$ completes the proof.
 \end{proof}
 
 \begin{remark}[Why the Negative-Power Method Fails for Positive Powers]
@@ -264,7 +292,7 @@ All theoretical results in this paper have been formalized and kernel-verified i
     \item \texttt{NegativePower.lean}: Proves Theorem~\ref{thm:neg_power} (Negative-Power Theorem and Gap Lemma).
     \item \texttt{RepunitCarryConnection.lean}: Proves the polynomial, spectral, and orbit isomorphism to $C(1, 4)$.
 \end{itemize}
-Across all modules contributing to the results of this paper, \textbf{100\% of the declarations are pure foundational}, depending exclusively on standard Lean axioms \texttt{[propext, Classical.choice, Quot.sound]}, with zero reliance on \texttt{sorryAx} or \texttt{native\_decide}.
+Across all modules contributing to the results of this paper, \textbf{100\% of the declarations are pure foundational}, depending exclusively on standard Lean axioms \texttt{[propext, Classical.choice, Quot.sound]}, with zero reliance on unproven axioms (\texttt{sorryAx} / \texttt{sorry}) and no reliance on computational reflection or decision-procedure oracles (\texttt{Lean.ofReduceBool} / \texttt{native\_decide}). (Here, as standard in formal mathematics, ``pure foundational'' denotes proofs derived within the calculus of inductive constructions using only Lean's core logic and standard axioms \texttt{propext}, \texttt{Quot.sound}, and \texttt{Classical.choice}, without foreign function calls or unverified kernel extensions.)
 
 \bibliographystyle{amsplain}
 \bibliography{references}
