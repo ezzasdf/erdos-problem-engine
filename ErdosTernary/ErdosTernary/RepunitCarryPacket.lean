@@ -10,8 +10,8 @@ import Mathlib
 
 This module formalizes the carry-packet obstruction for powers of two in base 3:
 1. **The Non-Recurrence Theorem:** For any $s \ge 2$, $1 + 3^s \ne 2^k$.
-   Consequently, the unique dyadically pure carry packet $2101_3 = 64$ cannot recur
-   at any separated ternary scale $64(1 + 3^s)$ for $s \ge 2$.
+   The canonical dyadically pure carry configuration considered here is $2101_3 = 64$.
+   Consequently, it cannot recur at any separated ternary scale $64(1 + 3^s)$ for $s \ge 2$.
 2. **The Quadrupling Carry Automaton on Cantor Inputs:**
    For $x \in C_3, 4x \in C_3$, the carry-propagation automaton has 4 states.
    Its reachable component from the initial state $(c=0, p=0)$ consists of exactly

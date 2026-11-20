@@ -5,20 +5,26 @@ import ErdosTernary.RepunitCarryPacket
 /-!
 # Structural Connection Lemma: Carry Automata and Safe-Multiplier SFTs
 
-This module formalizes the exact mathematical equivalence between the two-state
-quadrupling carry automaton language on Cantor inputs and the
-subshift of finite type (SFT) for the safe multiplier $M = 4$ ($a=1, b=2$ in Family 2).
+This module formalizes spectral and recurrence identities for the two-state
+transfer system $A = \begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}$ and connects
+them to the subshift of finite type (SFT) for the safe multiplier $M = 4$
+($a=1, b=2$ in Family 2).
+
+The interpretation of this transfer recurrence as the population growth of
+valid paths in the discrete carry automaton (`RepunitCarryPacket.lean`) is an
+analytical comparison presented in the manuscript, rather than a formally
+proved path-count theorem.
 
 ## Key Results
 1. `phi_eq`: The algebraic golden ratio definitions in `CantorMultiplier` and
    `RepunitCarryPacket` coincide identically.
-2. `carry_charpoly_eq_perronPoly`: The characteristic polynomial of the carry
-   automaton transition matrix $A = \begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}$
-   equals the Perron polynomial of $M = 4$ (`perronPoly 2 t`) for all $t \in \mathbb{R}$.
+2. `carry_charpoly_eq_perronPoly`: The characteristic polynomial of the transfer
+   matrix $A = \begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}$ equals the Perron
+   polynomial of $M = 4$ (`perronPoly 2 t`) for all $t \in \mathbb{R}$.
 3. `lambda_SFT_one_two_eq_carry_phi`: The Perron-Frobenius eigenvalue $\lambda_{\mathrm{SFT}}(1, 2)$
-   identically equals the carry automaton spectral radius $\phi = (1 + \sqrt{5})/2$.
-4. `orbitCount_sum_eq_goldenWordCount`: The population size of valid carry paths at
-   length $n$ matches the SFT word count $\mathrm{fib}(n+2)$ identically for all $n$.
+   identically equals the transfer spectral radius $\phi = (1 + \sqrt{5})/2$.
+4. `orbitCount_sum_eq_goldenWordCount`: The population size of the transfer recurrence
+   at step $n$ matches the SFT word count $\mathrm{fib}(n+2)$ identically for all $n$.
 -/
 
 namespace ErdosTernary.RepunitCarryConnection
@@ -67,8 +73,8 @@ theorem orbitCount_eq_fib_pair (n : ℕ) :
     rw [Nat.fib_add_two]
     rw [add_comm (Nat.fib (n + 1)) (Nat.fib n)]
 
-/-- The total reachable population of the carry automaton at step n
-    equals the Fibonacci number fib(n + 2). -/
+/-- The total population of the two-state transfer recurrence at step n
+    equals the Fibonacci number fib(n + 2) (matching the analytical golden shift word count). -/
 theorem orbitCount_sum_eq_fib (n : ℕ) :
     (orbitCount n).1 + (orbitCount n).2 = Nat.fib (n + 2) := by
   rw [orbitCount_eq_fib_pair]

@@ -32,7 +32,7 @@
 
 \author{Ezzeldin Ashraf Mohamed Shafey Wahba}
 \email{ezzeldinashraf.web@gmail.com}
-\thanks{The complete Lean~4 formalization, proof scripts, and computational artifacts are available at \url{https://github.com/ezzasdf/erdos-problem-engine}.}
+\thanks{The Lean~4 formalization, proof scripts, and computational artifacts are available at \url{https://github.com/ezzasdf/erdos-problem-engine}.}
 
 \date{\today}
 
@@ -41,9 +41,9 @@
 \begin{abstract}
 In 1979, Paul Erd\H{o}s~\cite{Erdos1979} conjectured that $2^0 = 1$, $2^2 = 4$, and $2^8 = 256$ are the only powers of $2$ whose base-$3$ (ternary) expansion contains no digit $2$. \textbf{The Erd\H{o}s conjecture remains open.} In this paper, we do not prove the Erd\H{o}s conjecture; rather, we reduce it to a clean, machine-verified condition: the conjecture is equivalent to the statement that the joint survivor set --- those $s \ge 5$ that survive the $3$-adic tree to depth $s+1$ (with $s$ trailing digits in $\{0, 1\}$) while their leading quotient avoids digit $2$ --- is empty ($\text{Erd\H{o}s} \iff \mathrm{jointSurvivors} = \emptyset$). 
 
-We formulate the problem through base-$4$ repunit coordinates $4^s = 3 R_s(4) + 1$, governed by the $3$-adic dynamical system $R_{s+1} = 4 R_s + 1$, building upon the repunit framework of Idowu (arXiv:2610.03789)~\cite{Idowu2026}. We prove that the rooted tree of repunit admissible residue classes is strictly isomorphic to the classical survivor tree of powers of $2$, establishing an exact level-by-level and branching correspondence. We establish the Archimedean--$3$-Adic Decoupling Theorem, which reduces the problem to an exact Diophantine target, and analyze the joint summability heuristic $\sum (2/3)^{1.26s} < \infty$, explaining why the summability heuristic alone does not yield a Borel--Cantelli argument.
+We formulate the problem through base-$4$ repunit coordinates $4^s = 3 R_s(4) + 1$, governed by the $3$-adic dynamical system $R_{s+1} = 4 R_s + 1$, building upon the repunit framework of Idowu (arXiv:2610.03789)~\cite{Idowu2026}. We establish the correspondence between the rooted tree of repunit admissible residue classes and the classical survivor tree of powers of $2$, and establish the Archimedean--$3$-Adic Decoupling Theorem, which reduces the problem to an exact Diophantine target, analyzing the joint summability heuristic $\sum (2/3)^{1.26s} < \infty$.
 
-In a self-contained analysis of obstructions, we prove why elementary methods fail: we formalize the infinite modular barrier ($|N_K| = 2^{K-1}$), prove the mod-$8$ non-recurrence of carry-absorbing packets ($1 + 3^s \ne 2^k$ for $s \ge 2$), and contrast the positive-power case with the negative-power theorem $2^{-n}$, completely proved here via the mod-$8$ Gap Lemma. The principal structural and obstruction results are formalized and kernel-verified in the Lean~4 proof assistant (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with pure foundational axioms and zero \texttt{sorry} placeholders, while supporting number-theoretic arguments (including multiplicative order minimality and the algebraic repunit-lifting congruence) are proved analytically in the manuscript. The First-Period Bridge Theorem is verified by finite computation in the bridge modules using \texttt{native\_decide} certificates.
+In a self-contained analysis of obstructions, we prove why elementary methods fail: we formalize the infinite modular barrier ($|N_K| = 2^{K-1}$), prove the mod-$8$ non-recurrence of carry-absorbing packets ($1 + 3^s \ne 2^k$ for $s \ge 2$), and contrast the positive-power case with the negative-power theorem $2^{-n}$, completely proved here via the mod-$8$ Gap Lemma. The principal results are supported by Lean~4 formalizations (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with pure foundational axioms and zero \texttt{sorry} placeholders, including the bounded-representative survivor correspondence, Archimedean decoupling, mod-$8$ carry-packet non-recurrence, and the negative-power theorem. Supporting number-theoretic arguments (including Saye's multiplicative-order calculation and the binomial repunit-lifting congruence) and structural comparisons (the projective quotient-tree isomorphism and carry-automaton SFT comparison) are proved analytically in the manuscript. The First-Period Bridge Theorem is verified by finite computation in the bridge modules using quarantined \texttt{native\_decide} certificates.
 \end{abstract}
 
 \maketitle
@@ -67,13 +67,13 @@ Despite extensive computational searches and partial density bounds, the conject
 
 \textbf{Prior Art and Context:} The formulation of the problem through base-$4$ repunit coordinates $4^s = 3 R_s(4) + 1$, the linear affine recurrence $R_{s+1} = 4 R_s + 1$, the modular lifting congruence $R_{r + q \cdot 3^m}(4) \equiv R_r(4) + q \cdot 3^m \pmod{3^{m+1}}$, and the two-of-three admissibility rule were introduced by Idowu~\cite{Idowu2026}, who also identified the two-of-three recursion as rooted in Saye's hierarchical trailing-digit filter~\cite{Saye2022}. We do not claim the original discovery of the base-$4$ repunit coordinate representation, the $3$-adic affine shift, or the two-of-three branching phenomenon.
 
-\textbf{Our Contributions:} Our contribution is the mathematical synthesis, structural reduction, obstruction theory, and complete interactive formalization:
+\textbf{Our Contributions:} Our contribution is the mathematical synthesis, structural reduction, obstruction theory, and interactive Lean~4 formalization of the principal results:
 \begin{enumerate}
-    \item \textbf{Rooted Tree Isomorphism Theorem (Theorem~\ref{thm:tree_iso}):} We prove that the repunit survivor tree $\Trep$ and the classical powers-of-two survivor tree $\Tpow$ are strictly isomorphic as rooted trees, establishing an exact level-by-level and branching correspondence (formalized at the level of bounded integer representatives in \texttt{RepunitTreeIso.lean}).
+    \item \textbf{Rooted Tree Correspondence (Proposition~\ref{prop:rep_tree_iso} and Theorem~\ref{thm:tree_iso}):} We establish the correspondence between repunit survivors and powers-of-two survivors: the level-by-level and branching correspondence on bounded integer representatives is formalized and kernel-verified in \texttt{RepunitTreeIso.lean}, while the full projective/quotient rooted-tree isomorphism over residue-class systems is proved analytically in the text.
     \item \textbf{Archimedean--$3$-Adic Decoupling (Theorem~\ref{thm:decoupling}):} We decouple the continuous Archimedean quotient from the discrete $3$-adic tree, reducing the full Erd\H{o}s conjecture to an exact Diophantine target: the emptiness of the joint survivor set ($\mathrm{jointSurvivors} = \emptyset$).
     \item \textbf{First-Period Bridge Theorem (Theorem~\ref{thm:bridge}):} We extend computational verification certificates to $K \in \{5, \dots, 18\}$ (covering periods up to $u_{18} = 258,280,326$), certifying that every spurious survivor in the first period exhibits a forbidden digit $2$.
     \item \textbf{Obstruction Theory (Section~\ref{sec:obstructions}):} We formalize why elementary methods stall: the infinite modular sieve barrier ($|N_K| = 2^{K-1}$ with positive natural density), the mod-$8$ non-recurrence of carry packets, the spectral radius contrast ($\rho_{\mathrm{adic}} = 2$ vs. $\rho_{\mathrm{digit}} = \phi < 2$), and the sampling discrepancy between positive and negative powers (where the negative-power theorem is completely solved via the mod-$8$ Gap Lemma).
-    \item \textbf{Machine Verification (Section~\ref{sec:formalization}):} The principal structural and obstruction results are formalized and kernel-verified in Lean~4 with pure foundational axioms. Supporting number-theoretic steps (such as order minimality and algebraic lifting congruences) are proved analytically in the manuscript. The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified by finite computation in the bridge modules using \texttt{native\_decide} certificates, strictly quarantined from the structural theorems.
+    \item \textbf{Machine Verification Boundary (Section~\ref{sec:formalization}):} The principal results are supported by Lean~4 formalizations with pure foundational axioms: the bounded-representative survivor correspondence, Archimedean decoupling, carry-packet mod-$8$ non-recurrence, and negative-power theorem. Supporting number-theoretic arguments (Saye's order calculation, binomial lifting) and structural identifications (the projective quotient-tree isomorphism and carry-automaton path-count comparison) are proved analytically in the manuscript. Theorem~\ref{thm:bridge} is verified computationally via quarantined \texttt{native\_decide} certificates.
 \end{enumerate}
 
 ---
@@ -153,7 +153,16 @@ Thus the multiplicative order of $2$ modulo $3^m$ is exactly $u_m = 2 \cdot 3^{m
 
 Let $\Trep$ denote the rooted tree whose vertices at depth $m \ge 1$ are residue classes $s \bmod 3^{m-1}$ such that the trailing $m-1$ ternary digits of $R_s(4)$ belong to $\{0, 1\}^{m-1}$. Let $\Tpow$ denote the rooted survivor tree whose vertices at depth $m \ge 1$ are residue classes $n \bmod (2 \cdot 3^{m-1})$ such that the trailing $m$ ternary digits of $2^n$ belong to $\{0, 1\}^m$ (with $n$ even, $n = 2s$).
 
-\begin{theorem}[Rooted Tree Isomorphism]\label{thm:tree_iso}
+\begin{proposition}[Bounded-Representative Survivor Correspondence]\label{prop:rep_tree_iso}
+Let $m \ge 1$. For bounded integer representatives $s < 3^{m-1}$ and even exponents $n = 2s < 2 \cdot 3^{m-1}$, the map $s \mapsto 2s$ establishes an exact level-by-level bijection between repunit survivors ($d_j(R_s(4)) \in \{0, 1\}$ for all $0 \le j < m-1$) and power-of-two survivors ($d_j(2^n) \in \{0, 1\}$ for all $0 \le j < m$). Furthermore:
+\begin{enumerate}
+    \item Any survivor exponent $n$ must be even ($n = 2s$), since for odd exponents $d_0(2^{2s+1}) = 2$;
+    \item Branching choices $q \in \{0, 1, 2\}$ correspond identically under lifts $s' = s + q \cdot 3^{m-1} \mapsto n' = 2s' = n + q \cdot (2 \cdot 3^{m-1})$.
+\end{enumerate}
+\emph{(Formalized and kernel-verified in \texttt{RepunitTreeIso.lean}.)}
+\end{proposition}
+
+\begin{theorem}[Projective Quotient Rooted-Tree Isomorphism]\label{thm:tree_iso}
 The map defined level-by-level by:
 \begin{equation}
 \Phi_m : \Trep(m) \to \Tpow(m), \quad \Phi_m(s) = (2 s) \bmod (2 \cdot 3^{m-1})
@@ -161,19 +170,15 @@ The map defined level-by-level by:
 is an exact isomorphism of rooted trees. Specifically:
 \begin{enumerate}
     \item $\Phi_m$ is a bijection between $\Trep(m)$ and $\Tpow(m)$ for every depth $m \ge 1$, with $|\Trep(m)| = |\Tpow(m)| = 2^{m-1}$;
-    \item $\Phi_{m+1}$ respects the tree structure: $\pi(\Phi_{m+1}(s')) = \Phi_m(\pi(s'))$, where $\pi$ is the canonical parent projection;
-    \item The branching choices $q \in \{0, 1, 2\}$ correspond identically under the lift $s' = s + q \cdot 3^{m-1} \mapsto n' = 2s' = n + q \cdot (2 \cdot 3^{m-1})$.
+    \item $\Phi_{m+1}$ respects parent projections: $\pi(\Phi_{m+1}(s')) = \Phi_m(\pi(s'))$;
+    \item The branching choices $q \in \{0, 1, 2\}$ correspond identically under the quotient lifts.
 \end{enumerate}
 \end{theorem}
 
 \begin{proof}
-By Lemma~\ref{lem:modular_lifting}, the map $s \bmod 3^{m-1} \mapsto R_s(4) \bmod 3^{m-1}$ is a bijection on $\Z / 3^{m-1} \Z$. The admissibility condition for $\Trep(m)$ requires $d_j(R_s(4)) \in \{0, 1\}$ for all $0 \le j < m-1$. There are exactly $2^{m-1}$ such sequences of digits in $\{0, 1\}^{m-1}$. Hence $|\Trep(m)| = 2^{m-1}$.
+By Lemma~\ref{lem:modular_lifting}, $s \bmod 3^{m-1} \mapsto R_s(4) \bmod 3^{m-1}$ is a bijection on $\Z / 3^{m-1} \Z$, yielding $|\Trep(m)| = 2^{m-1}$. By Lemma~\ref{lem:saye_period}, the trailing $m$ ternary digits of $2^n$ depend solely on $n \bmod (2 \cdot 3^{m-1})$. Since $\gcd(2, 3^{m-1}) = 1$, the map $s \bmod 3^{m-1} \mapsto 2s \bmod (2 \cdot 3^{m-1})$ is an isomorphism of abelian groups between $\Z / 3^{m-1} \Z$ and the even residue classes in $\Z / (2 \cdot 3^{m-1} \Z)$.
 
-For the powers-of-two tree, any survivor must have an even exponent $n = 2s$, since for odd $n$, $2^n \equiv 2 \pmod 3$, forcing the lowest digit $d_0(2^n) = 2$. By Lemma~\ref{lem:saye_period}, the trailing $m$ ternary digits of $2^n$ depend only on $n \bmod (2 \cdot 3^{m-1})$. Since $\gcd(2, 3^{m-1}) = 1$, the map $s \bmod 3^{m-1} \mapsto 2s \bmod (2 \cdot 3^{m-1})$ is an isomorphism of abelian groups between $\Z / 3^{m-1} \Z$ and the even residue classes in $\Z / (2 \cdot 3^{m-1} \Z)$.
-
-Under this identification, $2^{2s} = 4^s = 3 R_s(4) + 1$. The least significant digit $d_0(4^s) = 1$ is always in $\{0, 1\}$, and the subsequent $m-1$ digits satisfy $d_{j+1}(4^s) = d_j(R_s(4))$ for all $0 \le j < m-1$. Thus the trailing $m$ digits of $2^{2s}$ belong to $\{0, 1\}^m$ if and only if the trailing $m-1$ digits of $R_s(4)$ belong to $\{0, 1\}^{m-1}$. 
-
-Under lifting to depth $m+1$, $s' = s + q \cdot 3^{m-1}$ maps to $n' = 2s' = 2s + q \cdot (2 \cdot 3^{m-1})$. The branch choice $q \in \{0, 1, 2\}$ in the repunit tree maps to the identical branch choice $q$ in the survivor tree. Hence $\Phi$ is an isomorphism of rooted trees. (In the formalization \texttt{RepunitTreeIso.lean}, this isomorphism is verified for bounded integer representatives $s < 3^m$ and $n < 2 \cdot 3^m$.)
+Under this identification, $2^{2s} = 4^s = 3 R_s(4) + 1$, with lowest digit $d_0(4^s) = 1$ and $d_{j+1}(4^s) = d_j(R_s(4))$ for all $0 \le j < m-1$. Combining this with the bounded-representative bijection of Proposition~\ref{prop:rep_tree_iso}, $\Phi_m$ preserves admissibility, matches branch choices $q \in \{0, 1, 2\}$, and commutes with canonical parent projections $\pi$.
 \end{proof}
 
 \section{Archimedean--3-Adic Decoupling and the Diophantine Target}\label{sec:decoupling}
@@ -348,18 +353,18 @@ For negative powers $2^{-n}$, the rational expansion is periodic of period $P = 
 
 \section{Lean 4 Formalization}\label{sec:formalization}
 
-The principal structural and obstruction results in this paper have been formalized and verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. Supporting number-theoretic arguments (including multiplicative order minimality and the algebraic repunit-lifting congruence) are proved analytically in the manuscript rather than fully formalized. The first nine modules listed below are pure foundational (no \texttt{native\_decide}). The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified separately in the bridge module suite (\texttt{Bridge.lean} through \texttt{BridgeK18.lean}) using \texttt{native\_decide} certificates for $K=5,\dots,18$; these are quarantined from the structural theorems. The complete machine-checked formalization, proofs, and verification scripts are openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
+The principal results in this paper are supported by Lean~4 formalizations (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. Foundational formalizations cover the bounded-representative survivor correspondence, Archimedean decoupling, carry-packet mod-$8$ non-recurrence, and the negative-power theorem. Supporting number-theoretic arguments (including Saye's multiplicative-order calculation and the binomial repunit-lifting congruence) and structural comparisons (the projective quotient-tree isomorphism and carry-automaton SFT path count) are proved analytically in the manuscript. The first nine modules listed below are pure foundational (no \texttt{native\_decide}). The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified separately in the bridge module suite (\texttt{Bridge.lean} through \texttt{BridgeK18.lean}) using \texttt{native\_decide} certificates for $K=5,\dots,18$, strictly quarantined from the structural theorems. The formalization repository is openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
 {\sloppy
 \begin{itemize}\setlength{\itemsep}{0.5pt}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}
     \item \texttt{RepunitBase4.lean}: Formalizes $4^s = 3 R_s(4) + 1$ and the digit index shift.
     \item \texttt{RepunitDynamics.lean}: Formalizes the $3$-adic conjugacy recurrence of Section~\ref{subsec:conjugacy_recurrence}.
     \item \texttt{RepunitLifting.lean}: Formalizes the digit-level branching mechanics of Lemma~\ref{lem:modular_lifting}: lower-digit preservation under $3^m$ shifts (\texttt{digit3\_add\_mul\_lower}), the single-digit shift at index $m$ (\texttt{digit3\_add\_mul}), and the exact two-of-three admissibility count (\texttt{two\_admissible\_of\_three}, \texttt{one\_forbidden\_of\_three}). The algebraic lifting congruence and permutation property of $R_s(4) \bmod 3^m$ are proved in the text via binomial expansion.
-    \item \texttt{RepunitTreeIso.lean}: Proves the Rooted Tree Isomorphism (Theorem~\ref{thm:tree_iso}) at the level of bounded representatives ($s < 3^m$ and $n < 2 \cdot 3^m$), establishing the level-by-level bijection, even-exponent reduction, and branching equivalence; the quotient-tree formulation on projective residue-class systems is proved analytically in the text.
+    \item \texttt{RepunitTreeIso.lean}: Proves the Bounded-Representative Correspondence (Proposition~\ref{prop:rep_tree_iso}) for integer representatives ($s < 3^m, n < 2 \cdot 3^m$), establishing the level bijection, even-exponent reduction, and branching equivalence; the projective quotient-tree isomorphism (Theorem~\ref{thm:tree_iso}) is proved analytically in the text.
     \item \texttt{RepunitArchimedean.lean}: Proves Theorem~\ref{thm:decoupling} (Decoupling Theorem).
     \item \texttt{RepunitDiophantine.lean}: Proves Corollary~\ref{cor:reduction} (Equivalence of Erd\H{o}s to $\mathrm{jointSurvivors} = \emptyset$).
     \item \texttt{RepunitCarryPacket.lean}: Proves Lemma~\ref{lem:non_recurrence} (Mod-8 Non-Recurrence of the $64(1+3^s)$ Carry Packet).
     \item \texttt{NegativePower.lean}: Proves Theorem~\ref{thm:neg_power} (Negative-Power Theorem, LTE 2-adic lift, and Gap Lemma orbit surjectivity).
-    \item \texttt{RepunitCarryConnection.lean}: Formalizes a Fibonacci recurrence comparison for the matrix transfer system $A = \begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}$: characteristic polynomial equivalence to $M = 4$, Perron eigenvalue $\phi = (1+\sqrt{5})/2$, and population growth $F_{n+2}$; the formal reduction from the automaton in \texttt{RepunitCarryPacket.lean} to this matrix system is an analytical comparison presented in Section~\ref{sec:obstructions}.
+    \item \texttt{RepunitCarryConnection.lean}: Formalizes the transfer recurrence $(x,y) \mapsto (x+y,x)$, its Fibonacci identity $F_{n+2}$, and characteristic polynomial equivalence to the $M=4$ Perron polynomial; its interpretation as the valid path count of the carry automaton in \texttt{RepunitCarryPacket.lean} is an analytical comparison presented in Section~\ref{sec:obstructions}.
     \item \texttt{BridgeSuite}: The computational certificate suite for Theorem~\ref{thm:bridge} (First-Period Bridge), comprising modules \texttt{Bridge}, \texttt{BridgeCompute}, \texttt{BridgeMiddle}, \texttt{BridgeCandidates}, \texttt{BridgeK13}--\texttt{BridgeK18}, and \texttt{BridgeUniform}.
 \end{itemize}\par}
 
