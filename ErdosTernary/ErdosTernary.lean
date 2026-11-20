@@ -7,9 +7,12 @@ import ErdosTernary.MiddleDigits
 import ErdosTernary.LagariasHausdorff
 import ErdosTernary.OstrowskiFormLemma
 import ErdosTernary.BridgeCompute
-import ErdosTernary.Mass1Dynamics
 import ErdosTernary.Lemma41Finite
-import ErdosTernary.Lemma41
 import ErdosTernary.CantorMultiplier
 import ErdosTernary.TimeReversal
 import ErdosTernary.PeriodicOrbit
+import ErdosTernary.RepunitBase4
+import ErdosTernary.RepunitLifting
+import ErdosTernary.RepunitTreeIso
+import ErdosTernary.RepunitArchimedean
+import ErdosTernary.RepunitDynamics

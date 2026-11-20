@@ -372,6 +372,8 @@ theorem extremizer_exact_fibonacci (N : ℕ → ℕ)
   · have hrec := h_rec (n + 1) (by omega)
     have ih1 := ih (n + 1) (by omega)
     have ih0 := ih n (by omega)
+    have : n + 1 - 1 = n := by omega
+    rw [this] at hrec
     rw [hrec, ih1, ih0]
     rfl
 
@@ -397,9 +399,8 @@ theorem perronPoly_at_phi_pos (b : ℕ) (hb : 3 ≤ b) :
   dsimp [perronPoly]
   have h_factor : phi ^ b - phi ^ (b - 1) = phi ^ (b - 1) * (phi - 1) := by
     have : phi ^ b = phi ^ (b - 1) * phi := by
-      have : b = (b - 1) + 1 := by omega
-      conv_lhs => rw [this, pow_succ]
-      ring
+      have hb_eq : b = (b - 1) + 1 := by omega
+      conv_lhs => rw [hb_eq, pow_succ]
     rw [this]
     ring
   have h_inv := phi_sub_one_eq_inv
@@ -413,10 +414,10 @@ theorem perronPoly_at_phi_pos (b : ℕ) (hb : 3 ≤ b) :
     exact mul_div_cancel_right₀ (phi ^ (b - 2)) hp
   rw [h_factor, h_prod]
   have hb2 : b - 2 ≥ 1 := by omega
-  have hphi_pow : phi ^ (b - 2) ≥ phi := by
-    have h_one : phi ≥ 1 := phi_gt_one.le
-    have : phi ^ 1 = phi := pow_one phi
-    rw [← this]
+  have hphi_pow : phi ≤ phi ^ (b - 2) := by
+    have h_one : 1 ≤ phi := phi_gt_one.le
+    have : phi = phi ^ 1 := (pow_one phi).symm
+    rw [this]
     exact pow_le_pow_right h_one hb2
   have h_gt : phi ^ (b - 2) > 1 := by
     have := phi_gt_one
@@ -430,8 +431,10 @@ theorem strict_inequality_non_extremizer (p : SFTParams)
     p.a ≥ 2 ∨ (p.a = 1 ∧ p.b ≥ 3) := by
   dsimp [isExtremizer] at h_not_ext
   have : p.a ≥ 1 := p.ha
-  rcases eq_or_lt_of_le this with rfl | ha_ge2
+  rcases eq_or_lt_of_le this with h1 | ha_ge2
   · right
+    have ha1 : p.a = 1 := by omega
+    subst ha1
     have : p.b > 1 := p.hab
     have : p.b ≠ 2 := by
       intro hb2; apply h_not_ext; exact ⟨rfl, hb2⟩
@@ -450,9 +453,11 @@ theorem non_extremizer_trichotomy (p : SFTParams)
     (p.a ≥ 2 ∧ p.b - p.a ≥ 2) := by
   have ha : p.a ≥ 1 := p.ha
   have hab : p.a < p.b := p.hab
-  rcases eq_or_lt_of_le ha with rfl | ha_ge2
+  rcases eq_or_lt_of_le ha with h1 | ha_ge2
   · -- a = 1
     left
+    have ha1 : p.a = 1 := by omega
+    subst ha1
     have hb : p.b ≠ 2 := by
       intro hb2; apply h_not_ext; exact ⟨rfl, hb2⟩
     omega
