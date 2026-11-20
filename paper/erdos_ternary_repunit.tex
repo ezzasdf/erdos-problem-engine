@@ -344,11 +344,12 @@ The consecutive elements of $\mathcal{S}_8$ alternate with gaps of $2$ and $6$ (
 \end{proof}
 
 \begin{remark}[Why the Negative-Power Method Fails for Positive Powers]
-\enlargethispage{11\baselineskip}
 For negative powers $2^{-n}$, the rational expansion is periodic of period $P = 2^{n-2}$, which equals the entire subgroup order. The digit stream \emph{samples the entire group uniformly}. For positive powers $2^n$, the number is an integer, the expansion is non-periodic, and $2^n$ samples only a \emph{single trajectory} rather than the entire group. This difference in sampling mechanisms explains why the negative-power theorem is elementary, while the positive-power conjecture is resistant to elementary methods.
 \end{remark}
 
+\newpage
 \section{Lean 4 Formalization}\label{sec:formalization}
+\enlargethispage{5\baselineskip}
 
 The principal results in this paper are supported by Lean~4 formalizations (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. Foundational formalizations cover the bounded-representative survivor correspondence, Archimedean decoupling, carry-packet mod-$8$ non-recurrence, and the negative-power theorem. Supporting number-theoretic arguments (including Saye's multiplicative-order calculation and the binomial repunit-lifting congruence) and structural comparisons (the projective quotient-tree isomorphism and carry-automaton SFT path count) are proved analytically in the manuscript. The first nine modules listed below are pure foundational (no \texttt{native\_decide}). The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified separately in the bridge module suite (\texttt{Bridge.lean} through \texttt{BridgeK18.lean}) using \texttt{native\_decide} certificates for $K=5,\dots,18$, strictly quarantined from the structural theorems. The formalization repository is openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
 {\sloppy
@@ -365,8 +366,9 @@ The principal results in this paper are supported by Lean~4 formalizations (vers
     \item \texttt{BridgeSuite}: The computational certificate suite for Theorem~\ref{thm:bridge} (First-Period Bridge), comprising modules \texttt{Bridge}, \texttt{BridgeCompute}, \texttt{BridgeMiddle}, \texttt{BridgeCandidates}, \texttt{BridgeK13}--\texttt{BridgeK18}, and \texttt{BridgeUniform}.
 \end{itemize}\par}
 
+\newpage
 \subsection{Trust Model and Axiom Inventory}
-\enlargethispage{8\baselineskip}
+\enlargethispage{6\baselineskip}
 We distinguish two precise verification tiers across the formalization:
 \begin{enumerate}\setlength{\itemsep}{0.5pt}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}
     \item \textbf{Foundational Kernel Theorems:} Across the nine core theoretical modules (\texttt{RepunitBase4} through \texttt{RepunitCarryConnection}), \textbf{100\% of declarations are pure foundational}. They are checked strictly by the Lean~4 kernel, relying exclusively on standard foundational axioms \texttt{[propext, Classical.choice, Quot.sound]}, with zero unproved axioms (\texttt{sorryAx} / \texttt{sorry}) and no reliance on computational reflection or decision-procedure oracles (\texttt{Lean.ofReduceBool} / \texttt{native\_decide}).
