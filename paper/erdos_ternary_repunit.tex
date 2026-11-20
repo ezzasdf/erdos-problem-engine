@@ -231,7 +231,7 @@ The classical trailing-digit approach tests whether $2^n \bmod 3^K$ has digits i
 \subsection{The First-Period Bridge Theorem}\label{subsec:bridge}
 To investigate whether small depths $K$ can eliminate spurious survivors, we analyze the interaction between modular trailing constraints and ternary digit distributions of $2^n$.
 
-\begin{definition}[Trailing Filter $B_K$ and Cantor Integer Set $\mathcal{C}_{\mathbb{N}}$]\label{def:filters}
+\begin{definition}[Trailing Filter $B_K$, Cantor Set $\mathcal{C}_{\mathbb{N}}$, and Exponent Set $E_{\mathcal{C}}$]\label{def:filters}
 For depths $K \ge 1$ and precision $L \ge 1$:
 \begin{enumerate}
     \item \textbf{Trailing Modular Filter $B_K$:} The set of non-negative integers $n$ whose trailing $K$ ternary digits contain no digit $2$:
@@ -239,9 +239,13 @@ For depths $K \ge 1$ and precision $L \ge 1$:
     B_K = \left\{ n \in \N : d_j(2^n) \in \{0, 1\} \text{ for all } 0 \le j < K \right\}.
     \end{equation}
     By Lemma~\ref{lem:saye_period}, membership $n \in B_K$ is purely periodic, determined strictly by the residue class $n \bmod u_K$, where $u_K = 2 \cdot 3^{K-1}$.
-    \item \textbf{Cantor Integer Set $\mathcal{C}_{\mathbb{N}}$:} The set of all integers whose complete ternary expansion omits the digit $2$:
+    \item \textbf{Cantor Integer Set $\mathcal{C}_{\mathbb{N}}$ and Exponent Set $E_{\mathcal{C}}$:} The set $\mathcal{C}_{\mathbb{N}}$ consists of all natural numbers whose complete ternary expansion omits the digit $2$:
     \begin{equation}
-    \mathcal{C}_{\mathbb{N}} = \left\{ n \in \N : 2^n = \sum_{j=0}^{M_n} d_j(2^n) 3^j, \quad d_j(2^n) \in \{0, 1\} \text{ for all } j \ge 0 \right\}.
+    \mathcal{C}_{\mathbb{N}} = \left\{ m \in \N : d_j(m) \in \{0, 1\} \text{ for all } j \ge 0 \right\}.
+    \end{equation}
+    The corresponding power-of-two exponent set is:
+    \begin{equation}
+    E_{\mathcal{C}} = \left\{ n \in \N : 2^n \in \mathcal{C}_{\mathbb{N}} \right\}.
     \end{equation}
     \item \textbf{Leading Prefix Filter $A_L$:} The set of integers $n$ whose leading $L$ ternary digits contain no digit $2$:
     \begin{equation}
@@ -251,7 +255,7 @@ For depths $K \ge 1$ and precision $L \ge 1$:
 \end{enumerate}
 \end{definition}
 
-Clearly, $\mathcal{C}_{\mathbb{N}} \subseteq A_L$ for every $L \ge 1$, so exhibiting any digit $2$ (whether in the leading prefix, in a middle window, or in trailing blocks) establishes $2^n \notin \mathcal{C}$ and excludes $n$ from $\mathcal{C}_{\mathbb{N}}$. 
+Clearly, $E_{\mathcal{C}} \subseteq A_L$ for every $L \ge 1$, so exhibiting any digit $2$ (whether in the leading prefix, in a middle window, or in trailing blocks) establishes $2^n \notin \mathcal{C}_{\mathbb{N}}$ and excludes $n$ from $E_{\mathcal{C}}$. 
 
 For small depths $K \in \{5, \dots, 9\}$, $2^n$ can be computed as a full big integer; direct evaluation verifies that every candidate $n \in [0, u_K) \cap B_K \setminus \{0, 2, 8\}$ exhibits a digit $2$ among its leading $L = 30$ digits ($n \notin A_{30}$). For larger depths $K \in \{10, \dots, 18\}$, evaluating $2^n$ as full arbitrary-precision integers ($n \approx 10^7$ to $2.58 \times 10^8$) is computationally prohibitive. Instead, the formalization verifies Cantor non-membership via efficient modular windows modulo $3^{50}$:
 \begin{itemize}

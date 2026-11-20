@@ -348,14 +348,15 @@ theorem checkBridge_extract {K r : Nat}
 theorem pow2_not_cantor_for_large_K (K : Nat) (hK : K ≥ 13) (r : Nat)
     (hr : r ∈ computeNKFast K) (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
     ¬(memCantorNat (2 ^ r)) := by
-  have hcases : K = 13 ∨ K = 14 ∨ K = 15 ∨ K = 16 ∨ K = 17 ∨ K ≥ 18 := by omega
-  rcases hcases with rfl | rfl | rfl | rfl | rfl | h18
+  have hcases : K = 13 ∨ K = 14 ∨ K = 15 ∨ K = 16 ∨ K = 17 ∨ K = 18 ∨ K > 18 := by omega
+  rcases hcases with rfl | rfl | rfl | rfl | rfl | rfl | hgt18
   · exact bridge_K13_not_cantor r hr hSpecial
   · exact bridge_K14_not_cantor r hr hSpecial
   · exact bridge_K15_not_cantor r hr hSpecial
   · exact bridge_K16_not_cantor r hr hSpecial
   · exact bridge_K17_not_cantor r hr hSpecial
-  · exact ostrowski_invariant K h18 r hr hSpecial.1 hSpecial.2.1 hSpecial.2.2
+  · exact bridge_K18_not_cantor r hr hSpecial
+  · exact ostrowski_invariant K hgt18 r hr hSpecial.1 hSpecial.2.1 hSpecial.2.2
 
 def checkBridgeCantor (K : Nat) : Bool :=
   let nK := computeNKFast K
