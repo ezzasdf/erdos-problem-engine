@@ -349,7 +349,7 @@ For negative powers $2^{-n}$, the rational expansion is periodic of period $P = 
 \enlargethispage{2\baselineskip}
 \section{Lean 4 Formalization}\label{sec:formalization}
 
-All theoretical results in this paper have been formalized and verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. The nine modules listed below are pure foundational (no \texttt{native\_decide}). The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified separately in the bridge module suite (\texttt{Bridge.lean} through \texttt{BridgeK18.lean}) using \texttt{native\_decide} certificates for $K=13,\dots,18$; these are quarantined from the structural theorems. The complete machine-checked formalization, proofs, and verification scripts are openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
+All theoretical results in this paper have been formalized and verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. The first nine modules listed below are pure foundational (no \texttt{native\_decide}). The First-Period Bridge Theorem (Theorem~\ref{thm:bridge}) is verified separately in the bridge module suite (\texttt{Bridge.lean} through \texttt{BridgeK18.lean}) using \texttt{native\_decide} certificates for $K=5,\dots,18$; these are quarantined from the structural theorems. The complete machine-checked formalization, proofs, and verification scripts are openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
 {\sloppy
 \begin{itemize}\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
     \item \texttt{RepunitBase4.lean}: Formalizes $4^s = 3 R_s(4) + 1$ and the digit index shift.
@@ -361,7 +361,7 @@ All theoretical results in this paper have been formalized and verified in Lean~
     \item \texttt{RepunitCarryPacket.lean}: Proves Lemma~\ref{lem:non_recurrence} (Mod-8 Non-Recurrence of the $64(1+3^s)$ Carry Packet).
     \item \texttt{NegativePower.lean}: Proves Theorem~\ref{thm:neg_power} (Negative-Power Theorem, LTE 2-adic lift, and Gap Lemma orbit surjectivity).
     \item \texttt{RepunitCarryConnection.lean}: Formalizes the spectral and recurrence properties of the carry transfer matrix $A = \begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}$: characteristic polynomial equivalence to $M = 4$, Perron eigenvalue $\phi = (1+\sqrt{5})/2$, and the population recurrence matching the Golden Mean shift word count $F_{n+2}$.
-    \item \texttt{BridgeSuite}: The formalization suite for Theorem~\ref{thm:bridge} (First-Period Bridge), comprising modules \texttt{Bridge}, \texttt{BridgeCompute}, \texttt{BridgeMiddle}, \texttt{BridgeCandidates}, \texttt{BridgeK13}--\texttt{BridgeK18}, and \texttt{BridgeUniform}.
+    \item \texttt{BridgeSuite}: The computational certificate suite for Theorem~\ref{thm:bridge} (First-Period Bridge), comprising modules \texttt{Bridge}, \texttt{BridgeCompute}, \texttt{BridgeMiddle}, \texttt{BridgeCandidates}, \texttt{BridgeK13}--\texttt{BridgeK18}, and \texttt{BridgeUniform}.
 \end{itemize}\par}
 
 \subsection{Trust Model and Axiom Inventory}
