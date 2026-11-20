@@ -207,12 +207,13 @@ This completes the classification.
 
 ---
 
-\section{Exact Hausdorff Dimension Table ($M \le 300$)}
+\section{Exact Hausdorff Dimension Table (\texorpdfstring{$M \le 300$}{M <= 300})}
 
 Table~\ref{tab:dimension_table} provides the certified exact Hausdorff dimensions for representative integer multipliers up to $M = 300$, computed via symbolic carry-automaton state space minimization.
 
 \begin{table}[htbp]
 \centering
+\small
 \caption{Exact Hausdorff dimensions of $C(1, M)$ for representative multipliers $M \le 300$. All minimal polynomial factors are exact algebraic factors.}\label{tab:dimension_table}
 \begin{tabular}{rcccl}
 \toprule
@@ -226,20 +227,21 @@ $7$  & $\log_3 \phi \approx 0.438018$ & $4$  & $x^2 - x - 1$         & \textbf{E
 $10$ & $\log_3 \phi \approx 0.438018$ & $4$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=2$): $\phi = \frac{1+\sqrt{5}}{2}$ \\
 $13$ & $\log_3 \lambda_3 \approx 0.347934$ & $3$ & $x^3 - x^2 - 1$  & Non-extremizer (Family 2, $(1, 3)$): Narayana root \\
 $16$ & $\log_3 \psi \approx 0.255959$ & $5$ & $x^3 - x - 1$            & Non-extremizer ($3^5 - 3^4 + 1$): Plastic constant \\
-$19$ & $\log_3 \lambda_3 \approx 0.347934$ & $4$ & $x^3 - x^2 - 1$  & Non-extremizer (Family 2, $(2, 3)$): Dual to $13$ \\
+$19$ & $\log_3 \lambda_3 \approx 0.347934$ & $4$ & $x^3 - x^2 - 1$  & Non-extremizer (Family 2, $(2, 3)$): Dual to $13$ ($\lambda(2,3) = \lambda(1,3)$) \\
 $28$ & $\log_3 \phi \approx 0.438018$ & $6$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=3$): $\phi = \frac{1+\sqrt{5}}{2}$ \\
-$55$ & $\log_3 \lambda_4 \approx 0.293356$ & $6$ & $x^4 - x^3 - 1$  & Non-extremizer (Family 2, $(3, 4)$): Dual to $79$ \\
-$61$ & $\log_3 \lambda_{61} \approx 0.410672$ & $8$ & $x^5 - x^4 - x^2 - 1$ & \textbf{Max Non-Extremizer}: gap to $\phi$ is $0.0273$ \\
+$55$ & $\log_3 \lambda_4 \approx 0.293356$ & $6$ & $x^4 - x^3 - 1$  & Non-extremizer (Family 2, $(3, 4)$): Dual to $79$ ($\lambda(3,4) = \lambda(1,4)$) \\
+$61$ & $\log_3 \lambda_{61} \approx 0.410672$ & $8$ & $x^5 - x^4 - x^2 - 1$ & \textbf{Max Non-Extremizer}: gap $0.0273$ (cospectral to $5905$) \\
 $73$ & $\log_3 \phi \approx 0.438018$ & $16$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 2, $(2, 4)$): $\phi = \frac{1+\sqrt{5}}{2}$ \\
-$79$ & $\log_3 \lambda_4 \approx 0.293356$ & $8$ & $x^4 - x^3 - 1$  & Non-extremizer (Family 2, $(1, 4)$): $\lambda \approx 1.3803$ \\
+$79$ & $\log_3 \lambda_4 \approx 0.293356$ & $8$ & $x^4 - x^3 - 1$  & Non-extremizer (Family 2, $(1, 4)$): Dual to $55$ ($\lambda(1,4) = \lambda(3,4)$) \\
 $82$ & $\log_3 \phi \approx 0.438018$ & $8$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=4$): $\phi = \frac{1+\sqrt{5}}{2}$ \\
-$235$& $\log_3 \lambda_{235} \approx 0.312255$ & $11$ & degree $11$ factor & Non-extremizer (Family 2, $(2, 5)$): Dual to $217$ \\
+$217$& $\log_3 \lambda_{235} \approx 0.312255$ & $15$ & degree $15$ factor & Non-extremizer (Family 2, $(3, 5)$): Dual to $235$ ($\lambda(3,5) = \lambda(2,5)$) \\
+$235$& $\log_3 \lambda_{235} \approx 0.312255$ & $11$ & degree $11$ factor & Non-extremizer (Family 2, $(2, 5)$): Dual to $217$ ($\lambda(2,5) = \lambda(3,5)$) \\
 $244$& $\log_3 \phi \approx 0.438018$ & $10$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 1, $k=5$): $\phi = \frac{1+\sqrt{5}}{2}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\noindent\textbf{Table Note on Exactness:} All characteristic polynomials and minimal polynomial factors in Table~\ref{tab:dimension_table} are exact algebraic factors computed via symbolic determinant expansion of the minimal carry automaton. In all cases, including higher degrees (e.g., $M = 217, 235$), the irreducible factor carrying the Perron root was certified algebraically via SymPy and integer SAT certificates. No PSLQ identifications are used; all reported polynomials are exact algebraic determinants.
+\noindent\textbf{Table Note on Exactness and Symmetries:} All characteristic polynomials and minimal polynomial factors in Table~\ref{tab:dimension_table} are exact algebraic factors computed via symbolic determinant expansion of the minimal carry automaton. In all cases, including higher degrees (e.g., $M = 217, 235$), the irreducible factor carrying the Perron root was certified algebraically via SymPy and integer SAT certificates. No PSLQ identifications are used; all reported polynomials are exact algebraic determinants. Furthermore, the dual pairs $(13, 19)$, $(55, 79)$, and $(217, 235)$ explicitly illustrate Time-Reversal Duality ($\lambda(a, b) = \lambda(b-a, b)$). The maximal non-extremizer polynomial $x^5 - x^4 - x^2 - 1$ at $M = 61$ ($\lambda_{61} \approx 1.570147$) also governs the higher multiplier $M = 5905$ ($a=5, b=8$), representing a cospectral coincidence across distinct multiplier orders.
 
 ---
 

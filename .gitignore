@@ -25,3 +25,11 @@ Thumbs.db
 .superpowers/*.csv
 *.pyc
 verify_middle/results_m1.csv
+
+# LaTeX auxiliary files
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
