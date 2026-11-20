@@ -152,9 +152,11 @@ theorem pow3_lte_decomp (m : ℕ) : ∃ c : ℕ, 3 ^ (2 ^ (m + 1)) = 1 + 2 ^ (m 
     have hP2 : 2 ^ (m + 4) = 2 * 2 ^ (m + 3) := by
       rw [Nat.pow_succ, mul_comm]
     have hP4 : 2 ^ (m + 5) = 4 * 2 ^ (m + 3) := by
-      have : m + 5 = (m + 3) + 2 := by omega
-      rw [this, Nat.pow_add]
-      decide
+      have : 2 ^ (m + 5) = 2 ^ (m + 3) * 2 ^ 2 := by
+        have : m + 5 = (m + 3) + 2 := by omega
+        rw [this, Nat.pow_add]
+      rw [this]
+      ring
     rw [hP2, hP4]
     exact lte_algebra_step m c
 
@@ -172,18 +174,23 @@ lemma pow3_odd (k : ℕ) : ∃ j, 3 ^ k = 2 * j + 1 := by
 /-- Shift identity: 3^(k + 2^(n-2)) = 3^k + 2^n modulo 2^(n+1). -/
 theorem pow3_shift_decomp (n k : ℕ) (hn : 3 ≤ n) :
     ∃ C : ℕ, 3 ^ (k + 2 ^ (n - 2)) = 3 ^ k + 2 ^ n + C * 2 ^ (n + 1) := by
-  obtain ⟨m, hm⟩ : ∃ m, n = m + 3 := Nat.exists_eq_add_of_le hn
-  subst hm
-  have h2n : m + 3 - 2 = m + 1 := by omega
-  have h2np1 : m + 3 + 1 = m + 4 := by omega
+  obtain ⟨m, hm⟩ : ∃ m, n = 3 + m := Nat.exists_eq_add_of_le hn
+  have h2n : n - 2 = m + 1 := by omega
+  have h2np1 : 2 ^ (n + 1) = 2 * 2 ^ (m + 3) := by
+    have : n + 1 = (m + 3) + 1 := by omega
+    rw [this, Nat.pow_succ, mul_comm]
+  have h2nm3 : 2 ^ n = 2 ^ (m + 3) := by
+    have : n = m + 3 := by omega
+    rw [this]
   obtain ⟨c, hc⟩ := pow3_lte_decomp m
   obtain ⟨j, hj⟩ := pow3_odd k
+  rw [h2n]
   have hpow : 3 ^ (k + 2 ^ (m + 1)) = 3 ^ k * 3 ^ (2 ^ (m + 1)) := pow_add 3 k (2 ^ (m + 1))
   rw [hpow, hc]
   use (j + 3 ^ k * c)
   have h2pow : 2 ^ (m + 4) = 2 * 2 ^ (m + 3) := by
     rw [Nat.pow_succ, mul_comm]
-  rw [h2pow]
+  rw [h2pow, h2np1, h2nm3]
   have hj2 : 3 ^ k * 2 ^ (m + 3) = j * (2 * 2 ^ (m + 3)) + 2 ^ (m + 3) := by
     rw [hj]
     ring
@@ -196,7 +203,9 @@ theorem pow3_shift_decomp (n k : ℕ) (hn : 3 ≤ n) :
 theorem pow3_shift_mod (n k : ℕ) (hn : 3 ≤ n) :
     3 ^ (k + 2 ^ (n - 2)) % 2 ^ (n + 1) = (3 ^ k + 2 ^ n) % 2 ^ (n + 1) := by
   obtain ⟨C, hC⟩ := pow3_shift_decomp n k hn
-  rw [hC, Nat.add_assoc, Nat.add_mul_mod_self_right]
+  rw [hC]
+  have : 3 ^ k + 2 ^ n + C * 2 ^ (n + 1) = (3 ^ k + 2 ^ n) + 2 ^ (n + 1) * C := by ring
+  rw [this, Nat.add_mul_mod_self_left]
 
 lemma mod_eight_eq_of_dvd_eight {n : ℕ} (hn : 3 ≤ n) (y : ℕ) :
     (y % 2 ^ n) % 8 = y % 8 := by
@@ -207,75 +216,76 @@ lemma mod_eight_eq_of_dvd_eight {n : ℕ} (hn : 3 ≤ n) (y : ℕ) :
     exact dvd_mul_right 8 (2 ^ m)
   exact Nat.mod_mod_of_dvd y hdvd
 
-lemma residue_split {n z : ℕ} (hz : z < 2 ^ (n + 1)) :
-    z = z % 2 ^ n ∨ z = z % 2 ^ n + 2 ^ n := by
-  have hdiv : z / 2 ^ n < 2 := by
-    have h2np1 : 2 ^ (n + 1) = 2 ^ n * 2 := by rw [Nat.pow_succ, mul_comm]
-    have : z < 2 ^ n * 2 := by rwa [← h2np1]
+lemma eq_or_eq_add_pow2 {n z x : ℕ} (hz : z < 2 ^ (n + 1)) (hx : z % 2 ^ n = x) :
+    z = x ∨ z = x + 2 ^ n := by
+  have : z / 2 ^ n < 2 := by
+    have : z < 2 ^ n * 2 := by
+      have h2 : 2 ^ (n + 1) = 2 ^ n * 2 := by rw [Nat.pow_succ, mul_comm]
+      rwa [← h2]
     exact Nat.div_lt_of_lt_mul this
-  have hz_eq := (Nat.div_add_mod z (2 ^ n)).symm
+  have hz_decomp := (Nat.div_add_mod z (2 ^ n)).symm
+  rw [hx] at hz_decomp
   interval_cases z / 2 ^ n
   · left; omega
   · right; omega
 
-theorem pow3_orbit_surj_aux (d : ℕ) :
-    ∀ (x : ℕ), x < 2 ^ (d + 3) → isCoset13 x → ∃ k, 3 ^ k % 2 ^ (d + 3) = x := by
-  induction d with
-  | zero =>
-    intro x hx hcoset
-    dsimp [isCoset13] at hcoset
-    have hxmod : x % 8 = x := Nat.mod_eq_of_lt (by omega)
-    rw [hxmod] at hcoset
-    rcases hcoset with rfl | rfl
-    · use 0; decide
-    · use 1; decide
-  | succ d ih =>
-    intro y hy hcoset
-    let n := d + 3
-    have hn3 : 3 ≤ n := by omega
-    have hyn : y < 2 ^ (n + 1) := hy
-    let x := y % 2 ^ n
-    have hx_lt : x < 2 ^ n := Nat.mod_lt y (by positivity)
-    have hcoset_x : isCoset13 x := by
-      dsimp [isCoset13] at hcoset ⊢
-      rwa [mod_eight_eq_of_dvd_eight hn3]
-    obtain ⟨k, hk⟩ := ih x hx_lt hcoset_x
-    let r := 3 ^ k % 2 ^ (n + 1)
-    have hr_lt : r < 2 ^ (n + 1) := Nat.mod_lt _ (by positivity)
-    have hr_mod : r % 2 ^ n = x := by
-      dsimp [r]
-      have hdvd : 2 ^ n ∣ 2 ^ (n + 1) := ⟨2, by rw [Nat.pow_succ, mul_comm]⟩
-      rw [Nat.mod_mod_of_dvd _ hdvd, hk]
-    have hy_cases : y = x ∨ y = x + 2 ^ n := residue_split hyn
-    have hr_cases : r = x ∨ r = x + 2 ^ n := by
-      have := residue_split hr_lt
-      rwa [hr_mod] at this
-    by_cases h : r = y
-    · use k
-      exact h
-    · use (k + 2 ^ (n - 2))
-      rw [pow3_shift_mod n k hn3]
-      have hshift : (3 ^ k + 2 ^ n) % 2 ^ (n + 1) = (r + 2 ^ n) % 2 ^ (n + 1) := by
-        rw [Nat.add_mod, Nat.mod_mod (3 ^ k), ← Nat.add_mod]
-      rw [hshift]
-      rcases hy_cases with rfl | rfl <;> rcases hr_cases with hr_eq | hr_eq
-      · contradiction
-      · have : (x + 2 ^ n + 2 ^ n) = x + 2 ^ (n + 1) := by
-          have : 2 ^ n + 2 ^ n = 2 ^ (n + 1) := by rw [Nat.pow_succ, mul_comm, mul_two]
-          omega
-        rw [hr_eq, this, Nat.add_mod_right, Nat.mod_eq_of_lt (by omega)]
-      · rw [hr_eq, Nat.mod_eq_of_lt]
-        have : x < 2 ^ n := hx_lt
-        have : 2 ^ (n + 1) = 2 ^ n + 2 ^ n := by rw [Nat.pow_succ, mul_comm, mul_two]
-        omega
-      · contradiction
+lemma shift_mod_eq (k p : ℕ) :
+    (3 ^ k + 2 ^ p) % 2 ^ (p + 1) = (3 ^ k % 2 ^ (p + 1) + 2 ^ p) % 2 ^ (p + 1) := by
+  have : (3 ^ k + 2 ^ p) % 2 ^ (p + 1) = (3 ^ k % 2 ^ (p + 1) + 2 ^ p % 2 ^ (p + 1)) % 2 ^ (p + 1) := by
+    rw [Nat.add_mod]
+  rw [this]
+  have hlt : 2 ^ p < 2 ^ (p + 1) := by
+    have : 2 ^ (p + 1) = 2 ^ p * 2 := by rw [Nat.pow_succ, mul_comm]
+    omega
+  rw [Nat.mod_eq_of_lt hlt]
 
 /-- Subgroup surjectivity: The orbit ⟨3⟩ mod 2^n traverses all residues in [0, 2^n)
     congruent to 1 or 3 mod 8. -/
-theorem pow3_orbit_surj (n : ℕ) (hn : 3 ≤ n) (x : ℕ) (hx : x < 2 ^ n) (hcoset : isCoset13 x) :
-    ∃ k, 3 ^ k % 2 ^ n = x := by
-  obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hn
-  exact pow3_orbit_surj_aux d x hx hcoset
+theorem pow3_orbit_surj :
+    ∀ (n : ℕ), 3 ≤ n → ∀ (x : ℕ), x < 2 ^ n → isCoset13 x → ∃ k, 3 ^ k % 2 ^ n = x := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | h n ih =>
+    intro hn x hx hcoset
+    rcases eq_or_lt_of_le hn with rfl | hn_gt
+    · dsimp [isCoset13] at hcoset
+      have hxmod : x % 8 = x := Nat.mod_eq_of_lt (by omega)
+      rw [hxmod] at hcoset
+      rcases hcoset with rfl | rfl
+      · use 0; decide
+      · use 1; decide
+    · obtain ⟨p, rfl⟩ : ∃ p, n = p + 1 := Nat.exists_eq_succ_of_ne_zero (by omega)
+      have hp3 : 3 ≤ p := by omega
+      let x0 := x % 2 ^ p
+      have hx0_lt : x0 < 2 ^ p := Nat.mod_lt x (by positivity)
+      have hcoset_x0 : isCoset13 x0 := by
+        dsimp [isCoset13] at hcoset ⊢
+        rwa [mod_eight_eq_of_dvd_eight hp3]
+      have hlt : p < p + 1 := Nat.lt_succ_self p
+      obtain ⟨k, hk⟩ := ih p hlt hp3 x0 hx0_lt hcoset_x0
+      let r := 3 ^ k % 2 ^ (p + 1)
+      have hr_lt : r < 2 ^ (p + 1) := Nat.mod_lt _ (by positivity)
+      have hr_mod : r % 2 ^ p = x0 := by
+        dsimp [r]
+        have hdvd : 2 ^ p ∣ 2 ^ (p + 1) := ⟨2, by rw [Nat.pow_succ, mul_comm]⟩
+        rw [Nat.mod_mod_of_dvd _ hdvd, hk]
+      have hx_cases : x = x0 ∨ x = x0 + 2 ^ p := eq_or_eq_add_pow2 hx rfl
+      have hr_cases : r = x0 ∨ r = x0 + 2 ^ p := eq_or_eq_add_pow2 hr_lt hr_mod
+      by_cases h : r = x
+      · use k
+      · use (k + 2 ^ (p - 2))
+        rw [pow3_shift_mod p k hp3, shift_mod_eq k p]
+        change (r + 2 ^ p) % 2 ^ (p + 1) = x
+        rcases hx_cases with hx_eq | hx_eq <;> rcases hr_cases with hr_eq | hr_eq
+        · rw [hx_eq, hr_eq] at h
+          contradiction
+        · rw [hx_eq, hr_eq]
+          have : (x0 + 2 ^ p + 2 ^ p) = x0 + 2 ^ (p + 1) := by omega
+          rw [this, Nat.add_mod_right, Nat.mod_eq_of_lt (by omega)]
+        · rw [hx_eq, hr_eq]
+          exact Nat.mod_eq_of_lt (by omega)
+        · rw [hx_eq, hr_eq] at h
+          contradiction
 
 /-- Orbit Target Intersection: For all n ≥ 5, the cyclic orbit of 3 mod 2^n
     visits the target interval [threshold n, 2^n). -/
@@ -284,6 +294,7 @@ theorem exists_target_pow3 {n : ℕ} (hn : 5 ≤ n) :
   obtain ⟨x, hA, hB, hcoset⟩ := exists_target_residue hn
   have hn3 : 3 ≤ n := by omega
   obtain ⟨k, hk⟩ := pow3_orbit_surj n hn3 x hB hcoset
+  use k
   rw [hk]
   exact ⟨hA, hB⟩
 
