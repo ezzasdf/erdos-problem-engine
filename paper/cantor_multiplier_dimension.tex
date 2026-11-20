@@ -214,29 +214,30 @@ Table~\ref{tab:dimension_table} provides the certified exact Hausdorff dimension
 \begin{table}[htbp]
 \centering
 \small
+\setlength{\tabcolsep}{4pt}
 \caption{Exact Hausdorff dimensions of $C(1, M)$ for representative multipliers $M \le 300$. All minimal polynomial factors are exact algebraic factors.}\label{tab:dimension_table}
-\begin{tabular}{rcccl}
+\begin{tabular}{rcclp{3.8cm}}
 \toprule
-$M$ & Exact $\dimH C(1, M)$ & States & Minimal Poly Factor & Multiplier Classification \\
+$M$ & Exact $\dimH C(1, M)$ & States & Minimal Factor & Classification \& Duality \\
 \midrule
-$1$  & $\log_3 2 \approx 0.630930$ & $1$  & $x - 2$               & Pure $3$-power ($3^0$), $\dim = \log_3 2$ \\
+$1$  & $\log_3 2 \approx 0.630930$ & $1$  & $x - 2$               & Pure $3$-power ($3^0$) \\
 $2$  & $0$                         & $1$  & $x$                   & Null multiplier ($C(1, 2) = \{0\}$) \\
-$3$  & $\log_3 2 \approx 0.630930$ & $2$  & $x - 2$               & Pure $3$-power ($3^1$), $\dim = \log_3 2$ \\
-$4$  & $\log_3 \phi \approx 0.438018$ & $2$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=1$): $\phi = \frac{1+\sqrt{5}}{2}$ \\
-$7$  & $\log_3 \phi \approx 0.438018$ & $4$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 2, $(1, 2)$): $\phi = \frac{1+\sqrt{5}}{2}$ \\
-$10$ & $\log_3 \phi \approx 0.438018$ & $4$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=2$): $\phi = \frac{1+\sqrt{5}}{2}$ \\
-$13$ & $\log_3 \lambda_3 \approx 0.347934$ & $3$ & $x^3 - x^2 - 1$  & Non-extremizer (Family 2, $(1, 3)$): Narayana root \\
-$16$ & $\log_3 \psi \approx 0.255959$ & $5$ & $x^3 - x - 1$            & Non-extremizer ($3^5 - 3^4 + 1$): Plastic constant \\
-$19$ & $\log_3 \lambda_3 \approx 0.347934$ & $4$ & $x^3 - x^2 - 1$  & Non-extremizer (Family 2, $(2, 3)$): Dual to $13$ ($\lambda(2,3) = \lambda(1,3)$) \\
-$28$ & $\log_3 \phi \approx 0.438018$ & $6$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=3$): $\phi = \frac{1+\sqrt{5}}{2}$ \\
-$55$ & $\log_3 \lambda_4 \approx 0.293356$ & $6$ & $x^4 - x^3 - 1$  & Non-extremizer (Family 2, $(3, 4)$): Dual to $79$ ($\lambda(3,4) = \lambda(1,4)$) \\
-$61$ & $\log_3 \lambda_{61} \approx 0.410672$ & $8$ & $x^5 - x^4 - x^2 - 1$ & \textbf{Max Non-Extremizer}: gap $0.0273$ (cospectral to $5905$) \\
-$73$ & $\log_3 \phi \approx 0.438018$ & $16$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 2, $(2, 4)$): $\phi = \frac{1+\sqrt{5}}{2}$ \\
-$79$ & $\log_3 \lambda_4 \approx 0.293356$ & $8$ & $x^4 - x^3 - 1$  & Non-extremizer (Family 2, $(1, 4)$): Dual to $55$ ($\lambda(1,4) = \lambda(3,4)$) \\
-$82$ & $\log_3 \phi \approx 0.438018$ & $8$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=4$): $\phi = \frac{1+\sqrt{5}}{2}$ \\
-$217$& $\log_3 \lambda_{235} \approx 0.312255$ & $15$ & degree $15$ factor & Non-extremizer (Family 2, $(3, 5)$): Dual to $235$ ($\lambda(3,5) = \lambda(2,5)$) \\
-$235$& $\log_3 \lambda_{235} \approx 0.312255$ & $11$ & degree $11$ factor & Non-extremizer (Family 2, $(2, 5)$): Dual to $217$ ($\lambda(2,5) = \lambda(3,5)$) \\
-$244$& $\log_3 \phi \approx 0.438018$ & $10$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 1, $k=5$): $\phi = \frac{1+\sqrt{5}}{2}$ \\
+$3$  & $\log_3 2 \approx 0.630930$ & $2$  & $x - 2$               & Pure $3$-power ($3^1$) \\
+$4$  & $\log_3 \phi \approx 0.438018$ & $2$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=1$) \\
+$7$  & $\log_3 \phi \approx 0.438018$ & $4$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 2, $(1, 2)$) \\
+$10$ & $\log_3 \phi \approx 0.438018$ & $4$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=2$) \\
+$13$ & $\log_3 \lambda_3 \approx 0.347934$ & $3$ & $x^3 - x^2 - 1$  & Non-extremizer (Family 2, $(1, 3)$) \\
+$16$ & $\log_3 \psi \approx 0.255959$ & $5$ & $x^3 - x - 1$            & Non-extremizer ($3^5 - 3^4 + 1$) \\
+$19$ & $\log_3 \lambda_3 \approx 0.347934$ & $4$ & $x^3 - x^2 - 1$  & Non-extremizer (Family 2, $(2, 3)$): Dual to $13$ \\
+$28$ & $\log_3 \phi \approx 0.438018$ & $6$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=3$) \\
+$55$ & $\log_3 \lambda_4 \approx 0.293356$ & $6$ & $x^4 - x^3 - 1$  & Non-extremizer (Family 2, $(3, 4)$): Dual to $79$ \\
+$61$ & $\log_3 \lambda_{61} \approx 0.410672$ & $8$ & $x^5 - x^4 - x^2 - 1$ & \textbf{Max Non-Extremizer} (cospectral to $5905$) \\
+$73$ & $\log_3 \phi \approx 0.438018$ & $16$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 2, $(2, 4)$) \\
+$79$ & $\log_3 \lambda_4 \approx 0.293356$ & $8$ & $x^4 - x^3 - 1$  & Non-extremizer (Family 2, $(1, 4)$): Dual to $55$ \\
+$82$ & $\log_3 \phi \approx 0.438018$ & $8$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=4$) \\
+$217$& $\log_3 \lambda_{235} \approx 0.312255$ & $15$ & degree $15$ factor & Non-extremizer (Family 2, $(3, 5)$): Dual to $235$ \\
+$235$& $\log_3 \lambda_{235} \approx 0.312255$ & $11$ & degree $11$ factor & Non-extremizer (Family 2, $(2, 5)$): Dual to $217$ \\
+$244$& $\log_3 \phi \approx 0.438018$ & $10$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 1, $k=5$) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -249,7 +250,7 @@ $244$& $\log_3 \phi \approx 0.438018$ & $10$ & $x^2 - x - 1$        & \textbf{Ex
 
 All major algebraic and dynamical theorems in this paper have been formalized in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}:
 \begin{itemize}
-    \item \texttt{CantorMultiplier.lean}: Formalizes Condition~(S), the upper bound $\dimH \le \log_3 \phi$, and the attainment on Family~1 and Family~2.
+    \item \texttt{CantorMultiplier.lean}: Formalizes Condition~(S), proving $\dimH \le \log_3 \phi$ and its attainment on Family~1 and Family~2.
     \item \texttt{TimeReversal.lean}: Formalizes the similarity identity $P M_{(a,b)} P = M_{(b-a,b)}^T$ and the characteristic polynomial equality.
     \item \texttt{PeriodicOrbit.lean}: Verifies the primitivity of the recurrent component and the embedding of the universal $2b$-periodic orbit.
     \item \texttt{RepunitCarryConnection.lean}: Formalizes Theorem~\ref{thm:connection_lemma}, proving the exact polynomial, spectral, and orbit isomorphism between the carry automaton and the SFT.
@@ -258,7 +259,7 @@ All major algebraic and dynamical theorems in this paper have been formalized in
 
 An exhaustive, automated axiom audit across the entire formalization confirms:
 \begin{itemize}
-    \item \textbf{182 of 270 declarations} in the core formalization are pure foundational, depending exclusively on standard Lean foundation: \texttt{[propext, Classical.choice, Quot.sound]};
+    \item \textbf{182 of 270 declarations} in the core formalization are pure foundational, depending exclusively on standard Lean foundation: \linebreak\texttt{[propext, Classical.choice, Quot.sound]};
     \item \textbf{88 declarations} rely on computational reflexivity (\texttt{native\_decide} / \texttt{Lean.ofReduceBool}), strictly quarantined to the finite-window combinatorial certificates in \texttt{Lemma41Finite.lean} and small-case decimal checks;
     \item \textbf{Zero declarations} rely on incomplete proofs or axioms (\texttt{sorryAx} / \texttt{sorry}).
 \end{itemize}
