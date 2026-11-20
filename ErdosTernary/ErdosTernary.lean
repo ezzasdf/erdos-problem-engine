@@ -16,3 +16,4 @@ import ErdosTernary.RepunitLifting
 import ErdosTernary.RepunitTreeIso
 import ErdosTernary.RepunitArchimedean
 import ErdosTernary.RepunitDynamics
+import ErdosTernary.RepunitDiophantine

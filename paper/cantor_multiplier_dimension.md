@@ -547,6 +547,12 @@ The table below delineates the machine-checked status of each component of the p
 | **Thm 4.2** | Time-Reversal Duality $P M_{(a,b)} P = M_{(b-a,b)}^T$ | `ErdosTernary/TimeReversal.lean` (`boundary_case2_charpoly_eq_boundary_case1`) | **[Lean]** | `[propext, Classical.choice, Quot.sound]` |
 | **Thm 4.3** | Component Primitivity & $2b$-Periodic Orbit | `ErdosTernary/PeriodicOrbit.lean` (`recurrent_component_has_period_one`, `periodicSeq_constraint`) | **[Lean]** | `[propext, Quot.sound]` |
 | **Thm 4.3** | Witness Cylinder Embedding ($g = 1, g \ge 2$) | `ErdosTernary/PeriodicOrbit.lean` (`witness_g_eq_1_occurs`, `witness_g_ge_2_occurs`) | **[Lean]** | `[propext, Quot.sound]` |
+| **Repunit** | Base-4 Repunit Coordinates & Digit Shift | `ErdosTernary/RepunitBase4.lean` (`pow4_eq_three_mul_repunit`, `memCantorNat_pow4_iff_memCantorNat_repunit`) | **[Lean]** | `[propext, Quot.sound]` |
+| **Lifting** | 3-Adic Modular Lifting Dynamics (2-of-3) | `ErdosTernary/RepunitLifting.lean` (`two_admissible_of_three`, `digit3_add_mul_lower`) | **[Lean]** | `[propext, Classical.choice, Quot.sound]` |
+| **Tree Iso** | Rooted Tree Isomorphism $\mathcal{T}_{\text{rep}} \cong \mathcal{T}_{\text{pow}}$ | `ErdosTernary/RepunitTreeIso.lean` (`survivor_vertex_equiv`, `branching_isomorphism`) | **[Lean]** | `[propext, Quot.sound]` |
+| **Decoupling**| Archimedean-Adic Decoupling & Reduction | `ErdosTernary/RepunitArchimedean.lean` (`erdos_ternary_reduction`, `repunit4_div_three_pow_pos`) | **[Lean]** | `[propext, Classical.choice, Quot.sound]` |
+| **Dynamics** | 3-Adic Conjugacy Recurrence $R_{s+1} = 4R_s + 1$ | `ErdosTernary/RepunitDynamics.lean` (`repunit4_succ`, `repunit4_eq_iterate_T`, `repunit4_mod_compat`) | **[Lean]** | `[propext, Quot.sound]` |
+| **Target**   | Non-Averaged Diophantine Target & Finiteness | `ErdosTernary/RepunitDiophantine.lean` (`erdos_conjecture_iff_jointSurvivors_empty`, `finite_powers_of_two_of_finite_joint`) | **[Lean]** | `[propext, Classical.choice, Quot.sound]` |
 | **Interior** | Interior Domain ($a \ge 2, b - a \ge 2$) Ergodic Gap | §2.5 Steps 8.1–8.4 (Proved in prose; Lean-verified modulo `h_gap`) | **[P] / [Lean*]** | Modular `h_gap` (Birkhoff ergodic theorem) |
 | **Lemma 4.1** | Finite Injectivity Certificates (957 instances) | `scripts/cantor_multiplier/lemma41_hinject.py`, `Lemma41Finite.lean` | **[E]** | Exhaustive symbolic SAT / certificate scan |
 | **Table** | Exact Dimension Table ($M \le 300$) | `scripts/cantor_multiplier/x2p_dim_table.py` | **[E]** | SymPy algebraic charpoly factorization |
@@ -628,24 +634,67 @@ Within the fundamental period $[0, u_K)$, we established the following exact cla
 
 This theorem has been fully formalized and kernel-verified in Lean 4 with **zero `sorry`** across the modules `ErdosTernary.BridgeCompute`, `ErdosTernary.BridgeMiddle`, and `ErdosTernary.BridgeCandidates`.
 
-### 5.4 The Barrier Theorem & Why the Erdős Conjecture Remains Open
+### 5.4 The Modular Sieve Barrier
 
-Despite the complete resolution of the Cantor multiplier dimension program and the formal proof of the Bridge Theorem on the first period, **the classical Erdős Ternary Conjecture remains completely open.**
+The classical trailing-digit filter $B_K(n)$ is purely modular arithmetic modulo $3^K$. Its survivor set $N_K = \{n \in [0, u_K) : B_K(n)\}$ grows as $2^{K-1}$. Because $B_K(n)$ is $u_K$-periodic ($u_K = 2 \cdot 3^{K-1}$), testing trailing digits alone can *never* rule out powers of 2 for large $n \ge u_K$: for every level $K$, there are infinitely many integers $n \equiv r \pmod{u_K}$ with $r \in N_K$ that satisfy $B_K(n)$. Thus, trailing-digit modular analysis alone encounters an insurmountable barrier.
 
-We state this with absolute mathematical honesty, delineating the exact structural barrier:
+### 5.5 Base-4 Repunit Coordinates, Rooted Tree Isomorphism, and 3-Adic Dynamics
 
-1. **The Modular Periodicity Barrier:**
-   The trailing-digit filter $B_K(n)$ is purely modular arithmetic modulo $3^K$. Its survivor set $N_K = \{n \in [0, u_K) : B_K(n)\}$ grows as $2^{K-1}$. Because $B_K(n)$ is $u_K$-periodic, testing trailing digits alone can *never* rule out powers of 2 for large $n \ge u_K$: for every level $K$, there are infinitely many integers $n \equiv r \pmod{u_K}$ with $r \in N_K$ that satisfy $B_K(n)$.
-2. **The Irrational Rotation Obstruction:**
-   The leading ternary digits of $2^n$ are determined by the fractional part of the logarithm:
-   $$\{n \log_3 2\} \pmod 1.$$
-   Because $\alpha = \log_3 2$ is irrational, the sequence $\{n \alpha\}$ is dense and uniformly distributed in $[0, 1]$. To prove that $2^n$ contains a digit 2 for all $n > 8$, one must prove that every survivor $n \ge u_K$ of the trailing-digit sieve $B_K$ has an irrational rotation $\{n \alpha\}$ that lands in the open set $U \subset [0, 1]$ corresponding to leading digit 2.
-3. **The Two Unclosed Frontiers in Lean 4:**
-   In our formal architecture (`ErdosFinalGlue.lean` and `LargeBridge.lean`), completing the global proof of the Erdős conjecture requires discharging two explicit obligations:
-   - *Frontier 1 (Survivor Displacement Distribution):* Proving that for all large $r \ge u_K(13)$, the Ostrowski continued-fraction expansion of $r \alpha$ forces a carry cascade that cannot avoid digit 2.
-   - *Frontier 2 (Global Sieve Disjointness):* Proving that the discrete set of modular survivors $N_K$ and the dense rotation avoidance set are disjoint for all $n > 8$.
+To gain a non-trivial dynamical handle on the survivor tree, we formalize the base-4 repunit coordinate transformation (inspired by Idowu 2026):
 
-Because Frontiers 1 and 2 require deep Diophantine approximation bounds that currently lie beyond existing formal libraries, we make **no claim of having proved the full Erdős Ternary Conjecture.** The conjecture remains a celebrated open challenge.
+1. **Parity and Repunit Coordinate:**
+   Every power of two that belongs to the Cantor set has an even exponent $n = 2s$ (for odd exponents $2^{2s+1}$, the lowest ternary digit is identically $2$, proved in `ErdosTernary.RepunitBase4.digit3_pow2_odd_zero`).
+   We write:
+   $$2^{2s} = 4^s = 3 R_s(4) + 1, \quad \text{where} \quad R_s(4) = \frac{4^s - 1}{3}.$$
+   The ternary digits satisfy an exact index shift:
+   $$d_0(4^s) = 1, \quad \text{and} \quad d_{j+1}(4^s) = d_j(R_s(4)) \quad (\forall j \ge 0).$$
+   Consequently:
+   $$4^s \in \mathcal{C} \iff R_s(4) \in \mathcal{C} \quad (\text{kernel-verified in `memCantorNat_pow4_iff_memCantorNat_repunit`}).$$
+
+2. **Rooted Tree Isomorphism ($\mathcal{T}_{\text{rep}} \cong \mathcal{T}_{\text{pow}}$):**
+   In `ErdosTernary.RepunitTreeIso`, we prove that the repunit survivor tree $\mathcal{T}_{\text{rep}}$ (nodes $s < 3^m$ where $d_j(R_s(4)) \ne 2$ for all $j < m$) is isomorphic as a rooted, edge-labeled binary tree to the power-of-two survivor tree $\mathcal{T}_{\text{pow}}$ (nodes $n < 2 \cdot 3^m$ where $d_j(2^n) \ne 2$ for all $j \le m$):
+   - Vertex map: $n = 2s$ (`survivor_vertex_equiv`).
+   - Edge / Branching map: for each node $s$ and child label $q \in \{0, 1, 2\}$, $s + q \cdot 3^m$ is admissible in $\mathcal{T}_{\text{rep}}$ if and only if $2s + 2q \cdot 3^m$ is admissible in $\mathcal{T}_{\text{pow}}$ (`branching_isomorphism`).
+   At every depth $m$, exactly 2 out of 3 lifts remain admissible, matching the branching factor of $\mathcal{T}_{\text{pow}}$ (`two_admissible_of_three`).
+
+3. **3-Adic Dynamical Conjugacy:**
+   On the natural numbers $\mathbb{N}$, the repunit sequence satisfies the exact affine recurrence:
+   $$R_{s+1}(4) = 4 R_s(4) + 1 = T(R_s(4)), \quad \text{where } T(y) = 4y + 1.$$
+   Iterating from $R_0(4) = 0$ yields $R_s(4) = T^{[s]}(0)$ (`repunit4_eq_iterate_T`).
+   Modulo $3^m$, this induces an exact topological conjugacy on the projective limit $\mathbb{Z}_3 = \varprojlim \mathbb{Z}/3^m\mathbb{Z}$: the translation $s \mapsto s + 1$ (the 3-adic odometer) is topologically conjugated to the affine dynamical map $y \mapsto 4y + 1$ (`repunit4_mod_succ`, `repunit4_mod_compat`).
+
+### 5.6 The Archimedean Decoupling & The Non-Averaged Diophantine Target
+
+The central structural insight formalised in this work is the **Archimedean Decoupling Theorem** (`ErdosTernary.RepunitArchimedean.erdos_ternary_reduction`):
+
+> **Theorem (Archimedean Decoupling, Lean 4 Verified).** For all $s \ge 5$, $4^s > 3^{s+1}$, which implies $R_s(4) \ge 3^s$ and $\lfloor R_s(4)/3^s \rfloor \ge 1$. Consequently, $4^s$ belongs to the Cantor set if and only if:
+> $$s \in \{0, 1, 4\} \quad \lor \quad \Big(s \ge 5 \;\land\; \underbrace{\forall j < s, \; d_j(R_s(4)) \ne 2}_{\text{3-adic tree survivor at depth } s} \;\land\; \underbrace{\lfloor R_s(4) / 3^s \rfloor \in \mathcal{C}}_{\text{Archimedean leading digits}}\Big).$$
+
+This decouples the Erdős problem into two distinct, quantifiable mathematical conditions:
+1. **The 3-Adic Modular Condition:** $s \pmod{3^s}$ must be an $s$-th level survivor in the binary tree $\mathcal{T}_{\text{rep}}$. Because the tree branches 2-of-3 at every depth, the fraction of residue classes surviving to depth $s$ in $\mathbb{Z}/3^s\mathbb{Z}$ is exactly:
+   $$\rho_{\text{adic}}(s) = (2/3)^s.$$
+2. **The Archimedean Leading-Digits Condition:** The high-order quotient $Q(s) = \lfloor R_s(4) / 3^s \rfloor$ must also omit digit 2. The number of high-order digits is:
+   $$\Delta(s) = L(s) - s = \lfloor s \log_3 4 \rfloor - s \approx s (\log_3 4 - 1) \approx 0.26186 s.$$
+   The leading digits are determined by the fractional parts $\{s \log_3 4\} \pmod 1$. Assuming generic equidistribution on Cantor sets, the heuristic probability that these $\Delta(s)$ leading digits omit 2 is:
+   $$\rho_{\text{arch}}(s) \approx (2/3)^{0.26186 s}.$$
+
+#### The Joint Summability Heuristic vs. The Non-Averaged Gap
+Under independent distribution of the 3-adic prefix and the Archimedean quotient, the joint probability of survival for an integer $s$ is:
+$$\mathbb{P}(s \text{ survives}) \approx \rho_{\text{adic}}(s) \cdot \rho_{\text{arch}}(s) = (2/3)^{s + 0.26186 s} = (2/3)^{1.26186 s}.$$
+Because the base $2/3 < 1$ and the exponent exceeds 1, this heuristic sum converges rapidly:
+$$\sum_{s=1}^\infty (2/3)^{1.26186 s} = \frac{(2/3)^{1.26186}}{1 - (2/3)^{1.26186}} \approx 1.498 < \infty.$$
+By the first Borel-Cantelli lemma, this provides a rigorous heuristic explanation for why only finitely many solutions ($s \in \{0, 1, 4\}$) can exist.
+
+#### The Exact Non-Averaged Target
+In `ErdosTernary.RepunitDiophantine`, we prove that the Erdős conjecture is logically equivalent to the emptiness of the joint survivor set:
+$$\text{erdosSolutions} = \{0, 1, 4\} \iff \text{jointSurvivors} = \emptyset.$$
+The genuine mathematical barrier to turning this heuristic into a theorem is the **non-averaged gap**: $s \mapsto R_s(4) \pmod{3^s}$ is a single deterministic trajectory, not a random variable. Average avoidance across all $3^s$ classes does not guarantee avoidance on the integer orbit.
+
+We state the precise open Diophantine challenge:
+> **The Non-Averaged Diophantine Target:** Prove that there exists $\delta > 0$ such that the counting function of joint survivors satisfies:
+> $$|\{ s \le N : s \text{ survives in } \mathcal{T}_{\text{rep}} \text{ to depth } s \;\land\; \lfloor R_s(4) / 3^s \rfloor \in \mathcal{C} \}| = O(N^{1-\delta}) \quad (N \to \infty).$$
+
+Establishing this non-averaged equidistribution bound for the deterministic orbit $\{s \log_3 4\}$ along the 3-adic tree survivor branch would immediately imply the finiteness of Erdős solutions (`finite_powers_of_two_of_finite_joint`), providing the missing analytical bridge to the 1978 conjecture.
 
 ---
 
@@ -661,3 +710,4 @@ Because Frontiers 1 and 2 require deep Diophantine approximation bounds that cur
 8. **R. Saye**, *A fast algorithm for searching powers of 2 without digit 2 in base 3*, Mathematics of Computation, **91** (2022), no. 336, 1949–1967.
 9. **I. Vardi**, *Computational Recreations in Mathematica*, Addison-Wesley, Redwood City, CA, 1991.
 10. **P. Walters**, *An Introduction to Ergodic Theory*, Graduate Texts in Mathematics, vol. 79, Springer-Verlag, New York, 1982.
+11. **M. A. Idowu**, *Base-4 Repunits and the Erdős Ternary Problem: 3-Adic Dynamics and Rooted Tree Reformulation*, arXiv:2610.03789 (2026).
