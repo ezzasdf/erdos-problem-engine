@@ -19,7 +19,6 @@ import ErdosTernary.Ostrowski
 import ErdosTernary.OstrowskiFormLemma
 import ErdosTernary.BridgeCompute
 import ErdosTernary.LeadingDigits
-import ErdosTernary.BridgeUniform
 
 namespace ErdosTernary.OstrowskiAvoid
 
@@ -31,7 +30,7 @@ open Narkiewicz
 
 /-! ## Layer 1: Size Invariant -/
 
-private theorem q5_val : Q Al32 5 = 19 := by native_decide
+private theorem q5_val : Q Al32 5 = 19 := by decide
 
 /-- The max value representable using q_0..q_4 with Ostrowski constraints
     is at most 22. -/
@@ -81,12 +80,12 @@ theorem bridge_from_invariant_cond
     (h_cond : ∀ r : ℕ, r ≥ 23 →
       (∃ k, 5 ≤ k ∧ gd Al32 Al32_hyp k r ≥ 1) →
       ¬(C30Lead (Int.fract ((r : ℝ) * α))))
+    (h_size : ∀ (K r : ℕ), K ≥ 12 → r ∈ computeNK K → (r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) → r ≥ 23)
     (K r : ℕ) (hK : K ≥ 12)
     (hr : r ∈ computeNK K)
     (hSpecial : r ≠ 0 ∧ r ≠ 2 ∧ r ≠ 8) :
     ¬(memCantorNat (2 ^ r)) := by
-  have hr23 : r ≥ 23 :=
-    ErdosTernary.BridgeUniform.NK_excludes_small_23 K (by omega) r hr hSpecial
+  have hr23 : r ≥ 23 := h_size K r hK hr hSpecial
   have hinv := invariant_from_size r hr23
   have hnotC30 := h_cond r hr23 hinv
   exact not_mem_C30Lead_not_cantor r hnotC30
@@ -115,6 +114,6 @@ theorem not_C30_implies_not_cantor (r : ℕ)
 
     Computational coverage: K=5..9 via checkBridgeCantor, K=10..12 via
     BridgeMiddle, K=13..15 via checkBridgeCantor. K≥16 remains axiom.
--/-
+-/
 
 end ErdosTernary.OstrowskiAvoid

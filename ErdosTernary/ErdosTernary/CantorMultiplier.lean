@@ -31,14 +31,28 @@
   - ErdosTernary.LagariasHausdorff
 -/
 
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import ErdosTernary.Lemma41
+import Mathlib
 import ErdosTernary.LagariasHausdorff
 
 namespace ErdosTernary.CantorMultiplier
 
 open Real
-open ErdosTernary.Lemma41
+
+noncomputable def phi : ℝ := (1 + Real.sqrt 5) / 2
+
+theorem phi_pos : 0 < phi := by
+  have h5 : 0 < Real.sqrt 5 := Real.sqrt_pos.mpr (by norm_num)
+  dsimp [phi]
+  linarith
+
+theorem phi_gt_one : phi > 1 := by
+  dsimp [phi]
+  have : 1 < Real.sqrt 5 := by
+    rw [Real.lt_sqrt (by norm_num)]; norm_num
+  linarith
+
+def perronPoly (b : ℕ) (x : ℝ) : ℝ :=
+  x ^ b - x ^ (b - 1) - 1
 
 /-!
 ## 1. Condition (S) and Multiplier Classification (Theorem 3)
@@ -48,7 +62,7 @@ open ErdosTernary.Lemma41
     A polynomial P(y) = ∑ c_q y^q satisfies (S) if c_0 = 1 and every subset sum
     of its coefficients lies in the interval [-1, 2]. -/
 def satisfiesConditionS (c : List ℤ) : Prop :=
-  c.head? = some 1 ∧ ∀ s : List ℤ, s <+ c → (-1 ≤ s.sum ∧ s.sum ≤ 2)
+  c.head? = some 1 ∧ ∀ s : List ℤ, s.Sublist c → (-1 ≤ s.sum ∧ s.sum ≤ 2)
 
 /-- Multiplier classification types for the safe class (Theorem 3):
     Every polynomial satisfying Condition (S) with P(3^k) > 0 belongs to:
@@ -109,7 +123,7 @@ lemma family2_extremizer_iff_reduced_one_two (a b : ℕ) (ha : 1 ≤ a) (hab : a
     have hgcd : Nat.gcd a (2 * a) = a := by
       have : 2 * a = a * 2 := by ring
       rw [this]
-      exact Nat.gcd_mul_right_left a 2
+      exact Nat.gcd_eq_left (Nat.dvd_mul_right a 2)
     rw [hgcd]
     have ha_pos : 0 < a := by omega
     have haa : a / a = 1 := Nat.div_self ha_pos
@@ -118,13 +132,12 @@ lemma family2_extremizer_iff_reduced_one_two (a b : ℕ) (ha : 1 ≤ a) (hab : a
       rw [this, Nat.mul_div_cancel_left 2 ha_pos]
     exact ⟨haa, h2aa⟩
   · rintro ⟨ha1, hb2⟩
-    let g := Nat.gcd a b
-    have ha_eq : a = 1 * g := by
-      have := Nat.div_mul_cancel (Nat.gcd_dvd_left a b)
-      omega
-    have hb_eq : b = 2 * g := by
-      have := Nat.div_mul_cancel (Nat.gcd_dvd_right a b)
-      omega
+    have ha_dvd := Nat.gcd_dvd_left a b
+    have hb_dvd := Nat.gcd_dvd_right a b
+    have ha_eq := Nat.div_mul_cancel ha_dvd
+    have hb_eq := Nat.div_mul_cancel hb_dvd
+    rw [ha1] at ha_eq
+    rw [hb2] at hb_eq
     omega
 
 /-- An extremizer in the safe class: either Family 1 (all a ≥ 1) or Family 2 with b = 2a. -/
@@ -158,13 +171,13 @@ lemma log3phi_pos : 0 < log3phi := by
 lemma log3phi_lt_half : log3phi < 1 / 2 := by
   dsimp [log3phi, dim_growth]
   have h3 : 0 < Real.log 3 := Real.log_pos (by norm_num)
-  rw [div_lt_iff₀ h3]
+  rw [div_lt_iff h3]
   have : phi < Real.sqrt 3 := by
     dsimp [phi]
-    have h5 : Real.sqrt 5 < 2.24 := by
+    have h5 : Real.sqrt 5 < (224 / 100 : ℝ) := by
       rw [Real.sqrt_lt (by norm_num) (by norm_num)]; norm_num
-    have h3s : 1.73 < Real.sqrt 3 := by
-      rw [Real.lt_sqrt (by norm_num) (by norm_num)]; norm_num
+    have h3s : (173 / 100 : ℝ) < Real.sqrt 3 := by
+      rw [Real.lt_sqrt (by norm_num)]; norm_num
     linarith
   have h_log : Real.log phi < Real.log (Real.sqrt 3) :=
     Real.log_lt_log phi_pos this
@@ -224,7 +237,7 @@ lemma perron_root_pos (sm : SafeMultiplier) : 0 < perron_root sm := by
 
 lemma perron_root_ge_one (sm : SafeMultiplier) : 1 ≤ perron_root sm := by
   rcases sm with _ | _ | ⟨a, b, ha, hab⟩
-  · dsimp [perron_root]
+  · dsimp [perron_root]; exact le_rfl
   · dsimp [perron_root]; exact phi_gt_one.le
   · dsimp [perron_root]; exact lambda_SFT_ge_one _ _
 
@@ -237,10 +250,10 @@ lemma perron_root_le_phi (sm : SafeMultiplier) : perron_root sm ≤ phi := by
 lemma perron_root_dim_growth_le (sm : SafeMultiplier) :
     dim_growth (perron_root sm) ≤ log3phi := by
   dsimp [dim_growth, log3phi]
-  have h3 : 0 < Real.log 3 := Real.log_pos (by norm_num)
-  rw [div_le_div_iff_of_pos_right h3]
+  have h3 : 0 ≤ Real.log 3 := (Real.log_pos (by norm_num)).le
   have hpos : 0 < perron_root sm := perron_root_pos sm
-  exact Real.log_le_log hpos (perron_root_le_phi sm)
+  have hle : Real.log (perron_root sm) ≤ Real.log phi := Real.log_le_log hpos (perron_root_le_phi sm)
+  exact div_le_div_of_nonneg_right hle h3
 
 /-- Attainment: Family 1 multipliers M = 3^a + 1 have Perron root exactly φ,
     hence dimension exactly log_3 φ. -/
@@ -285,9 +298,9 @@ theorem family2_reduced_a1_strict (b : ℕ) (hb : 3 ≤ b) (lambda : ℝ)
     dim_growth lambda < log3phi := by
   dsimp [dim_growth, log3phi]
   have h3 : 0 < Real.log 3 := Real.log_pos (by norm_num)
-  rw [div_lt_div_iff_of_pos_right h3]
   have hlam_pos : 0 < lambda := by linarith
-  exact Real.log_lt_log hlam_pos h_root_lt_phi
+  have hlt : Real.log lambda < Real.log phi := Real.log_lt_log hlam_pos h_root_lt_phi
+  exact div_lt_div_of_pos_right hlt h3
 
 /-- Extremal Characterization Theorem:
     A 3-power-free safe multiplier M > 1 attains the maximal Perron root φ
@@ -312,19 +325,19 @@ theorem safe_class_extremizer_classification (sm : SafeMultiplier)
     isExtremalSafeMultiplier sm ↔ perron_root sm = phi := by
   constructor
   · intro hext
-    rcases sm with _ | ⟨a, ha⟩ | ⟨a, b, ha, hab⟩
-    · dsimp [isExtremalSafeMultiplier] at hext
+    rcases sm with ⟨k⟩ | ⟨a, ha⟩ | ⟨a, b, ha, hab⟩
+    · dsimp [isExtremalSafeMultiplier] at hext; contradiction
     · rfl
     · exact family2_extremizer_attains_perron_root a b ha hab hext
   · intro h_phi
-    rcases sm with _ | ⟨a, ha⟩ | ⟨a, b, ha, hab⟩
+    rcases sm with ⟨k⟩ | ⟨a, ha⟩ | ⟨a, b, ha, hab⟩
     · exfalso
       dsimp [SafeMultiplier.val, isThreePowerFree] at h_free h_gt1
       rcases k with _ | k
       · omega
       · have : (3 ^ (k + 1)) % 3 = 0 := by
           rw [pow_succ]
-          exact Nat.mul_mod_right (3 ^ k) 3
+          exact Nat.mul_mod_left (3 ^ k) 3
         exact h_free this
     · dsimp [isExtremalSafeMultiplier]
     · dsimp [isExtremalSafeMultiplier]
@@ -352,19 +365,19 @@ theorem safe_class_dimension_extremizer_classification (sm : SafeMultiplier)
     isExtremalSafeMultiplier sm ↔ dim_growth (perron_root sm) = log3phi := by
   constructor
   · intro hext
-    rcases sm with _ | ⟨a, ha⟩ | ⟨a, b, ha, hab⟩
-    · dsimp [isExtremalSafeMultiplier] at hext
+    rcases sm with ⟨k⟩ | ⟨a, ha⟩ | ⟨a, b, ha, hab⟩
+    · dsimp [isExtremalSafeMultiplier] at hext; contradiction
     · rfl
     · exact family2_extremizer_attains_log3phi a b ha hab hext
   · intro h_dim
-    rcases sm with _ | ⟨a, ha⟩ | ⟨a, b, ha, hab⟩
+    rcases sm with ⟨k⟩ | ⟨a, ha⟩ | ⟨a, b, ha, hab⟩
     · exfalso
       dsimp [SafeMultiplier.val, isThreePowerFree] at h_free h_gt1
       rcases k with _ | k
       · omega
       · have : (3 ^ (k + 1)) % 3 = 0 := by
           rw [pow_succ]
-          exact Nat.mul_mod_right (3 ^ k) 3
+          exact Nat.mul_mod_left (3 ^ k) 3
         exact h_free this
     · dsimp [isExtremalSafeMultiplier]
     · dsimp [isExtremalSafeMultiplier]

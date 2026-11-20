@@ -135,8 +135,8 @@ structure LeafBound (p : SFTParams) : Prop where
 
 /-- Regime 6 finite discharge from Lemma41Finite. -/
 theorem tii_h_regime6_finite :
-    (((List.range 4096).filter isExc6b).map map6b).nodup ∧
-    (((List.range 8192).filter isExc6a).map map6a).nodup :=
+    (((List.range 4096).filter isExc6b).map map6b).Nodup ∧
+    (((List.range 8192).filter isExc6a).map map6a).Nodup :=
   ⟨images_injective_6b, images_injective_6a⟩
 
 /-!
@@ -152,21 +152,21 @@ structure DeltaNegativity (p : SFTParams) (Delta : ℕ → ℤ) : Prop where
 /-- Delta finite coincidence types discharged by Lemma41Finite. -/
 theorem delta_coincidences_finite :
     -- Delta Case 2
-    (((List.range 2048).filter isExc_dg_case2_g_eq_a_minus_1).map map_case2_g_eq_a_minus_1).nodup ∧
-    (((List.range 4096).filter isExc_case2_2g_eq_a_plus_1).map map_case2_2g_eq_a_plus_1).nodup ∧
-    (((List.range 1024).filter isExc_case2_g_eq_a_plus_1).map map_case2_g_eq_a_plus_1).nodup ∧
+    (((List.range 2048).filter isExc_dg_case2_g_eq_a_minus_1).map map_case2_g_eq_a_minus_1).Nodup ∧
+    (((List.range 4096).filter isExc_case2_2g_eq_a_plus_1).map map_case2_2g_eq_a_plus_1).Nodup ∧
+    (((List.range 1024).filter isExc_case2_g_eq_a_plus_1).map map_case2_g_eq_a_plus_1).Nodup ∧
     -- Delta Case 3
     ((List.range 2048).filter isExcCase3_unmapped).length = 0 ∧
     -- Delta Case 1 (all 9 coincidence types)
-    (((List.range 256).filter isExc_dg_3_2).map map_dg_3_2).nodup ∧
-    (((List.range 2048).filter isExc_dg_4_3).map map_dg_4_3).nodup ∧
-    (((List.range 2048).filter isExc_dg_5_2).map map_dg_5_2).nodup ∧
-    (((List.range 1024).filter isExc_dg_5_3).map map_dg_5_3).nodup ∧
-    (((List.range 8192).filter isExc_dg_7_2).map map_dg_7_2).nodup ∧
-    (((List.range 4096).filter isExc_dg_7_3).map map_dg_7_3).nodup ∧
-    (((List.range 8192).filter isExc_dg_7_5).map map_dg_7_5).nodup ∧
-    (((List.range 4096).filter isExc_dg_8_3).map map_dg_8_3).nodup ∧
-    (((List.range 8192).filter isExc_dg_12_5).map map_dg_12_5).nodup :=
+    (((List.range 256).filter isExc_dg_3_2).map map_dg_3_2).Nodup ∧
+    (((List.range 2048).filter isExc_dg_4_3).map map_dg_4_3).Nodup ∧
+    (((List.range 2048).filter isExc_dg_5_2).map map_dg_5_2).Nodup ∧
+    (((List.range 1024).filter isExc_dg_5_3).map map_dg_5_3).Nodup ∧
+    (((List.range 8192).filter isExc_dg_7_2).map map_dg_7_2).Nodup ∧
+    (((List.range 4096).filter isExc_dg_7_3).map map_dg_7_3).Nodup ∧
+    (((List.range 8192).filter isExc_dg_7_5).map map_dg_7_5).Nodup ∧
+    (((List.range 4096).filter isExc_dg_8_3).map map_dg_8_3).Nodup ∧
+    (((List.range 8192).filter isExc_dg_12_5).map map_dg_12_5).Nodup :=
   ⟨images_injective_case2_g_eq_a_minus_1, images_injective_case2_2g_eq_a_plus_1,
    images_injective_case2_g_eq_a_plus_1,
    exc_case3_zero,
