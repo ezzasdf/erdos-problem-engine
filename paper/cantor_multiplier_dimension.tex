@@ -30,9 +30,8 @@
 
 \title[Extremal Hausdorff Dimension of Cantor Multipliers]{The Extremal Hausdorff Dimension of Cantor Multiplier Intersections and the Golden Mean Shift}
 
-\author{Antigravity Project Team}
-\address{Google DeepMind}
-\email{antigravity@google.com}
+\author{Ezzeldin Ashraf Mohamed Shafey Wahba}
+\email{ezzeldinashraf.web@gmail.com}
 
 \date{\today}
 
@@ -58,7 +57,7 @@ For any integer multiplier $M \ge 1$, the intersection of $\Sigma$ with its scal
 \begin{equation}
 C(1, M) = \Sigma \cap M^{-1} \Sigma = \{ x \in \Sigma : M x \in \Sigma \}.
 \end{equation}
-When $M = 3^k$ is a pure power of $3$, multiplication by $M$ corresponds to a $k$-step Bernoulli shift on digits, yielding $C(1, 3^k) \cong \Sigma$ and $\dimH C(1, 3^k) = \log_3 2 \approx 0.630930$. Conversely, when $M$ is coprime to $3$, multiplication by $M$ introduces intricate digit correlations driven by base-$3$ carry cascades. For almost all integers $M$, the set $C(1, M)$ consists of isolated points or is completely empty~\cite{KenyonPeres1996,HochmanShmerkin2012}.
+When $M = 3^k$ is a pure power of $3$, multiplication by $M$ corresponds to a $k$-step Bernoulli shift on digits, yielding $C(1, 3^k) \cong \Sigma$ and $\dimH C(1, 3^k) = \log_3 2 \approx 0.630930$. Conversely, when $M$ is coprime to $3$, multiplication by $M$ introduces intricate digit correlations driven by base-$3$ carry cascades. For almost all integers $M$, the set $C(1, M)$ consists of isolated points or is completely empty~\cite{KenyonPeres1996,HochmanShmerkin2012}. The systematic study of Cantor multiplier intersections $C(1, M)$ in connection with ternary digit distributions was initiated by Lagarias~\cite{Lagarias2009}.
 
 However, there exists a structured family of integers $M$, termed \emph{safe multipliers}, for which carry propagation terminates locally, rendering $C(1, M)$ an affine subshift of finite type (SFT). The primary objective of this paper is to classify the Hausdorff dimensions $\dimH C(1, M)$ for all safe multipliers, identify the exact extremizers of the dimension, and formalize the underlying dynamical theory in the Lean~4 interactive proof assistant.
 
@@ -128,7 +127,7 @@ More generally, clearing denominators yields the linear constraint on binary seq
 \begin{equation}\label{eq:sft_constraint}
 0 \le z_i - z_{i-a} + z_{i-b} \le 1 \quad (\forall i \in \Z).
 \end{equation}
-The shift space $\Sigma_{(a,b)} \subset \{0, 1\}^\Z$ of binary sequences satisfying~\eqref{eq:sft_constraint} is a subshift of finite type of order $b$.
+The shift space $\Sigma_{(a,b)} \subset \{0, 1\}^\Z$ of binary sequences satisfying~\eqref{eq:sft_constraint} is a subshift of finite type of order $b$ (in the sense of symbolic dynamics; see Lind and Marcus~\cite{LindMarcus1995}).
 \end{definition}
 
 ---

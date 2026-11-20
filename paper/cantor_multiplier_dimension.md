@@ -1,6 +1,6 @@
 # Dimension of the Ternary "No-Digit-2" Intersection Sets $C(1, M)$: Two Extremal Families, a Factorization Theorem, and the Digitwise-Safe Class
 
-**Authors:** The Erdős Ternary Research Initiative  
+**Author:** Ezzeldin Ashraf Mohamed Shafey Wahba (<ezzeldinashraf.web@gmail.com>)  
 **Date:** November 2026  
 **Repository & Verification Artifacts:** [https://github.com/ezzasdf/erdos-problem-engine](https://github.com/ezzasdf/erdos-problem-engine)  
 **Lean 4 Toolchain:** Lean 4.12.0 (Mathlib 4.12.0 pinned)
