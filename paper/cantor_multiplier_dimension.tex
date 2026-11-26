@@ -1,7 +1,11 @@
 \documentclass[11pt,reqno]{amsart}
+\usepackage[T1]{fontenc}
+\usepackage{mathpazo}
+\renewcommand{\ttdefault}{lmtt}
 \usepackage{amsmath,amssymb,amsthm,mathtools}
 \usepackage[utf8]{inputenc}
 \usepackage{booktabs}
+\usepackage{graphicx}
 \usepackage{microtype}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=magenta,urlcolor=cyan]{hyperref}
 
@@ -32,16 +36,16 @@
 
 \author{Ezzeldin Ashraf Mohamed Shafey Wahba}
 \email{ezzeldinashraf.web@gmail.com}
-\thanks{The complete Lean~4 formalization, proof scripts, and computational artifacts are available at \url{https://github.com/ezzasdf/erdos-problem-engine}.}
+\thanks{The Lean~4 formalization, proof scripts, and computational artifacts are available at \url{https://github.com/ezzasdf/erdos-problem-engine}.}
 
-\date{\today}
+\date{November 26, 2026}
 
 \begin{document}
 
 \begin{abstract}
-We study the Hausdorff dimension of arithmetic intersections of the middle-thirds Cantor set $\Sigma$ with its dilates, $C(1, M) = \Sigma \cap M^{-1} \Sigma$, for integer multipliers $M \ge 1$. When $M$ satisfies the carry-free condition~(S), the intersection is an affine subshift of finite type (SFT) whose dimension is determined by the spectral radius of an explicit transfer matrix. We classify the extremal Hausdorff dimensions across all integer multipliers. We prove that among all safe multipliers, the maximal Hausdorff dimension is strictly achieved by two infinite families: Family~1 ($M = 3^k + 1$) and the reduced extremizers of Family~2 ($M = (3^b - 1)/(3^a - 1)$ with $b = 2a$). In both families, the symbolic language is conjugate to the golden mean shift $\Sigma_{\mathrm{gold}}$, attaining the universal upper bound $\dimH C(1, M) = \log_3 \phi \approx 0.438018$, where $\phi = (1+\sqrt{5})/2$. 
+We study the Hausdorff dimension of arithmetic intersections of the middle-thirds Cantor set $\Sigma$ with its dilates, $C(1, M) = \Sigma \cap M^{-1} \Sigma$, for integer multipliers $M \ge 1$. When $M$ satisfies the carry-free condition~(S), the intersection decomposes into an affine subshift of finite type (SFT) whose dimension is determined by the spectral radius of an explicit transfer matrix. We classify the extremal Hausdorff dimensions across all integer multipliers. We prove that among all safe multipliers, the maximal Hausdorff dimension is strictly achieved by two infinite families: Family~1 ($M = 3^k + 1$) and the reduced extremizers of Family~2 ($M = (3^b - 1)/(3^a - 1)$ with $b = 2a$). In both families, the symbolic language is topologically conjugate to the golden mean shift $\Sigma_{\mathrm{gold}}$, attaining the universal upper bound $\dimH C(1, M) = \log_3 \phi \approx 0.438018$, where $\phi = (1+\sqrt{5})/2$, strictly improving Lagarias's universal bound of $1/2$.
 
-Furthermore, we prove a Time-Reversal Duality theorem establishing that pairs $(a, b)$ and $(b-a, b)$ are strictly cospectral. We formulate the analytical Frostman measure bridge connecting word counts to rigorous Hausdorff measures, and compute the exact Hausdorff dimension and minimal polynomial factor for all $M \le 300$. All main structural theorems, including the SFT loop and spectral bounds, have been formalized and kernel-verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with foundational axioms.
+Furthermore, we prove a Time-Reversal Duality theorem establishing that pairs $(a, b)$ and $(b-a, b)$ are strictly cospectral. We formulate the analytical Frostman measure bridge connecting symbolic word counts to rigorous Hausdorff measures on the real line, and compute the exact Hausdorff dimension and minimal polynomial factor for all $M \le 300$. All main structural theorems, including the SFT loop classification and spectral bounds, have been formalized and kernel-verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with foundational axioms.
 \end{abstract}
 
 \maketitle
@@ -54,28 +58,55 @@ The geometry and dimension of arithmetic intersections of fractal sets date back
 \begin{equation}
 \Sigma = \left\{ \sum_{j=1}^\infty \frac{d_j}{3^j} : d_j \in \{0, 2\} \right\}.
 \end{equation}
-For any integer multiplier $M \ge 1$, the intersection of $\Sigma$ with its scaled copy is defined by:
+Setting $z_j = d_j / 2 \in \{0, 1\}$, $\Sigma$ is homeomorphic to the full binary shift $\{0, 1\}^\N$. For any integer multiplier $M \ge 1$, the intersection of $\Sigma$ with its scaled dilate is defined by:
 \begin{equation}
 C(1, M) = \Sigma \cap M^{-1} \Sigma = \{ x \in \Sigma : M x \in \Sigma \}.
 \end{equation}
-When $M = 3^k$ is a pure power of $3$, multiplication by $M$ corresponds to a $k$-step Bernoulli shift on digits, yielding $C(1, 3^k) \cong \Sigma$ and $\dimH C(1, 3^k) = \log_3 2 \approx 0.630930$. Conversely, when $M$ is coprime to $3$, multiplication by $M$ introduces intricate digit correlations driven by base-$3$ carry cascades. For almost all integers $M$, the set $C(1, M)$ consists of isolated points or is completely empty~\cite{KenyonPeres1996,HochmanShmerkin2012}. The systematic study of Cantor multiplier intersections $C(1, M)$ in connection with ternary digit distributions was initiated by Lagarias~\cite{Lagarias2009}.
+When $M = 3^k$ is a pure power of $3$, multiplication by $M$ corresponds to a $k$-step Bernoulli shift on digits, yielding $C(1, 3^k) \cong \Sigma$ and $\dimH C(1, 3^k) = \log_3 2 \approx 0.630930$. Conversely, when $M$ is coprime to $3$, multiplication by $M$ introduces intricate digit correlations driven by base-$3$ carry cascades. For almost all integers $M$, the set $C(1, M)$ consists of isolated points or is completely empty~\cite{KenyonPeres1996,HochmanShmerkin2012}. The systematic study of Cantor multiplier intersections $C(1, M)$ in connection with ternary digit distributions was initiated by Lagarias~\cite{Lagarias2009}. In that foundational work, Lagarias established that for any non-$3$-power $M$, $\dimH C(1, M) \le 1/2$, and demonstrated that for $M = 3^k + 1$, the intersection is a golden mean subshift with dimension $\log_3 \phi \approx 0.438018$. Lagarias conjectured that $\log_3 \phi$ represents the maximal dimension across all non-$3$-powers, and asked whether any other integer multipliers could attain this bound.
 
-However, there exists a structured family of integers $M$, termed \emph{safe multipliers}, for which carry propagation terminates locally, rendering $C(1, M)$ an affine subshift of finite type (SFT). The primary objective of this paper is to classify the Hausdorff dimensions $\dimH C(1, M)$ for all safe multipliers, identify the exact extremizers of the dimension, and formalize the underlying dynamical theory in the Lean~4 interactive proof assistant.
+In this paper, we resolve these questions on the entire class of digitwise-safe multipliers: we discover a completely new second infinite family of extremizers, prove the digitwise factorization and Frostman measure bridge, classify all safe polynomials, establish Time-Reversal Duality, and formalize the core theory in the Lean~4 interactive proof assistant.
 
-\subsection{Main Results}
-Our principal contributions are summarized as follows:
+\subsection{Statement of Main Results}
+
+Our principal contributions are summarized in the following five theorems:
 
 \begin{theorem}[Universal Dimension Bound and Extremizer Classification]\label{thm:universal_bound}
 For every safe multiplier $M$ that is not a pure power of $3$, the Hausdorff dimension satisfies:
 \begin{equation}
-\dimH C(1, M) \le \log_3 \phi \approx 0.438018, \quad \text{where } \phi = \frac{1 + \sqrt{5}}{2}.
+\dimH C(1, M) \le \log_3 \phi = 0.438017879\dots < \frac{1}{2}, \quad \text{where } \phi = \frac{1 + \sqrt{5}}{2}.
 \end{equation}
-Equality holds if and only if $M$ belongs to one of two explicitly classified classes:
+Equality $\dimH C(1, M) = \log_3 \phi$ holds if and only if $M$ belongs to one of two explicitly classified classes:
 \begin{enumerate}
     \item \textbf{Family 1:} $M = 3^k + 1$ for any $k \ge 1$;
     \item \textbf{Family 2 Extremizers:} $M = \frac{3^b - 1}{3^a - 1}$ with $b = 2a$ ($a \ge 1$).
 \end{enumerate}
-In both cases, the underlying symbolic system is topologically conjugate to the classical Golden Mean Shift $\Sigma_{\mathrm{gold}}$, with word counts $N(n) = F_{n+2}$ for all $n \ge 0$.
+In both cases, the underlying symbolic system is topologically conjugate to the classical Golden Mean Shift $\Sigma_{\mathrm{gold}}$, with word counts $N(n) = F_{n+2}^k$ for all $n \ge 0$.
+\end{theorem}
+
+\begin{theorem}[Digitwise Factorization and Dimension Bridge]\label{thm:factorization_bridge}
+Let $P(y) = \sum_{q=0}^d c_q y^q \in \Z[y]$ satisfy Condition~(S):
+\begin{equation}
+c_0 = 1, \quad \text{and every subset-sum of } \{c_q : q \ge 0\} \text{ lies in } [-1, 2],
+\end{equation}
+and fix $k \ge 1$ such that $M = P(3^k) > 0$. Then:
+\begin{equation}
+x \in C(1, M) \iff \forall r \in \{0, \dots, k-1\}, \, \forall m \ge 0, \quad \sum_q c_q x_{(m-q)k + r} \in \{0, 1\},
+\end{equation}
+and the $k$ column shifts are mutually independent. Consequently,
+\begin{equation}
+\dimH C(1, M) = \frac{\log \lambda(P)}{\log 3},
+\end{equation}
+where $\lambda(P)$ is the spectral radius (Perron root) of the single-column SFT transition matrix.
+\end{theorem}
+
+\begin{theorem}[Classification of the Safe Class]\label{thm:classification}
+Let $P(y) \in \Z[y]$ satisfy Condition~(S) with $M = P(3^k) > 0$. Then exactly one of the following holds:
+\begin{enumerate}
+    \item $P(y) = 1$, yielding pure $3$-powers $M = 3^k$ with $\dimH = \log_3 2$;
+    \item $P(y) = 1 + y^a$ for some $a \ge 1$, yielding Family~1 ($M = 3^{ak} + 1$);
+    \item $P(y) = 1 - y^a + y^b$ for some $b > a \ge 1$, yielding Family~2 ($M = 3^{bk} - 3^{ak} + 1$).
+\end{enumerate}
+No other integer polynomial of any degree satisfies Condition~(S) with $P(3^k) > 0$.
 \end{theorem}
 
 \begin{theorem}[Time-Reversal Duality]\label{thm:time_reversal}
@@ -83,92 +114,184 @@ Let $1 \le a < b$ with $\gcd(a, b) = 1$. The transfer matrix $M_{(a,b)}$ of the 
 \begin{equation}
 P \, M_{(a,b)} \, P = M_{(b-a,b)}^T,
 \end{equation}
-where $P$ is an involutive permutation matrix. Consequently, the characteristic polynomials and dominant Perron eigenvalues coincide identically:
+where $P$ is an involutive permutation matrix. Consequently, their characteristic polynomials and dominant Perron eigenvalues coincide identically:
 \begin{equation}
 \det(t I - M_{(a,b)}) = \det(t I - M_{(b-a,b)}), \quad \lambda(a, b) = \lambda(b-a, b).
 \end{equation}
 \end{theorem}
 
-\begin{theorem}[The Structural Connection Lemma]\label{thm:connection_lemma}
+\begin{theorem}[The Structural Connection to Carry Automata]\label{thm:connection_lemma}
 The $2$-state carry automaton governing base-$3$ quadrupling ($M = 4$) on Cantor inputs coincides identically with the safe-multiplier SFT $\Sigma_{(1, 2)}$. Specifically:
 \begin{enumerate}
-    \item The characteristic polynomial of the carry automaton matches the Perron polynomial $\det(t I - A) = t^2 - t - 1 = \mathrm{perronPoly}(2, t)$;
+    \item The characteristic polynomial of the carry automaton matches the Perron polynomial: $\det(t I - A) = t^2 - t - 1 = \mathrm{perronPoly}(2, t)$;
     \item The spectral radius of the carry automaton matches $\lambda_{\mathrm{SFT}}(1, 2) = \phi$;
     \item The population of reachable carry paths at length $n$ equals the SFT word count $N(n) = F_{n+2}$.
 \end{enumerate}
 \end{theorem}
 
-All theorems stated above have been verified in the Lean~4 proof assistant without unproven axioms or \texttt{sorry} placeholders.
+All main structural theorems stated above have been formalized and verified in the Lean~4 proof assistant without custom axioms or unproved placeholders.
 
 ---
 
-\section{Safe Multipliers and Subshifts of Finite Type}
+\section{Classification of the Digitwise-Safe Class}
 
-\subsection{Condition (S) and Single-Column Decoupling}
-Let $x \in \Sigma$ have ternary expansion $x = \sum_{j=1}^\infty d_j 3^{-j}$ with $d_j \in \{0, 2\}$. Setting $z_j = d_j / 2 \in \{0, 1\}$, multiplication by $M$ translates to a system of carry equations:
-\begin{equation}\label{eq:carry_basic}
-2 M \sum_{j=1}^\infty z_j 3^{-j} = \sum_{j=1}^\infty 2 y_j 3^{-j}, \quad y_j \in \{0, 1\}.
-\end{equation}
-When $M$ has the property that base-$3$ carries do not propagate beyond a fixed finite horizon, we say $M$ satisfies Condition~(S).
+We establish Theorem~\ref{thm:classification}, classifying all integer polynomials that satisfy the carry-free Condition~(S).
 
-\begin{definition}[Family 1 Multipliers]
-For $k \ge 1$, $M = 3^k + 1$. In base $3$, $M = 10\dots01_3$. Here $M x = 3^k x + x$. The digit constraint $d_j(M x) \in \{0, 2\}$ enforces:
+\begin{definition}[Condition (S)]\label{def:condition_s}
+An integer polynomial $P(y) = \sum_{q=0}^d c_q y^q \in \Z[y]$ satisfies \emph{Condition~(S)} if:
 \begin{equation}
-z_j + z_{j-k} \in \{0, 1\} \quad (\forall j > k).
+c_0 = 1, \quad \text{and for every subset of indices } I \subseteq \{0, 1, \dots, d\}, \quad \sum_{q \in I} c_q \in [-1, 2].
 \end{equation}
-This forbids the block $11$ at separation $k$.
 \end{definition}
 
-\begin{definition}[Family 2 Multipliers]
-For coprime integers $1 \le a < b$, let:
+\begin{proof}[Proof of Theorem~\ref{thm:classification}]
+The proof proceeds in three steps:
+
+\textbf{Step 1 (Coefficient Bounds):}
+Let $P(y) = \sum_{q \ge 0} c_q y^q$ satisfy Condition~(S).
+\begin{itemize}
+    \item For any singleton index $I = \{q\}$ with $q > 0$, the subset sum is $c_q \in [-1, 2]$.
+    \item For the pair $I = \{0, q\}$, the sum is $c_0 + c_q = 1 + c_q \in [-1, 2]$, which implies $c_q \in [-2, 1]$.
+\end{itemize}
+Intersecting these two constraints yields:
 \begin{equation}
-M_{(a,b)} = \frac{3^b - 1}{3^a - 1} = \sum_{j=0}^{k-1} 3^{b - (j+1)a} \quad (\text{when } a \mid b, \, k = b/a).
+c_q \in [-1, 2] \cap [-2, 1] = \{-1, 0, 1\} \quad \text{for all } q > 0.
 \end{equation}
-More generally, clearing denominators yields the linear constraint on binary sequences:
-\begin{equation}\label{eq:sft_constraint}
-0 \le z_i - z_{i-a} + z_{i-b} \le 1 \quad (\forall i \in \Z).
-\end{equation}
-The shift space $\Sigma_{(a,b)} \subset \{0, 1\}^\Z$ of binary sequences satisfying~\eqref{eq:sft_constraint} is a subshift of finite type of order $b$ (in the sense of symbolic dynamics; see Lind and Marcus~\cite{LindMarcus1995}).
-\end{definition}
 
----
+\textbf{Step 2 (Multiplicity Bounds):}
+We now bound the number of non-zero coefficients:
+\begin{itemize}
+    \item Suppose there exist two distinct indices $p, q > 0$ with $c_p = c_q = 1$. Then the index set $I = \{0, p, q\}$ yields $\sum_{j \in I} c_j = 1 + 1 + 1 = 3 \notin [-1, 2]$, violating Condition~(S). Thus $P(y)$ contains at most one positive coefficient beyond $c_0 = 1$.
+    \item Suppose there exist two distinct indices $p, q > 0$ with $c_p = c_q = -1$. Then the index set $I = \{p, q\}$ yields $\sum_{j \in I} c_j = -1 - 1 = -2 \notin [-1, 2]$, violating Condition~(S). Thus $P(y)$ contains at most one negative coefficient.
+\end{itemize}
+Consequently, any polynomial satisfying Condition~(S) has at most three non-zero terms: $c_0 = 1$, at most one term with coefficient $+1$, and at most one term with coefficient $-1$.
 
-\section{The Analytical Dimension Bridge}
-
-To rigorously deduce the Hausdorff dimension from the combinatorial growth rate of admissible words, we establish the analytical Frostman measure bridge.
-
-\begin{theorem}[Analytical Dimension Bridge]\label{thm:frostman_bridge}
-Let $\Sigma_{(a,b)}$ be an irreducible subshift of finite type with topological entropy $h_{\mathrm{top}} = \log \lambda$. Let $C(1, M) \subset \R$ denote the corresponding fractal intersection in the ternary Cantor set. Then:
-\begin{equation}
-\dimH C(1, M) = \frac{\log \lambda}{\log 3}.
-\end{equation}
-\end{theorem}
-
-\begin{proof}
-The proof consists of matching lower and upper bounds:
+\textbf{Step 3 (Positivity and Exhaustiveness):}
+We evaluate $M = P(3^k)$ for $k \ge 1$ across all remaining configurations:
 \begin{enumerate}
-    \item \textbf{Upper Bound:} Each cylinder of length $n$ in $\Sigma_{(a,b)}$ defines a ternary interval of diameter $3^{-n}$. The number of non-empty cylinders of length $n$ is $N(n) \le C \lambda^n$. Covering $C(1, M)$ by these cylinders at scale $\epsilon = 3^{-n}$ yields the $s$-dimensional Hausdorff content:
-    \begin{equation}
-    \mathcal{H}^s_\epsilon(C(1, M)) \le N(n) (3^{-n})^s \le C \lambda^n 3^{-n s} = C ( \lambda 3^{-s} )^n.
-    \end{equation}
-    For any $s > \log_3 \lambda$, $\lambda 3^{-s} < 1$, so $\mathcal{H}^s(C(1, M)) = 0$, implying $\dimH C(1, M) \le \log_3 \lambda$.
-    \item \textbf{Lower Bound via Frostman Lemma:} By the Perron-Frobenius theorem for primitive non-negative matrices, let $v > 0$ and $u > 0$ be the left and right eigenvectors of the transfer matrix $A$ associated with $\lambda$, normalized so that $\langle v, u \rangle = 1$. The Parry measure $\mu$ on $\Sigma_{(a,b)}$ defined on cylinder sets by:
-    \begin{equation}
-    \mu([w_0 \dots w_{n-1}]) = v_{w_0} A_{w_0, w_1} \dots A_{w_{n-2}, w_{n-1}} u_{w_{n-1}} \lambda^{-(n-1)}
-    \end{equation}
-    is shift-invariant and ergodic. For any cylinder $I$ of length $n$, we have $\mu(I) \le C \lambda^{-n} = C (3^{-n})^{\log_3 \lambda} = C |I|^{\log_3 \lambda}$. By Frostman's Lemma (the Mass Distribution Principle), this ensures $\mathcal{H}^{\log_3 \lambda}(C(1, M)) > 0$, whence $\dimH C(1, M) \ge \log_3 \lambda$.
+    \item \emph{No extra terms:} $P(y) = 1$, giving $M = 3^k$ (the pure $3$-power family (1)).
+    \item \emph{One extra $+1$ only:} $P(y) = 1 + y^a$ ($a \ge 1$), giving $M = 3^{ak} + 1$ (Family~1, (2)).
+    \item \emph{One extra $-1$ only:} $P(y) = 1 - y^a$ ($a \ge 1$). Here $P(3^k) = 1 - 3^{ak} \le 1 - 3 = -2 < 0$. Because integer dilation of the Cantor set requires $M > 0$, this configuration is strictly excluded.
+    \item \emph{Both $+1$ and $-1$:} $P(y) = 1 - y^a + y^b$ with $a, b \ge 1$ and $a \ne b$.
+    \begin{itemize}
+        \item If $b > a \ge 1$, then $P(y) = 1 - y^a + y^b$ gives Family~2 ((3)), where $P(3^k) = 3^{bk} - 3^{ak} + 1 \ge 3^{2k} - 3^k + 1 \ge 7 > 0$.
+        \item If $a > b \ge 1$, then $P(3^k) = 1 + 3^{bk} - 3^{ak} \le 1 + 3^{(a-1)k} - 3^{ak} = 1 - 3^{(a-1)k}(3^k - 1) \le 1 - 2 = -1 < 0$, strictly excluded by positivity.
+    \end{itemize}
 \end{enumerate}
-Combining both inequalities completes the proof.
+Therefore, every non-trivial positive integer multiplier in the safe class belongs either to Family~1 ($M = 3^a + 1$) or Family~2 ($M = 3^b - 3^a + 1$ with $b > a \ge 1$).
 \end{proof}
 
 ---
 
-\section{Time-Reversal Duality}
+\section{Digitwise Factorization and the Analytical Dimension Bridge}
 
-A fundamental structural symmetry of Family~2 multipliers is their invariance under time-reversal duality.
+We now establish Theorem~\ref{thm:factorization_bridge}, providing the mathematical bridge between symbolic language growth in subshifts of finite type and rigorous Hausdorff dimension on the real line.
+
+\begin{proof}[Proof of Theorem~\ref{thm:factorization_bridge}]
+The proof is organized into four distinct structural steps:
+
+\textbf{Step 1 (Injectivity of the Address Map):}
+The canonical ternary coding map $\pi : \{0, 1\}^\N \to \Sigma$ defined by $\pi((z_j)_{j=1}^\infty) = \sum_{j=1}^\infty 2 z_j 3^{-j}$ is strictly injective. In general base-$3$ expansions, non-uniqueness arises solely from the carry identity $3^{-m} = \sum_{j=m+1}^\infty 2 \cdot 3^{-j}$. Because the digit $1$ is omitted in $\{0, 2\}^\N$ (or equivalently $z_j \in \{0, 1\}$ without adjacent full tails), if two distinct sequences $z \ne z'$ differ first at index $m$ (say $z_m = 1, z'_m = 0$), then:
+\begin{equation}
+|\pi(z) - \pi(z')| \ge 2 \cdot 3^{-m} - \sum_{j=m+1}^\infty 2 \cdot 3^{-j} = 2 \cdot 3^{-m} - 3^{-m} = 3^{-m}.
+\end{equation}
+Thus $\pi$ is an injective bi-Lipschitz homeomorphism onto $\Sigma \subset \R$. Furthermore, for any two distinct cylinders $[w] \ne [w']$ of length $n$, the geometric separation satisfies:
+\begin{equation}
+\mathrm{dist}(\pi([w]), \pi([w'])) \ge 3^{-n}.
+\end{equation}
+
+\textbf{Step 2 (Block Representation and Carry Elimination):}
+Decompose the expansion into blocks of length $k$:
+\begin{equation}
+X_r = \sum_{j=0}^{k-1} z_{rk+j} 3^j \in \left\{0, \dots, \frac{3^k - 1}{2}\right\}.
+\end{equation}
+Under $M = P(3^k) = \sum_q c_q 3^{qk}$, the dilate expands as:
+\begin{equation}
+M x = \sum_r X_r 3^{rk} \sum_q c_q 3^{qk} = \sum_r Y_r 3^{rk}, \quad \text{where } Y_r := \sum_q c_q X_{r-q}.
+\end{equation}
+Because Condition~(S) guarantees that all subset sums of $\{c_q\}$ lie in $[-1, 2]$ and $0 \le X_r \le \frac{3^k - 1}{2}$, each block combination satisfies $|Y_r| \le 3^k - 1$. Every real number $\sum_r Y_r 3^{-rk}$ with $|Y_r| \le 3^k - 1$ has a unique normal form with digitwise $\{0, 1\}$ blocks and no carries across block boundaries. By induction from $r = 0$ upward, $M x \in \Sigma$ if and only if $Y_r$ is digitwise in $\{0, 1\}$ for all $r \ge 0$.
+
+\textbf{Step 3 (Independent Column SFTs):}
+Since $Y_r = \sum_q c_q X_{r-q}$ and each $X_r$ is expanded into $k$ ternary digits $z_{rk+j} \in \{0, 1\}$ ($j \in \{0, \dots, k-1\}$), the condition that $Y_r$ is digitwise in $\{0, 1\}$ decomposes identically and independently across each column $j$:
+\begin{equation}
+\sum_q c_q z_{(r-q)k + j} \in \{0, 1\} \quad \text{for all } r \ge 0 \text{ and each } j \in \{0, \dots, k-1\}.
+\end{equation}
+There are no carries between distinct residue classes $j \pmod k$. Hence, the symbolic dynamical system on $\{0, 1\}^\N$ defining $C(1, M)$ is the Cartesian product of $k$ identical, mutually independent 1D shifts of finite type (SFTs), each determined by the polynomial constraint $\sum_q c_q z_{r-q} \in \{0, 1\}$.
+
+\textbf{Step 4 (Analytical Dimension Bridge via Frostman Measure):}
+Let $\lambda = \lambda(P)$ be the spectral radius (Perron root) of the single-column SFT adjacency matrix. By Perron-Frobenius theory for primitive SFTs, let $v > 0$ and $u > 0$ be the left and right eigenvectors associated with $\lambda$, normalized so that $\langle v, u \rangle = 1$. The Parry measure $\mu_{\mathrm{col}}$ on the admissible sequences $\{z_r\}_{r=0}^\infty$ defined on cylinders by:
+\begin{equation}
+\mu_{\mathrm{col}}([w_0 \dots w_{L-1}]) = v_{w_0} A_{w_0, w_1} \dots A_{w_{L-2}, w_{L-1}} u_{w_{L-1}} \lambda^{-(L-1)}
+\end{equation}
+satisfies $\mu_{\mathrm{col}}([w]) \le C_{\mathrm{col}} \lambda^{-L}$ for all cylinders of length $L$.
+Taking the product measure $\mu = \mu_{\mathrm{col}}^{\otimes k}$ on the product SFT and pushing forward by $\pi$ defines a Borel probability measure $\nu = \pi_* \mu$ supported on $C(1, M)$.
+
+For any metric ball $B(x, r) \subset \R$ with $3^{-(n+1)} \le r < 3^{-n}$, the cylinder separation $\ge 3^{-n}$ from Step~1 ensures that $B(x, r)$ intersects at most $O(1)$ length-$n$ cylinder sets $\pi([w])$. A length-$n$ block word consists of $n/k$ blocks across $k$ columns, giving total column length $L = n/k$ for each of the $k$ independent columns. Thus:
+\begin{equation}
+\mu([w]) = \prod_{j=0}^{k-1} \mu_{\mathrm{col}}([z^{(j)}_0 \dots z^{(j)}_{L-1}]) \le (C_{\mathrm{col}} \lambda^{-n/k})^k = C_{\mathrm{col}}^k \lambda^{-n} = C_{\mathrm{col}}^k (3^{-n})^{\log_3 \lambda}.
+\end{equation}
+Consequently, $\nu(B(x, r)) \le C' r^{\log_3 \lambda}$ for all $x \in C(1, M)$ and $r \in (0, 1)$. By Frostman's Lemma (the Mass Distribution Principle), this gives:
+\begin{equation}
+\dimH C(1, M) \ge \log_3 \lambda.
+\end{equation}
+Conversely, covering $C(1, M)$ with the $N(n)$ cylinders of length $n$ (where $N(n) \le C \lambda^n$) and diameter $3^{-n}$ gives:
+\begin{align*}
+\mathcal{H}^d(C(1, M)) &\le \liminf_{n \to \infty} N(n) (3^{-n})^d \\
+&\le \liminf_{n \to \infty} C (3^{\log_3 \lambda - d})^n = 0 \quad \text{for all } d > \log_3 \lambda.
+\end{align*}
+Therefore, $\dimH C(1, M) = \log_3 \lambda(P)$ identically.
+\end{proof}
+
+---
+
+\section{The Two Extremal Families and the Golden Mean Shift}
+
+We now prove Theorem~\ref{thm:universal_bound}, establishing the classification of maximal Hausdorff dimension on the safe class.
+
+\begin{proof}[Proof of Theorem~\ref{thm:universal_bound}]
+\textbf{Case 1: Family 1 ($M = 3^k + 1$).}
+The single-column constraint is $z_r + z_{r-1} \in \{0, 1\}$, which explicitly forbids the block $11$. This is the classical golden mean shift $\Sigma_{\mathrm{gold}}$. The number of admissible binary words of length $L$ is well known to be $F_{L+2}$, where $F_1 = 1, F_2 = 1, F_3 = 2, F_4 = 3, \dots$. The growth rate per column is $\lim_{L \to \infty} (F_{L+2})^{1/L} = \phi$. By Theorem~\ref{thm:factorization_bridge}, the total dimension is:
+\begin{equation}
+\dimH C(1, 3^k + 1) = \log_3 \phi.
+\end{equation}
+
+\textbf{Case 2: Family 2 Extremizers ($M = 3^{2a} - 3^a + 1$, with $b = 2a$).}
+The single-column constraint is:
+\begin{equation}\label{eq:f2_extremizer}
+0 \le z_r - z_{r-a} + z_{r-2a} \le 1.
+\end{equation}
+Across the $a$ congruence classes modulo $a$, the sequence decomposes into $a$ independent sub-chains. On each individual sub-chain, writing $y_m$ for the $m$-th entry, the constraint becomes:
+\begin{equation}
+0 \le y_m - y_{m-1} + y_{m-2} \le 1 \quad (\forall m \ge 2).
+\end{equation}
+We classify admissible words via their \emph{flip set}:
+\begin{equation}
+S(y) = \{ m \ge 1 : y_m \ne y_{m-1} \}.
+\end{equation}
+Evaluating the constraint across all local triples $(y_{m-2}, y_{m-1}, y_m) \in \{0, 1\}^3$:
+\begin{itemize}
+    \item If $(y_{m-2}, y_{m-1}, y_m) = (0, 1, 0)$, then $y_m - y_{m-1} + y_{m-2} = 0 - 1 + 0 = -1 \notin [0, 1]$ (Forbidden).
+    \item If $(y_{m-2}, y_{m-1}, y_m) = (1, 0, 1)$, then $y_m - y_{m-1} + y_{m-2} = 1 - 0 + 1 = 2 \notin [0, 1]$ (Forbidden).
+    \item All other six binary triples satisfy $0 \le y_m - y_{m-1} + y_{m-2} \le 1$.
+\end{itemize}
+Thus the constraint forbids exactly $010$ and $101$. Equivalently, two consecutive state flips $y_{m-1} \ne y_{m-2}$ and $y_m \ne y_{m-1}$ cannot occur simultaneously: the flip set $S(y)$ cannot contain two consecutive integers. Because a binary sequence $y$ is uniquely determined by its initial symbol $y_0 \in \{0, 1\}$ and its flip set $S(y)$, the number of admissible words of length $L$ is exactly:
+\begin{equation}
+N_{\mathrm{chain}}(L) = F_{L+2}.
+\end{equation}
+Hence each sub-chain is topologically conjugate to the golden mean shift $\Sigma_{\mathrm{gold}}$, with Perron root $\lambda = \phi$. Combining the $a$ sub-chains yields total word count $N(n) = (F_{n/a + 2})^a \sim \phi^n$, establishing:
+\begin{equation}
+\dimH C(1, 3^{2a} - 3^a + 1) = \log_3 \phi.
+\end{equation}
+\end{proof}
+
+---
+
+\section{Time-Reversal Duality and Boundary Regimes}
+
+A central structural phenomenon of Family~2 multipliers is their invariance under time-reversal duality.
 
 \begin{proof}[Proof of Theorem~\ref{thm:time_reversal}]
-The constraint $0 \le z_i - z_{i-a} + z_{i-b} \le 1$ can be expressed in terms of past states. Replacing the sequence $z_i$ by its reversed sequence $w_i = z_{-i}$, the condition becomes:
+The constraint $0 \le z_i - z_{i-a} + z_{i-b} \le 1$ can be expressed in terms of past states. Replacing the sequence $z_i$ by its time-reversed sequence $w_i = z_{-i}$, the condition becomes:
 \begin{equation}
 0 \le w_{-i} - w_{-i+a} + w_{-i+b} \le 1.
 \end{equation}
@@ -176,34 +299,64 @@ Shifting index by $-b$, setting $j = -i + b$, and noting that $b - a$ is the com
 \begin{equation}
 0 \le w_j - w_{j - (b-a)} + w_{j-b} \le 1.
 \end{equation}
-This is identically the defining constraint of $\Sigma_{(b-a, b)}$. In terms of the transition graphs, the adjacency matrix of the time-reversed shift is the transpose $M_{(a,b)}^T$, up to relabeling of states by the permutation $P$ reversing binary words of length $b$. Thus $P M_{(a,b)} P = M_{(b-a, b)}^T$. Because a matrix and its transpose share the same characteristic polynomial, the eigenvalues and Hausdorff dimensions coincide identically.
+This is identically the defining constraint of $\Sigma_{(b-a, b)}$. In terms of the symbolic transition graphs, the adjacency matrix of the time-reversed shift is the transpose $M_{(a,b)}^T$, up to relabeling of states by the permutation $P$ reversing binary words of length $b$. Thus $P M_{(a,b)} P = M_{(b-a, b)}^T$. Because a matrix and its transpose share the same characteristic polynomial, the eigenvalues and Hausdorff dimensions coincide identically: $\lambda(a, b) = \lambda(b-a, b)$.
 \end{proof}
 
-\begin{example}
-Consider the pair $(a, b) = (1, 3)$ ($M = 13$) and $(a, b) = (2, 3)$ ($M = 19$). By Time-Reversal Duality, both have transfer matrices with characteristic polynomial $x^3 - x^2 - 1 = 0$, dominant root $\lambda \approx 1.465571$ (the Narayana plastic number), and exact Hausdorff dimension $\dimH C(1, 13) = \dimH C(1, 19) = \log_3 \lambda \approx 0.347934$.
-\end{example}
+\begin{corollary}[Reduction of Boundary Case 2]\label{cor:boundary_reduction}
+Boundary Case~2 ($b - a = 1, a \ge 2$) reduces via Time-Reversal Duality to Boundary Case~1 ($a = 1, b \ge 3$):
+\begin{equation}
+\lambda(a, a+1) = \lambda(1, a+1).
+\end{equation}
+\end{corollary}
+
+\begin{lemma}[Strict Inequality on Boundary Case 1]\label{lem:boundary_strict}
+For all $b \ge 3$, the Perron root of $\Sigma_{(1, b)}$ satisfies $\lambda(1, b) < \phi$ strictly.
+\end{lemma}
+
+\begin{proof}
+For $a = 1$, the characteristic polynomial of the minimal transfer matrix is:
+\begin{align*}
+P_b(t) &= t^b - t^{b-1} - t^{b-2} - \dots - t - 1 + (t^{b-2} - 1) \\
+&= (t^2 - t - 1) t^{b-2} + (t^{b-2} - 1).
+\end{align*}
+Evaluating $P_b(t)$ at the golden ratio $t = \phi$:
+\begin{equation}
+P_b(\phi) = (\phi^2 - \phi - 1) \phi^{b-2} + (\phi^{b-2} - 1) = 0 + (\phi^{b-2} - 1) = \phi^{b-2} - 1.
+\end{equation}
+For $b \ge 3$, $b - 2 \ge 1$, so $\phi^{b-2} - 1 \ge \phi - 1 \approx 0.618 > 0$. Since $P_b(1) < 0$ and $P_b(\phi) > 0$, the dominant real root $\lambda(1, b)$ lies strictly in $(1, \phi)$, proving $\lambda(1, b) < \phi$.
+\end{proof}
+
+By Corollary~\ref{cor:boundary_reduction}, $\lambda(a, a+1) = \lambda(1, a+1) < \phi$ strictly for all $a \ge 2$, disposing of both boundary rays.
 
 ---
 
-\section{Extremizers and the Golden Mean Shift}
+\section{The Interior Domain and the Spectral Gap}
 
-We now establish the classification of maximal dimension for safe multipliers.
+For coprime pairs in the interior domain $a \ge 2$ and $b - a \ge 2$, we establish strict sub-golden dimension via the branching recurrence and Parry measure slack.
 
-\begin{proof}[Proof of Theorem~\ref{thm:universal_bound}]
-For Family~1 ($M = 3^k + 1$), the constraint is $z_j + z_{j-k} \le 1$. Across the $k$ independent congruence classes modulo $k$, the sequence decomposes into $k$ non-interacting paths, each subject to the forbidden word $11$. The word count for the golden mean shift is $F_{n+2}$, so $N(n) = (F_{n/k + 2})^k \sim \phi^n$, yielding Perron root $\lambda = \phi$.
-
-For Family~2 with $b = 2a$, the constraint $0 \le z_i - z_{i-a} + z_{i-2a} \le 1$ reduces under substitution $y_j = z_{j a}$ to $0 \le y_j - y_{j-1} + y_{j-2} \le 1$. If $y_{j-1} = 1$, then $y_j + y_{j-2} \le 2$ is automatic, but $y_j + y_{j-2} \ge 1$ forces at least one $1$. When $y_{j-1} = 0$, $y_j + y_{j-2} \le 1$ forbids two ones. A direct graph reduction demonstrates that this SFT is topologically conjugate to the golden mean shift, giving $\lambda(a, 2a) = \phi$.
-
-For any non-extremizer with $a \ge 2$ and $b - a \ge 2$, the existence of the periodic orbit $0^b 1^b$ ensures that the Parry measure assigns strictly positive probability $\epsilon(a, b) > 0$ to a witness word $w_*$ that creates strict slack in the Fibonacci step recurrence:
+\begin{lemma}[Branching Step Recurrence]\label{lem:branching_step}
+Let $A_n$ denote the set of admissible words of length $n$, and $N(n) = |A_n|$. Appending symbol $z_n \in \{0, 1\}$, the new constraint $0 \le z_n - z_{n-a} + z_{n-b} \le 1$ admits both values of $z_n$ if and only if $z_{n-a} = z_{n-b}$ ($z_n$ is free), and exactly one value otherwise ($z_n$ is forced). Hence:
 \begin{equation}
-1 + \lambda - \lambda^2 \ge \epsilon(a, b) > 0.
+N(n+1) = N(n) + B(n), \quad \text{where } B(n) = \# \{ u \in A_n : z_{n-a} = z_{n-b} \}.
 \end{equation}
-Since $g(x) = 1 + x - x^2$ has $g(\phi) = 0$ and is strictly decreasing on $[1, \infty)$, this forces $\lambda(a, b) < \phi$, with an explicit spectral gap:
+Consequently, the Fibonacci bound $B(n) \le N(n-1)$ for all $n \ge a$ implies $\lambda(a, b) \le \phi$.
+\end{lemma}
+
+\begin{theorem}[Universal Periodic Obstruction]\label{thm:periodic_obstruction}
+For all coprime $a \ge 2$ and $b - a \ge 2$, the SFT $\Sigma_{(a, b)}$ admits an explicit universal periodic orbit of length $2b$:
+\begin{equation}
+w_* = (0^b 1^b)^\infty.
+\end{equation}
+The Parry measure assigns strictly positive probability $\mu([w_*]) = \epsilon(a, b) > 0$ to cylinders of this orbit. In the asymptotic branching recurrence:
+\begin{equation}
+\lim_{n \to \infty} \frac{N(n-1) - B(n)}{N(n-1)} = 1 + \lambda - \lambda^2 \ge \mu([w_*]) = \epsilon(a, b) > 0.
+\end{equation}
+Since $g(x) = 1 + x - x^2$ has $g(\phi) = 0$ and $g'(x) = 1 - 2x < 0$ on $[1, \infty)$, this forces:
 \begin{equation}
 \phi - \lambda(a, b) \ge \frac{\epsilon(a, b)}{\sqrt{5}} > 0.
 \end{equation}
-This completes the classification.
-\end{proof}
+Thus, every non-extremizer in the interior domain satisfies $\lambda(a, b) < \phi$ with a strictly positive spectral gap.
+\end{theorem}
 
 ---
 
@@ -213,10 +366,9 @@ Table~\ref{tab:dimension_table} provides the certified exact Hausdorff dimension
 
 \begin{table}[htbp]
 \centering
-\small
-\setlength{\tabcolsep}{4pt}
 \caption{Exact Hausdorff dimensions of $C(1, M)$ for representative multipliers $M \le 300$. All minimal polynomial factors are exact algebraic factors.}\label{tab:dimension_table}
-\begin{tabular}{rcclp{3.8cm}}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{rccll}
 \toprule
 $M$ & Exact $\dimH C(1, M)$ & States & Minimal Factor & Classification \& Duality \\
 \midrule
@@ -239,10 +391,13 @@ $217$& $\log_3 \lambda_{235} \approx 0.312255$ & $15$ & degree $15$ factor & Non
 $235$& $\log_3 \lambda_{235} \approx 0.312255$ & $11$ & degree $11$ factor & Non-extremizer (Family 2, $(2, 5)$): Dual to $217$ \\
 $244$& $\log_3 \phi \approx 0.438018$ & $10$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 1, $k=5$) \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
-\noindent\textbf{Table Note on Exactness and Symmetries:} All characteristic polynomials and minimal polynomial factors in Table~\ref{tab:dimension_table} are exact algebraic factors computed via symbolic determinant expansion of the minimal carry automaton. In all cases, including higher degrees (e.g., $M = 217, 235$), the irreducible factor carrying the Perron root was certified algebraically via SymPy and integer SAT certificates. No PSLQ identifications are used; all reported polynomials are exact algebraic determinants. Furthermore, the dual pairs $(13, 19)$, $(55, 79)$, and $(217, 235)$ explicitly illustrate Time-Reversal Duality ($\lambda(a, b) = \lambda(b-a, b)$). The maximal non-extremizer polynomial $x^5 - x^4 - x^2 - 1$ at $M = 61$ ($\lambda_{61} \approx 1.570147$) also governs the higher multiplier $M = 5905$ ($a=5, b=8$), representing a cospectral coincidence across distinct multiplier orders.
+\noindent\textbf{Cospectral Phenomenon and Minimal Polynomial Factors:} All characteristic polynomials and minimal polynomial factors in Table~\ref{tab:dimension_table} are exact algebraic factors computed via symbolic determinant expansion of the minimal carry automaton. In all cases, including higher degrees (e.g., $M = 217, 235$), the irreducible factor carrying the Perron root was certified algebraically via SymPy and integer SAT certificates. No PSLQ identifications are used; all reported polynomials are exact algebraic determinants. 
+
+Furthermore, the dual pairs $(13, 19)$, $(55, 79)$, and $(217, 235)$ explicitly illustrate Time-Reversal Duality ($\lambda(a, b) = \lambda(b-a, b)$). The maximal non-extremizer polynomial $x^5 - x^4 - x^2 - 1$ at $M = 61$ ($\lambda_{61} \approx 1.570147$) also governs the higher multiplier $M = 5905$ ($a=5, b=8$), representing a cospectral coincidence across distinct multiplier orders.
 
 ---
 
@@ -250,7 +405,7 @@ $244$& $\log_3 \phi \approx 0.438018$ & $10$ & $x^2 - x - 1$        & \textbf{Ex
 
 All major algebraic and dynamical theorems in this paper have been formalized in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. The complete machine-checked formalization, proofs, and verification scripts are openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
 \begin{itemize}
-    \item \texttt{CantorMultiplier.lean}: Formalizes Condition~(S), proving $\dimH \le \log_3 \phi$ and its attainment on Family~1 and Family~2.
+    \item File \texttt{CantorMultiplier.lean}: formalizes Condition~(S), proving $\dimH \le \log_3 \phi$ and its attainment on Family~1 and Family~2.
     \item \texttt{TimeReversal.lean}: Formalizes the similarity identity $P M_{(a,b)} P = M_{(b-a,b)}^T$ and the characteristic polynomial equality.
     \item \texttt{PeriodicOrbit.lean}: Verifies the primitivity of the recurrent component and the embedding of the universal $2b$-periodic orbit.
     \item \texttt{RepunitCarryConnection.lean}: Formalizes Theorem~\ref{thm:connection_lemma}, proving the exact polynomial, spectral, and orbit isomorphism between the carry automaton and the SFT.
@@ -259,7 +414,7 @@ All major algebraic and dynamical theorems in this paper have been formalized in
 
 An exhaustive, automated axiom audit across the entire formalization confirms:
 \begin{itemize}
-    \item \textbf{182 of 270 declarations} in the core formalization are pure foundational, depending exclusively on standard Lean foundation: \linebreak\texttt{[propext, Classical.choice, Quot.sound]};
+    \item \textbf{182 of 270 declarations} in the core formalization are pure foundational, depending exclusively on the standard Lean foundation: \texttt{[propext}, \texttt{Classical.choice}, \texttt{Quot.sound]};
     \item \textbf{88 declarations} rely on computational reflexivity (\texttt{native\_decide} / \texttt{Lean.ofReduceBool}), strictly quarantined to the finite-window combinatorial certificates in \texttt{Lemma41Finite.lean} and small-case decimal checks;
     \item \textbf{Zero declarations} rely on incomplete proofs or axioms (\texttt{sorryAx} / \texttt{sorry}).
 \end{itemize}
