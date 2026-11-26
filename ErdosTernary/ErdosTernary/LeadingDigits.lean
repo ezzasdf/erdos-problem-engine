@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   Leading Digits: Connection between fractional parts and leading ternary digit blocks.
 
   For α = log₃(2), the leading 30-digit block of 2^r in base 3 is determined

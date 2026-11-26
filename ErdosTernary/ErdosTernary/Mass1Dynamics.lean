@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   Mass-1 Dynamics: Identifying Ostrowski mass-one residues in N_K.
 
   A residue r has Ostrowski mass 1 if r = q_j + ℓ with 5 ≤ j and ℓ ≤ 18,

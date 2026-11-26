@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, Lean 4 formalization, or cite these papers, please cite as follows."
+authors:
+  - family-names: "Wahba"
+    given-names: "Ezzeldin Ashraf Mohamed Shafey"
+    email: "ezzeldinashraf.web@gmail.com"
+title: "The Erdős Ternary Conjecture & Cantor Multiplier Intersections"
+version: 1.0.0
+date-released: 2026-11-26
+url: "https://github.com/ezzasdf/erdos-problem-engine"
+repository-code: "https://github.com/ezzasdf/erdos-problem-engine"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Wahba"
+      given-names: "Ezzeldin Ashraf Mohamed Shafey"
+  title: "The Extremal Hausdorff Dimension of Cantor Multiplier Intersections and the Golden Mean Shift"
+  year: 2026
+  journal: "Preprint"
+  url: "https://github.com/ezzasdf/erdos-problem-engine"

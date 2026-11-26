@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   Auto-generated range-check chunk proofs for K=15,16,17.
   Each chunk covers a range of size 3^13 = 1,594,323.
   Proved by native_decide on the range-parallel bridge check.

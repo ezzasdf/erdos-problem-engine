@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   ErdosTernary/Lemma41.lean
 
   Assembly of Lemma 4.1 for the Erdős ternary program / C(1, M) multipliers:

@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   Bridge Theorem: pow2Mod-based verification for K=13..16
   
   N_K candidate lists generated externally (Python via recurrence x0=1, x_{n+1}=2x_n mod 3^K).

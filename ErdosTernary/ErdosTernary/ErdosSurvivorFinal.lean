@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   ErdosSurvivorFinal.lean — The Erdős Ternary Conjecture: Clean Final Statement
 
   No sorry. No new axioms beyond propext, Classical.choice, Lean.ofReduceBool, Quot.sound.

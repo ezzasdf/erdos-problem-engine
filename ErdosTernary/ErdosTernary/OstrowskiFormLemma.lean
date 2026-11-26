@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   Lemma A: Form characterization of mass-one integers in Ostrowski numeration.
 
   For convergent denominators `q` of partial quotients `A >= 1` with anchor

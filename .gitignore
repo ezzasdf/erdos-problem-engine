@@ -33,3 +33,7 @@ verify_middle/results_m1.csv
 *.log
 *.out
 *.toc
+
+# Upload packages
+paper/*.zip
+paper/arxiv_upload_cantor/

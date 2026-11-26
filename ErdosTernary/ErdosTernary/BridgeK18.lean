@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   Bridge Theorem: K=18 Chunked Bridge Verification
   Proved by: checkBridgeCantorPow2_of_chunked 18 1594323 162
   Split into 3 parts (54 chunks each) to avoid stack overflow.

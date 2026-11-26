@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   LargeBridge.lean — Minimal-dependency bridge for the Erdős digit-2 conjecture.
 
   Proves: for K ≥ 18 and r ∈ computeNKFast K with r ∉ {0,2,8}, 2^r is not Cantor.

@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   Erdős ternary conjecture: powers of 2 and the digit 2 in base 3.
   Proves that 2^8 = 256 is the last power of 2 that lacks digit 2 in ternary.
 

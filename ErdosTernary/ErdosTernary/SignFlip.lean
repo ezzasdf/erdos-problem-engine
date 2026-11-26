@@ -1,3 +1,9 @@
+/-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
 import Mathlib.Tactic
 
 def td (n k : Nat) : Nat := (n / 3 ^ k) % 3

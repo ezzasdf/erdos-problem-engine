@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   BlockClassification.lean — Block classification for the Erdős ternary conjecture.
 
   Proves: the order of 2^P mod 3^30 is exactly 3^15 (via cubing chain + Euler),

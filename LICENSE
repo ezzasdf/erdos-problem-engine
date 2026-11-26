@@ -1,0 +1,29 @@
+# Intellectual Property and Licensing Notice
+
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+
+Author: Ezzeldin Ashraf Mohamed Shafey Wahba
+Email: ezzeldinashraf.web@gmail.com
+Repository: https://github.com/ezzasdf/erdos-problem-engine
+
+---
+
+## 1. Research Manuscripts and Academic Papers (`paper/`)
+
+All rights reserved. The mathematical manuscripts, preprints, and associated PDF/LaTeX files located in the `paper/` directory and subdirectories are the intellectual property of the author:
+
+- "The Extremal Hausdorff Dimension of Cantor Multiplier Intersections and the Golden Mean Shift"
+- "The Erdős Ternary Digit Conjecture: Rooted Repunit Trees, 3-Adic Dynamics, Archimedean Decoupling, and the Negative-Power Duality"
+
+No part of these manuscripts may be reproduced, redistributed, copied, modified, or submitted to any journal, conference, or repository under another name or without explicit written permission and proper academic attribution.
+
+---
+
+## 2. Software and Interactive Formalizations (`ErdosTernary/`, scripts, certificates)
+
+The Lean 4 source code, verification scripts, and certificate validation tools in this repository are licensed under the Apache License, Version 2.0 (the "License").
+
+You may obtain a copy of the License at:
+http://www.apache.org/licenses/LICENSE-2.0
+
+Any redistribution, derivation, or academic/commercial use of the formalization codebase must preserve the copyright notice and provide full credit to the author.

@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   Block1Invariant.lean — Block-1 digit invariant for the Erdos ternary conjecture.
   This file contains NO sorry, NO admit, NO axioms.
 -/

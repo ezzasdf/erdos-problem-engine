@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   Bridge Theorem: Leading/Trailing Orbit Intersection & Trailing Filters
 
   Formalizes the trailing 2-free condition B_K(n) for n = 0, 2, 8 and

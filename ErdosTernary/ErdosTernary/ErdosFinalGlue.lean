@@ -1,4 +1,10 @@
 /-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
+/-
   ErdosFinalGlue.lean — Final glue: full digit-form conjecture
 
   Imports ErdosSurvivorFinal (compiled, 0 sorry) and LargeBridge (1 sorry).
