@@ -50,10 +50,11 @@ def run_clean_evaluation():
         assert "PASS" in res_m19.stdout
         print("  -> Step 2 PASSED: Standalone Collatz-Wielandt audit succeeded in 0 dependencies.")
 
-        # Step 3: Test all 23 catalog certificates in clean room
-        catalog_dir = REPO_ROOT / "certificates" / "catalog"
+        # Step 3: Test all 23 catalog certificates extracted directly from clean-room unpack
+        catalog_dir = tmppath / "catalog"
         catalog_files = sorted([f for f in catalog_dir.glob("M*.json")])
-        print(f"\n[Step 3] Auditing all {len(catalog_files)} certificates in the catalog...")
+        assert len(catalog_files) == 23, f"Expected 23 extracted catalog certificates in {catalog_dir}, found {len(catalog_files)}"
+        print(f"\n[Step 3] Auditing all {len(catalog_files)} certificates extracted directly from the archive...")
         
         passed_catalog = 0
         for cfile in catalog_files:

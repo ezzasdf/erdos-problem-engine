@@ -1,0 +1,216 @@
+{
+  "catalog_version": "emve-catalog-v1.0.0",
+  "format_version": "emve-cert-v1",
+  "total_certificates": 23,
+  "audited_and_verified": 23,
+  "zenodo_doi": "10.5281/zenodo.24595631",
+  "certificates": [
+    {
+      "multiplier_M": 2,
+      "filename": "M2_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 1,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "601955c87e2143d6d74d1aeda645bf599cdc62fecb8e33959f13c7e0fa25d73e",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 4,
+      "filename": "M4_sturm_extremizer.json",
+      "certificate_type": "sturm_root_count",
+      "states": 2,
+      "conclusion": "rho(A) == phi exactly",
+      "payload_sha256": "2db5acf9014a99642c77eeeaf6d8d308ebcc57b323a7ac3b4c9d792916756c3e",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 5,
+      "filename": "M5_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 1,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "6cf1e06145c0cbf2b591ae12e91fcf02994bed05b524caeb5c81c937507d7f09",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 7,
+      "filename": "M7_sturm_extremizer.json",
+      "certificate_type": "sturm_root_count",
+      "states": 4,
+      "conclusion": "rho(A) == phi exactly",
+      "payload_sha256": "2a35fea03dd251490db08b44e9747e47fcc557873e554e1f874078e887771c5e",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 8,
+      "filename": "M8_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 1,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "13fddb42d2b16004bfbf8e49b7654009fe4099472408a19a39422428cf017c81",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 10,
+      "filename": "M10_sturm_extremizer.json",
+      "certificate_type": "sturm_root_count",
+      "states": 2,
+      "conclusion": "rho(A) == phi exactly",
+      "payload_sha256": "aea23357fcf9057944f9c7dd6e76d7d8618fab300f25039381b91488d543c4ee",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 11,
+      "filename": "M11_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 1,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "79d5410181942b61faca3e7e2ac514ae0da53c9e19db714581e3a2ccfd0ca897",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 13,
+      "filename": "M13_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 3,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "a66d1d8dc9ef1657031492e905897440498269202988678dcdf94bb811a89955",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 14,
+      "filename": "M14_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 1,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "17c054541b7c734455211a07bb8afa05b205422fe21280e94b977e885ea29ca3",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 16,
+      "filename": "M16_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 5,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "929d9f39b1f6144f6bcd888cae214ac47684006964ad947ccf99eff6e5ea07c1",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 17,
+      "filename": "M17_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 1,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "9e4d32960fc5db77a7c465d728b5ca02c3cb17b3c6fb27bfb03e124374c2a1d9",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 19,
+      "filename": "M19_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 6,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "148a5dd8005f2b70348da23d37fc1bcfe167228614ce0b73a13abcf0cd5fab4a",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 20,
+      "filename": "M20_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 1,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "8053edde477f185fde54ef0572d631e38f97b2ab10c7171483eb28b49743a581",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 22,
+      "filename": "M22_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 7,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "9ceb678a0f68eeebd5aa62953e5a24edffc2dc5660ab720830718d54b3ae1a8c",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 23,
+      "filename": "M23_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 1,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "b2a9547f401b46c109ef2024c0ffecc1e9aef36d8dc7209907377dbcba974ca7",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 25,
+      "filename": "M25_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 8,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "6339252dcf860852713ad7168050e8f2b05dfe0c77acee91e65494cbb35bf6df",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 26,
+      "filename": "M26_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 1,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "22fb425c7b4d5478c870d825477b56f8e5111b3a46049277495ac863c1e4eff6",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 28,
+      "filename": "M28_sturm_extremizer.json",
+      "certificate_type": "sturm_root_count",
+      "states": 2,
+      "conclusion": "rho(A) == phi exactly",
+      "payload_sha256": "a07d76c10914acefd7f0e1bfa6f826a0a6ca79ad1c1bd98440185044fdc94f04",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 29,
+      "filename": "M29_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 1,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "ebd092bcabebd407b3de982384cf89070e9cc6289bee51c634d338f5705f2159",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 31,
+      "filename": "M31_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 10,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "2082d37b519d6128831d5f68b5fdc9bc98e4fbcd7e80b83f53e55635236bf38f",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 32,
+      "filename": "M32_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 1,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "dd9ec69068b94b7142f2805542b21ffbc67fd1c52fcf756bf276d60779464c47",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 34,
+      "filename": "M34_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 8,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "9c1552b254040d20108705b8c9ad5db5cef714628b02e520cd7fc7aef75320f9",
+      "audit_status": "PASS"
+    },
+    {
+      "multiplier_M": 35,
+      "filename": "M35_collatz_wielandt.json",
+      "certificate_type": "collatz_wielandt",
+      "states": 1,
+      "conclusion": "rho(A) <= 1.60 < phi strictly",
+      "payload_sha256": "99809dc539eac8863c122aed6f3b43713f2f37eb26d7babf3e37c44b5b215054",
+      "audit_status": "PASS"
+    }
+  ]
+}

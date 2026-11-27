@@ -1,0 +1,41 @@
+{
+  "format_version": "emve-cert-v1",
+  "certificate_type": "collatz_wielandt",
+  "problem_id": "erdos-cantor-multiplier:M=29:family=OTHER:lag=None",
+  "mathematical_context": {
+    "problem": "Erdos 1939 Middle-Thirds Cantor Set Arithmetic Intersection",
+    "multiplier_M": 29,
+    "family": "OTHER",
+    "forward_lag": null,
+    "graph_type": "zero_reachable_forward_sft"
+  },
+  "claim": {
+    "property": "spectral_radius_upper_bound",
+    "inequality": "5 * sum_j A[i][j]*v[j] <= 8 * v[i] for all i",
+    "spectral_bound_rational": "8/5",
+    "spectral_bound_float": 1.6,
+    "target_golden_ratio": "phi = (1 + sqrt(5)) / 2 approx 1.618033989",
+    "conclusion": "rho(A) <= 1.60 < phi strictly"
+  },
+  "witness": {
+    "matrix_dimensions": [
+      1,
+      1
+    ],
+    "matrix": [
+      [
+        1
+      ]
+    ],
+    "witness_vector": [
+      100000
+    ]
+  },
+  "metadata": {
+    "generator": "EMVE export_catalog.py v1.0.0",
+    "zenodo_doi": "10.5281/zenodo.24595631",
+    "created_at_utc": "2026-11-27T21:45:00Z",
+    "checksum_type": "sha256_canonical_payload_integrity"
+  },
+  "payload_sha256": "ebd092bcabebd407b3de982384cf89070e9cc6289bee51c634d338f5705f2159"
+}
