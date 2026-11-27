@@ -1,0 +1,62 @@
+{
+  "format_version": "emve-cert-v1",
+  "certificate_type": "sturm_root_count",
+  "problem_id": "erdos-cantor-multiplier:M=7:family=F2:lag=(1, 2)",
+  "mathematical_context": {
+    "problem": "Erdos 1939 Middle-Thirds Cantor Set Arithmetic Intersection",
+    "multiplier_M": 7,
+    "family": "F2",
+    "forward_lag": [
+      1,
+      2
+    ],
+    "graph_type": "zero_reachable_forward_sft"
+  },
+  "claim": {
+    "property": "exact_spectral_radius_equality",
+    "target_field": "Q(sqrt(5))",
+    "target_root": "phi = (1 + sqrt(5)) / 2",
+    "polynomial_factor": "x^2 - x - 1",
+    "exact_roots_strictly_greater_than_phi": 0,
+    "conclusion": "rho(A) == phi exactly"
+  },
+  "witness": {
+    "matrix_dimensions": [
+      4,
+      4
+    ],
+    "matrix": [
+      [
+        1,
+        0,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        1,
+        0,
+        1
+      ]
+    ]
+  },
+  "metadata": {
+    "generator": "EMVE export_catalog.py v1.0.0",
+    "zenodo_doi": "10.5281/zenodo.24595631",
+    "created_at_utc": "2026-11-27T21:45:00Z",
+    "checksum_type": "sha256_canonical_payload_integrity"
+  },
+  "payload_sha256": "2a35fea03dd251490db08b44e9747e47fcc557873e554e1f874078e887771c5e"
+}

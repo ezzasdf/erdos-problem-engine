@@ -1,0 +1,128 @@
+{
+  "format_version": "emve-cert-v1",
+  "certificate_type": "collatz_wielandt",
+  "problem_id": "erdos-cantor-multiplier:M=25:family=F2:lag=(2, 3)",
+  "mathematical_context": {
+    "problem": "Erdos 1939 Middle-Thirds Cantor Set Arithmetic Intersection",
+    "multiplier_M": 25,
+    "family": "F2",
+    "forward_lag": [
+      2,
+      3
+    ],
+    "graph_type": "zero_reachable_forward_sft"
+  },
+  "claim": {
+    "property": "spectral_radius_upper_bound",
+    "inequality": "5 * sum_j A[i][j]*v[j] <= 8 * v[i] for all i",
+    "spectral_bound_rational": "8/5",
+    "spectral_bound_float": 1.6,
+    "target_golden_ratio": "phi = (1 + sqrt(5)) / 2 approx 1.618033989",
+    "conclusion": "rho(A) <= 1.60 < phi strictly"
+  },
+  "witness": {
+    "matrix_dimensions": [
+      8,
+      8
+    ],
+    "matrix": [
+      [
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1
+      ]
+    ],
+    "witness_vector": [
+      876119,
+      585075,
+      100000,
+      465672,
+      465672,
+      100000,
+      585075,
+      876119
+    ]
+  },
+  "metadata": {
+    "generator": "EMVE export_catalog.py v1.0.0",
+    "zenodo_doi": "10.5281/zenodo.24595631",
+    "created_at_utc": "2026-11-27T21:45:00Z",
+    "checksum_type": "sha256_canonical_payload_integrity"
+  },
+  "payload_sha256": "6339252dcf860852713ad7168050e8f2b05dfe0c77acee91e65494cbb35bf6df"
+}

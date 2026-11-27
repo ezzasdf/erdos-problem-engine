@@ -1,0 +1,94 @@
+{
+  "format_version": "emve-cert-v1",
+  "certificate_type": "collatz_wielandt",
+  "problem_id": "erdos-cantor-multiplier:M=19:family=F2:lag=(1, 3)",
+  "mathematical_context": {
+    "problem": "Erdos 1939 Middle-Thirds Cantor Set Arithmetic Intersection",
+    "multiplier_M": 19,
+    "family": "F2",
+    "forward_lag": [
+      1,
+      3
+    ],
+    "graph_type": "zero_reachable_forward_sft"
+  },
+  "claim": {
+    "property": "spectral_radius_upper_bound",
+    "inequality": "5 * sum_j A[i][j]*v[j] <= 8 * v[i] for all i",
+    "spectral_bound_rational": "8/5",
+    "spectral_bound_float": 1.6,
+    "target_golden_ratio": "phi = (1 + sqrt(5)) / 2 approx 1.618033989",
+    "conclusion": "rho(A) <= 1.60 < phi strictly"
+  },
+  "witness": {
+    "matrix_dimensions": [
+      6,
+      6
+    ],
+    "matrix": [
+      [
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        0,
+        1
+      ]
+    ],
+    "witness_vector": [
+      201563,
+      139062,
+      100000,
+      100000,
+      139062,
+      201562
+    ]
+  },
+  "metadata": {
+    "generator": "EMVE export_catalog.py v1.0.0",
+    "zenodo_doi": "10.5281/zenodo.24595631",
+    "created_at_utc": "2026-11-27T21:45:00Z",
+    "checksum_type": "sha256_canonical_payload_integrity"
+  },
+  "payload_sha256": "148a5dd8005f2b70348da23d37fc1bcfe167228614ce0b73a13abcf0cd5fab4a"
+}
