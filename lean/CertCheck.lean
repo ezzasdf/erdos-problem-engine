@@ -41,12 +41,12 @@ def mulVec (matrix : List (List Nat)) (v : List Nat) : List Nat :=
 
 /-- Check that all elements of witness vector v are strictly positive -/
 def allStrictlyPositive (v : List Nat) : Bool :=
-  v.all (fun x => x > 0)
+  v.all (fun x => decide (x > 0))
 
 /-- Check that c * (A * v)_i <= d * v_i for all rows i, verifying matching dimensions -/
 def checkInequality (c d : Nat) (Av : List Nat) (v : List Nat) : Bool :=
   Av.length == v.length &&
-  (List.zipWith (fun avi vi => c * avi <= d * vi) Av v).all id
+  (List.zipWith (fun avi vi => decide (c * avi <= d * vi)) Av v).all id
 
 /--
 Hardened Collatz–Wielandt verification predicate:
