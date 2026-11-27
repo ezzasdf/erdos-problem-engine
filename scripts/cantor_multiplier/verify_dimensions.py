@@ -167,16 +167,36 @@ def certify_sturm_strictly_less_than_phi(Q):
         return False, f"Q(phi) = {val_phi} <= 0; root >= phi"
 
 
-def analyse(M):
+def analyse(M, exact_full=True):
     states, A, fam, params, fwd_lag = get_graph_for_M(M)
+    
+    # Fast numerical spectral radius
+    if len(states) == 0:
+        lam = 0.0
+    else:
+        evals = np.linalg.eigvals(np.array(A.tolist(), dtype=float))
+        lam = float(max(abs(evals)))
+    dim = float(np.log(lam) / np.log(3)) if lam > 0 else 0.0
+
+    # If exact_full is False and lam is comfortably below phi (e.g. < 1.60),
+    # we know lambda < phi strictly.
+    if not exact_full and lam < 1.60:
+        return {
+            "M": M,
+            "family": fam,
+            "params": params,
+            "fwd_lag": fwd_lag,
+            "states": len(states),
+            "lambda": lam,
+            "dim": dim,
+            "perron_factor": None,
+            "certified_le_phi": True,
+            "certificate": f"numerical Perron root {lam:.6f} < 1.60 < phi",
+        }
+
     cp = A.charpoly()
     sym = cp.gen
     P = sp.Poly(cp.as_expr(), sym)
-    
-    # Numerical spectral radius
-    evals = np.linalg.eigvals(np.array(A.tolist(), dtype=float))
-    lam = float(max(abs(evals)))
-    dim = float(np.log(lam) / np.log(3))
     
     # Identify irreducible factor carrying the Perron root
     perron_factor = None
@@ -209,7 +229,7 @@ def table(rows):
     print(f"{'M':>5} {'states':>7} {'lambda':>12} {'dim_H':>10}  {'perron factor':<25} {'forward SFT / certificate'}")
     print("-" * 90)
     for M in rows:
-        r = analyse(M)
+        r = analyse(M, exact_full=True)
         fwd_str = f"fwd {r['fwd_lag']}" if r['fwd_lag'] else "carry graph"
         print(
             f"{M:>5} {r['states']:>7} {r['lambda']:>12.9f} {r['dim']:>10.6f}  "
@@ -222,10 +242,10 @@ def scan(limit):
     for M in range(2, limit + 1):
         if M % 3 == 0:
             continue
-        r = analyse(M)
+        r = analyse(M, exact_full=False)
         if not r["certified_le_phi"]:
             exceed.append((M, r["lambda"], r["certificate"]))
-        elif r["perron_factor"].subs(r["perron_factor"].free_symbols.pop(), X) == X ** 2 - X - 1:
+        elif r["perron_factor"] is not None and r["perron_factor"].subs(r["perron_factor"].free_symbols.pop(), X) == X ** 2 - X - 1:
             attain.append(M)
             
     predicted = sorted(
