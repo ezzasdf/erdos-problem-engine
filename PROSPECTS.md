@@ -1,85 +1,79 @@
-# Commercial Prospecting: Top 10 Target Organizations & Paid Pilot Strategy
+# Commercial Prospecting: Prioritized Segments & Technical Evaluation Framework
 
-**Objective:** Secure initial commercial traction through structured, paid 60-day evaluation pilots for the Erdős Mathematical Verification Engine (EMVE).
-
----
-
-## 1. Top 10 Target Organizations
-
-### A. AI Automated Reasoning & Theorem Proving Labs
-
-#### 1. Google DeepMind (Formal Mathematics & Automated Reasoning Group)
-- **Relevant Focus:** Project Gemini / AlphaProof / Lean 4 formalization of advanced mathematical conjectures.
-- **Why They Care:** EMVE bridges deep combinatorial transfer matrices with Lean 4 kernel verification. It provides concrete, machine-checked ground-truth data and automated certificates for non-trivial fractal and arithmetic conjectures.
-- **Target Tier:** Tier 2 (Integration & Development) — embeddable benchmark datasets and verifier pipelines for automated theorem-proving evaluation.
-
-#### 2. OpenAI (Formal Reasoning & Alignment Team)
-- **Relevant Focus:** Mathematical problem solving with verifiable certificates (e.g. o1/o3 reasoning models).
-- **Why They Care:** High demand for exact certificate generators (Collatz-Wielandt integer witnesses and algebraic number field evaluations) as verifiable reward functions and training ground-truth.
-- **Target Tier:** Tier 1 / Tier 2 — training set enrichment and formal verifier integration.
-
-#### 3. Anthropic (Formal Verification & Safe Systems)
-- **Relevant Focus:** Formal verification of critical algorithmic properties and mathematical safety constraints.
-- **Why They Care:** Mechanized verification pipelines combining verified kernels with automated algebraic solvers for continuous-to-discrete invariant analysis.
-- **Target Tier:** Tier 1 (Research & Internal Computation).
+**Objective:** Approach high-alignment prospects with a concrete, low-risk **Technical Evaluation Proposal** grounded in machine-checkable mathematical verification.
 
 ---
 
-### B. Quantitative Trading & Algorithmic Research
+## 1. Prioritized Customer Segments
 
-#### 4. Jane Street Capital (Quantitative Research & Formal Systems)
-- **Relevant Focus:** Renowned users of functional programming (OCaml) and formal methods for algorithmic invariants and discrete dynamical systems.
-- **Why They Care:** Exact spectral radius bounds and carry automata without floating-point error directly model discrete market state transitions and queuing dynamics.
-- **Target Tier:** Tier 1 (Research & Internal Computation) or Tier 2.
+Rather than treating all mathematical or computational groups as equally immediate prospects, target organizations are segmented by technical alignment and procurement feasibility:
 
-#### 5. Renaissance Technologies (Mathematical Modeling & Dynamics)
-- **Relevant Focus:** Statistical physics, ergodic theory, and dynamical systems applied to time series.
-- **Why They Care:** EMVE provides exact Hausdorff dimension computation, transfer matrix decomposition, and Parry Markov measure evaluation on subshifts of finite type.
-- **Target Tier:** Tier 1 (Research & Computation).
+### Priority Tier A: Immediate Technical Alignment (Primary Focus)
 
-#### 6. Citadel Securities (Automated Verification & Low-Latency Math)
-- **Relevant Focus:** Deterministic execution models, invariant checking, and hardware-accelerated discrete verification.
-- **Why They Care:** Rust high-throughput state-space exploration engines combined with formal bounds on integer carry propagation.
-- **Target Tier:** Tier 2 (Integration into internal execution models).
+#### 1. Interactive Theorem Proving & Formal Math Research Labs
+- **Target Profiles:** Research groups developing automated proof synthesis, benchmark suites, and formal mathematics libraries (e.g., Lean FRO, Cambridge Automated Reasoning Group, DeepMind Formal Math).
+- **Core Value Proposition:** EMVE provides a complete, machine-checked bridge between combinatorial transfer matrices, exact algebraic root certificates, and Lean 4 Mathlib structures. It offers hard, verifiable ground-truth benchmarks for auto-formalization tools.
+- **Engagement Strategy:** Offer EMVE's dual certificate generators as an automated pre-processor for Lean proof synthesis pipelines.
 
----
-
-### C. Zero-Knowledge Cryptography & Formal Methods
-
-#### 7. StarkWare Industries (ZK-STARK Formal Verification)
-- **Relevant Focus:** Algebraic intermediate representations (AIR), finite field arithmetic, and carry-free polynomial equations.
-- **Why They Care:** Formal verification of arithmetic carry propagation bounds and modular constraints in Lean 4 directly overlaps with constraint verification for STARK provers.
-- **Target Tier:** Tier 2 (Integration & Development).
-
-#### 8. Aztec Protocol / RISC Zero (ZK-VM Verification)
-- **Relevant Focus:** Verifying soundness and completeness of arithmetic circuits and instruction set carry behaviors.
-- **Why They Care:** Exact symbolic carry graphs and 3-adic carry decoupling mechanisms provide formal models for instruction-level arithmetic safety.
-- **Target Tier:** Tier 1 / Tier 2.
+#### 2. Formal Verification Consultancies & High-Assurance Engineering
+- **Target Profiles:** Specialized verification firms such as **Galois, Inc.**, **Runtime Verification**, and **Formal Land**.
+- **Core Value Proposition:** These consultancies bid on high-assurance client and government verification contracts. EMVE demonstrates how to pair external computational algebra with kernel-verified proof assistants without bloating the trusted computing base.
+- **Engagement Strategy:** Propose EMVE as a subcontracted exact verification engine for discrete transition and carry-automata verification tasks.
 
 ---
 
-### D. Specialized Formal Verification Consultancies & Cloud Infrastructure
+### Priority Tier B: Specialized Architectural Integrations (Secondary Focus)
 
-#### 9. Galois, Inc. (Formal Methods & High-Assurance Computing)
-- **Relevant Focus:** DoD/DARPA-funded formal verification of mathematical models, cryptographic protocols, and automated theorem proving.
-- **Why They Care:** EMVE is an exemplary demonstration of integrating interactive theorem proving (Lean 4) with certified computational number theory.
-- **Target Tier:** Tier 2 / Tier 3.
+#### 3. Zero-Knowledge VM & Arithmetic Circuit Teams
+- **Target Profiles:** ZK engineering teams modeling carry behavior and arithmetic constraints (e.g., **StarkWare**, **Aztec Protocol**, **RISC Zero**).
+- **Core Value Proposition:** Carry propagation across binary and ternary digit expansions models instruction-level carry overflow and constraint satisfaction.
+- **Prerequisite:** Requires developing a concrete tutorial showing how EMVE's carry graphs map onto an actual ZK circuit or Algebraic Intermediate Representation (AIR) constraint check.
 
-#### 10. Amazon Web Services (AWS Automated Reasoning Group)
-- **Relevant Focus:** Scalable automated mathematical reasoning, SMT solving, and Lean-based verification of cloud invariants.
-- **Why They Care:** Combining automated algebraic certificate generation with formal proof assistants to verify complex distributed and arithmetic properties.
-- **Target Tier:** Tier 1 / Tier 2.
+#### 4. Cloud Infrastructure Automated Reasoning Groups
+- **Target Profiles:** **AWS Automated Reasoning Group**, Microsoft Research Automated Reasoning.
+- **Core Value Proposition:** Scalable automated mathematical reasoning over discrete invariants, combining SMT solvers with exact quadratic number field Sturm sequences.
 
 ---
 
-## 2. The 60-Day Paid Pilot Offer Framework
+### Priority Tier C: Exploratory & Long-Term Targets
 
-To lower barrier-to-entry while securing formal commercial commitment, we propose approaching prospects with a **Structured 60-Day Commercial Pilot**:
+#### 5. Quantitative Trading & Algorithmic Research (Speculative)
+- **Target Profiles:** Quantitative trading teams (e.g., **Jane Street**, **Renaissance Technologies**).
+- **Honest Assessment:** Speculative. While these firms employ functional programming and discrete mathematicians, EMVE has not yet been demonstrated on an actual order-book or execution queuing problem. 
+- **Recommendation:** Do not pitch EMVE as a financial tool until an explicit market microstructure mapping has been validated.
 
-- **Pilot Investment:** \$10,000 – \$25,000 (flat fee, 100% credited toward an annual Tier 2/3 license upon conversion).
-- **Deliverables:**
-  1. Full Tier 1/2 commercial license for internal evaluation during the pilot term.
-  2. Provision of the exact spectral verification suite and high-throughput Rust carry engine.
-  3. Custom adaptation session (up to 10 engineering hours): configuring EMVE to certify a customer-designated dynamical system or arithmetic carry automaton.
-  4. Delivery of an Executive Verification Report certifying the customer's specific benchmark.
-- **Conversion Trigger:** Upon successful verification of the customer's target problem, the pilot transitions into a full annual Tier 2 ($35,000/year) or Tier 3 ($75,000+/year) enterprise contract.
+#### 6. Frontier AI Labs (Procurement & Security Overhead)
+- **Target Profiles:** **OpenAI**, **Anthropic**, **Meta FAIR**.
+- **Honest Assessment:** While these labs actively research mathematical reasoning, institutional procurement, NDA overhead, and large internal research teams make them difficult first customers for an early-stage solo product.
+- **Recommendation:** Publish open benchmarks first; approach researchers via preprint citations and conference workshops.
+
+---
+
+## 2. The Technical Evaluation Proposal Framework
+
+Rather than pitching rigid enterprise software tiers (\$10,000–\$75,000) upfront before validating customer requirements, approach prospects with a **Structured Technical Evaluation**:
+
+### The 5-Step Evaluation Workflow
+
+```mermaid
+flowchart LR
+    A["1. Customer Problem\nDefinition"] --> B["2. Feasibility &\nTrust Boundary Assessment"]
+    B --> C["3. Prototype Verifier &\nCertificate Generation"]
+    C --> D["4. Written Technical\nVerification Report"]
+    D --> E["5. Follow-on Tier 1/2\nLicensing Agreement"]
+```
+
+1. **Customer Problem Definition:**  
+   The customer specifies a discrete dynamical system, transition graph, or arithmetic carry constraint matrix whose spectral radius, boundedness, or invariant language needs rigorous certification.
+2. **Feasibility & Trust Boundary Assessment:**  
+   We assess whether the problem can be reduced to an affine SFT, carry automaton, or quadratic number field Sturm sequence, and deliver an explicit written statement of what can and cannot be certified.
+3. **Prototype Verifier Execution:**  
+   Execute the exact certificate generator to produce machine-auditable certificates (integer Collatz-Wielandt vectors or Sturm sign chains) free of floating-point error.
+4. **Written Technical Verification Report:**  
+   Deliver a comprehensive technical report documenting:
+   - The exact algebraic witnesses generated.
+   - The execution runtime and memory benchmarks.
+   - The precise trust boundary (assumptions made vs. properties certified).
+   - An independent reproducibility script for customer validation.
+5. **Commercial Conversion:**  
+   Upon successful validation of the deliverable, negotiate an ongoing commercial license (Tier 1 internal research or Tier 2 system integration) priced according to the customer's operational scale.

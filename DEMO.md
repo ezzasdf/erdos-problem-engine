@@ -6,16 +6,17 @@
 
 ---
 
-## 1. The Mathematical Problem
+## 1. The Mathematical Context
 
 For integer multipliers $M \ge 1$, we consider the arithmetic intersection of the middle-thirds Cantor set with its dilate:
 $$C(1, M) = \Sigma \cap M^{-1} \Sigma, \qquad \Sigma = \left\{ \sum_{j=1}^\infty \frac{d_j}{3^j} : d_j \in \{0, 2\} \right\}.$$
 
-A famous conjecture of Lagarias posits that for any multiplier coprime to $3$, the Hausdorff dimension satisfies:
-$$\dim_H C(1, M) \le \log_3 \phi \approx 0.438018, \qquad \text{where } \phi = \frac{1+\sqrt{5}}{2}.$$
+In foundational work on arithmetic intersections of $3$-adic Cantor sets, Abram, Bolshakov, and Lagarias (2015) proved that the particular family of intersections with multipliers $M = 3^k + 1$ attains Hausdorff dimension $\log_3 \phi \approx 0.438018$ (where $\phi = (1+\sqrt{5})/2$), and established that $\log_3 \phi$ bounds the Hausdorff dimension of the exceptional set of non-empty translates.
 
-**The Computational Goal:**  
-For any given multiplier $M$, rigorously certify whether $\dim_H C(1, M) \le \log_3 \phi$, determine whether it attains the maximal bound $\log_3 \phi$ exactly, and verify this **without floating-point rounding errors**.
+Our research investigates the broader question across the entire digitwise-safe class of multipliers: whether $\dim_H C(1, M) \le \log_3 \phi$ holds universally across all safe multipliers, and which multipliers attain this extremal value.
+
+**The Computational Verification Goal:**  
+Given a safe multiplier $M$, construct the canonical zero-reachable transition matrix $A$, rigorously certify whether its spectral radius satisfies $\lambda_0(M) \le \phi$, identify whether it attains the golden value $\phi$ exactly, and produce machine-checkable certificates **without floating-point rounding errors**.
 
 ---
 
@@ -44,6 +45,11 @@ python3 scripts/cantor_multiplier/verify_dimensions.py --scan 10
 ### Test B: Representative Dimension Table
 ```bash
 python3 scripts/cantor_multiplier/verify_dimensions.py
+```
+
+### Test C: Automated Customer-Independent Regression Test
+```bash
+python3 scripts/test_reproducibility.py
 ```
 
 ---
