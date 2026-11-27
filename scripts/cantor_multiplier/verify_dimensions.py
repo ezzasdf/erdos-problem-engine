@@ -1,27 +1,36 @@
 #!/usr/bin/env python3
 """Exact Hausdorff dimensions and algebraic certificates for Cantor multiplier intersections C(1,M).
 
-Models
-------
-1. Forward SFT for Digitwise-Safe Multipliers:
-   For M = 3^b - 3^a + 1 (1 <= a < b), expanding Mx = 3^b x - 3^a x + x yields
-   the forward recurrence on binary Cantor digits:
-       u_{n-b} = z_n - z_{n-(b-a)} + z_{n-b} in {0, 1}   (n >= b+1).
-   This is the forward one-sided SFT with lag pair (alpha, b) = (b-a, b),
-   initialized at state 0^b.
+Mathematical Certification Strategy
+-----------------------------------
+To guarantee 100% mathematical rigor without relying on floating-point approximations,
+this script provides exact algebraic certificates for every multiplier M:
 
-2. Carry Graph for General Multipliers:
-   For general M, reading ternary digits with carry c in [0, M]:
-       v = 2*M*z + c,   digit = v mod 3,   next carry = v div 3.
+1. Exact Rational Collatz-Wielandt Upper Bound Certificate:
+   For any nonnegative integer transition matrix A, if there exists an integer
+   vector v > 0 such that:
+       5 * (A @ v) <= 8 * v   (coordinate-wise in Z)
+   then by the Collatz-Wielandt formula, the Perron-Frobenius spectral radius satisfies:
+       rho(A) <= 8/5 = 1.60 < phi = (1 + sqrt(5))/2 = 1.6180339887...
+   This proves rho(A) < phi strictly using pure integer arithmetic.
 
-Exact Algebraic Certification
------------------------------
-Rather than relying on floating-point eigenvalues, the script computes the exact
-integer characteristic polynomial P(x) = det(x*I - A) in Z[x], factors P(x) over Z,
-and proves:
-  - If x^2 - x - 1 divides P(x), then lambda = phi exactly.
-  - For all other irreducible factors Q(x), an exact Sturm sequence proves that
-    Q(x) has no real roots in [phi, inf), certifying lambda < phi strictly.
+2. Exact Characteristic Polynomial and Sturm Sequence over Q(sqrt(5)):
+   For candidate extremizers or whenever rho(A) >= 1.60:
+   - The script computes the exact characteristic polynomial P(x) = det(x*I - A) in Z[x].
+   - It checks whether x^2 - x - 1 divides P(x) exactly in Z[x].
+   - It constructs the exact Sturm chain on the square-free part of P(x) and evaluates
+     the exact signs at phi in the quadratic number field Q(sqrt(5)) and at +inf.
+   - By Sturm's theorem, this counts the exact number of real roots strictly greater
+     than phi:
+       * If roots > phi is 0 and x^2 - x - 1 divides P(x), rho(A) = phi exactly.
+       * If roots > phi is 0 and x^2 - x - 1 does not divide P(x), rho(A) < phi strictly.
+       * If roots > phi > 0, rho(A) > phi strictly.
+
+Three Explicit Verification Statuses:
+  - EXACT_EQUAL_PHI: Exactly certified to attain lambda = phi (Theorem 1 extremizer).
+  - EXACT_STRICTLY_LESS_PHI: Exactly certified lambda < phi via integer CW vector or Sturm chain.
+  - NUMERICALLY_SCREENED: Floating-point eigenvalue approximation (exploration only).
+  - EXCEEDS_PHI / UNRESOLVED: Counterexample or failure.
 """
 
 import argparse
@@ -87,13 +96,13 @@ def carry_graph(M):
 
 def identify_multiplier(M):
     """Identify if M belongs to Family 1, Family 2, or neither."""
-    # Check Family 1: 3^k + 1
+    # Family 1: 3^k + 1
     p = 3
     for k in range(1, 15):
         if p + 1 == M:
             return "F1", k, (1, 1), 1
         p *= 3
-    # Check Family 2: 3^b - 3^a + 1 with 1 <= a < b
+    # Family 2: 3^b - 3^a + 1 with 1 <= a < b
     for b in range(2, 12):
         pow_b = 3 ** b
         if pow_b > M * 3:
@@ -106,7 +115,6 @@ def identify_multiplier(M):
 
 def golden_mean_graph():
     """Return reachable states and adjacency matrix for the golden mean shift (Family 1)."""
-    # States: 0 and 1. Admissible transitions: 0->0, 0->1, 1->0 (1->1 forbidden).
     states = [0, 1]
     A = sp.Matrix([[1, 1], [1, 0]])
     return states, A
@@ -116,7 +124,6 @@ def get_graph_for_M(M):
     """Get the appropriate forward transition graph for multiplier M."""
     fam, params, fwd_lag, b = identify_multiplier(M)
     if fam == "F1":
-        # Single-column golden mean shift: z_n + z_{n-1} in {0, 1}
         states, A = golden_mean_graph()
         return states, A, fam, params, (1, 1)
     elif fam == "F2":
@@ -128,145 +135,231 @@ def get_graph_for_M(M):
         return states, A, fam, None, None
 
 
-def certify_sturm_strictly_less_than_phi(Q):
-    """Algebraic Sturm sequence certificate that irreducible Q in Z[x] has no roots in [phi, inf)."""
-    phi_sym = (1 + sp.sqrt(5)) / 2
-    if Q == X ** 2 - X - 1:
-        return True, "root == phi identically"
+def sign_in_q_sqrt5(poly):
+    """Exact sign of poly(phi) in Q(sqrt(5)), where phi = (1 + sqrt(5)) / 2.
     
-    # Sturm chain on Q
-    st = sp.sturm(Q)
-    
-    def sign_at(poly, val):
-        if val == sp.oo:
-            lc = sp.Poly(poly, X).LC()
-            return 1 if lc > 0 else -1
-        v = poly.subs(X, val)
-        return 1 if v > 0 else (-1 if v < 0 else 0)
-    
-    # Check roots in [8/5, oo) where 8/5 = 1.6 < phi = 1.6180339887...
-    signs_16 = [sign_at(p, sp.Rational(8, 5)) for p in st]
-    signs_inf = [sign_at(p, sp.oo) for p in st]
-    
-    def sign_changes(s_list):
-        nz = [s for s in s_list if s != 0]
-        return sum(1 for i in range(len(nz) - 1) if nz[i] != nz[i + 1])
-    
-    roots_ge_16 = sign_changes(signs_16) - sign_changes(signs_inf)
-    if roots_ge_16 == 0:
-        return True, "no real roots in [1.6, oo); lambda < 1.6 < phi"
-    
-    # If there are roots in [1.6, oo), test exactly at phi in Q(sqrt(5))
-    val_phi = sp.simplify(Q.subs(X, phi_sym))
-    # Since Q is irreducible and != X^2 - X - 1, val_phi != 0.
-    # Check sign of Q(phi)
-    val_float = float(val_phi.evalf())
-    if val_float > 0:
-        return True, f"Q(phi) = {val_phi} > 0; root strictly < phi"
+    Using phi^2 = phi + 1, poly(phi) reduces to a*phi + b = (b + a/2) + (a/2)*sqrt(5).
+    The sign is determined via pure integer arithmetic on u = b + a/2 and v = a/2.
+    """
+    p = sp.Poly(poly, X)
+    m = sp.Poly(X ** 2 - X - 1, X)
+    _, rem = sp.div(p, m)
+    coeffs = rem.all_coeffs()
+    if len(coeffs) == 0:
+        return 0
+    elif len(coeffs) == 1:
+        a = sp.Rational(0)
+        b = sp.Rational(coeffs[0])
     else:
-        return False, f"Q(phi) = {val_phi} <= 0; root >= phi"
+        a = sp.Rational(coeffs[0])
+        b = sp.Rational(coeffs[1])
+        
+    u = b + a / 2
+    v = a / 2
+    if u == 0 and v == 0:
+        return 0
+    if u >= 0 and v >= 0:
+        return 1
+    if u <= 0 and v <= 0:
+        return -1
+        
+    # Opposite signs: compare u^2 and 5 * v^2 over Q
+    lhs = u ** 2
+    rhs = 5 * (v ** 2)
+    if u > 0 and v < 0:
+        return 1 if lhs > rhs else (-1 if lhs < rhs else 0)
+    else:  # u < 0 and v > 0
+        return 1 if rhs > lhs else (-1 if rhs < lhs else 0)
 
 
-def analyse(M, exact_full=True):
-    states, A, fam, params, fwd_lag = get_graph_for_M(M)
+def count_roots_strictly_greater_than_phi(P_expr):
+    """Exact count of real roots in (phi, inf) using a Sturm sequence over Q(sqrt(5))."""
+    P = sp.Poly(P_expr, X, domain="QQ")
+    P_sqf = sp.sqf_part(P)
+    m = sp.Poly(X ** 2 - X - 1, X, domain="QQ")
+    divides_phi = (sp.rem(P_sqf, m) == 0)
     
-    # Fast numerical spectral radius
-    if len(states) == 0:
+    # If phi is a root of P_sqf, factor it out to evaluate the remaining roots
+    R, _ = sp.div(P_sqf, m) if divides_phi else (P_sqf, 0)
+    if R.degree() == 0:
+        return divides_phi, 0
+        
+    st = sp.sturm(R)
+    signs_phi = [sign_in_q_sqrt5(f) for f in st]
+    signs_inf = [1 if sp.Poly(f, X).LC() > 0 else -1 for f in st]
+    
+    nz_phi = [s for s in signs_phi if s != 0]
+    nz_inf = [s for s in signs_inf if s != 0]
+    c_phi = sum(1 for i in range(len(nz_phi) - 1) if nz_phi[i] != nz_phi[i + 1])
+    c_inf = sum(1 for i in range(len(nz_inf) - 1) if nz_inf[i] != nz_inf[i + 1])
+    
+    roots_gt_phi = c_phi - c_inf
+    return divides_phi, roots_gt_phi
+
+
+def find_collatz_wielandt_vector(A_np):
+    """Find a strictly positive integer vector v > 0 such that 5 * (A @ v) <= 8 * v."""
+    n = A_np.shape[0]
+    if n == 0:
+        return True, np.zeros(0, dtype=int)
+    try:
+        # Solve (1.60 * I - A) u = 1
+        M_mat = 1.60 * np.eye(n) - A_np
+        u = np.linalg.solve(M_mat, np.ones(n))
+        if np.all(u > 0):
+            scale = 100000.0 / np.min(u)
+            v = np.round(u * scale).astype(int)
+            v[v <= 0] = 1
+            Av = A_np.astype(int) @ v
+            # Exact integer inequality
+            if np.all(5 * Av <= 8 * v):
+                return True, v
+    except np.linalg.LinAlgError:
+        pass
+    return False, None
+
+
+def analyse(M, mode="exact"):
+    """Analyse multiplier M with an explicit status and algebraic certificate."""
+    states, A, fam, params, fwd_lag = get_graph_for_M(M)
+    n = len(states)
+    
+    # Fast numerical spectral radius for display
+    if n == 0:
         lam = 0.0
     else:
         evals = np.linalg.eigvals(np.array(A.tolist(), dtype=float))
         lam = float(max(abs(evals)))
     dim = float(np.log(lam) / np.log(3)) if lam > 0 else 0.0
 
-    # If exact_full is False and lam is comfortably below phi (e.g. < 1.60),
-    # we know lambda < phi strictly.
-    if not exact_full and lam < 1.60:
+    # Numerical exploratory mode
+    if mode == "numerical":
         return {
             "M": M,
             "family": fam,
             "params": params,
             "fwd_lag": fwd_lag,
-            "states": len(states),
+            "states": n,
             "lambda": lam,
             "dim": dim,
+            "status": "NUMERICALLY_SCREENED",
             "perron_factor": None,
-            "certified_le_phi": True,
-            "certificate": f"numerical Perron root {lam:.6f} < 1.60 < phi",
+            "certificate": f"numerical Perron root {lam:.6f}",
         }
 
+    # Step 1: Attempt exact integer Collatz-Wielandt certificate (rho <= 8/5 = 1.6 < phi)
+    A_np = np.array(A.tolist(), dtype=float)
+    cw_ok, v = find_collatz_wielandt_vector(A_np)
+    if cw_ok:
+        return {
+            "M": M,
+            "family": fam,
+            "params": params,
+            "fwd_lag": fwd_lag,
+            "states": n,
+            "lambda": lam,
+            "dim": dim,
+            "status": "EXACT_STRICTLY_LESS_PHI",
+            "perron_factor": None,
+            "certificate": "Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)",
+        }
+
+    # Step 2: Exact characteristic polynomial and Sturm sequence over Q(sqrt(5))
     cp = A.charpoly()
-    sym = cp.gen
-    P = sp.Poly(cp.as_expr(), sym)
-    
-    # Identify irreducible factor carrying the Perron root
+    expr = cp.as_expr().subs(cp.gen, X)
+    div_phi, roots_gt = count_roots_strictly_greater_than_phi(expr)
+
+    # Determine Perron factor for display
     perron_factor = None
-    factors = sp.factor_list(P.as_expr())[1]
+    factors = sp.factor_list(expr)[1]
     for factor, _ in factors:
-        coeffs = [float(c) for c in sp.Poly(factor, sym).all_coeffs()]
-        if np.any(np.abs(np.abs(np.roots(coeffs)) - lam) < 1e-7):
+        coeffs = [float(c) for c in sp.Poly(factor, X).all_coeffs()]
+        if np.any(np.abs(np.abs(np.roots(coeffs)) - lam) < 1e-6):
             perron_factor = sp.factor(factor)
             break
-            
-    # Exact algebraic certificate
-    pf_expr = perron_factor.subs(sym, X) if perron_factor is not None else X - 1
-    is_safe, cert_msg = certify_sturm_strictly_less_than_phi(pf_expr)
-    
+
+    if roots_gt > 0:
+        status = "EXCEEDS_PHI"
+        cert = f"Sturm sequence: {roots_gt} real root(s) > phi"
+    elif div_phi:
+        status = "EXACT_EQUAL_PHI"
+        cert = "Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi"
+    else:
+        status = "EXACT_STRICTLY_LESS_PHI"
+        cert = "Sturm sequence: 0 real roots in [phi, inf); lambda < phi"
+
     return {
         "M": M,
         "family": fam,
         "params": params,
         "fwd_lag": fwd_lag,
-        "states": len(states),
+        "states": n,
         "lambda": lam,
         "dim": dim,
+        "status": status,
         "perron_factor": perron_factor,
-        "certified_le_phi": is_safe,
-        "certificate": cert_msg,
+        "certificate": cert,
     }
 
 
 def table(rows):
-    print(f"{'M':>5} {'states':>7} {'lambda':>12} {'dim_H':>10}  {'perron factor':<25} {'forward SFT / certificate'}")
-    print("-" * 90)
+    print(f"{'M':>5} {'states':>7} {'lambda':>12} {'dim_H':>10}  {'status':<24} {'perron factor':<20} {'certificate'}")
+    print("-" * 115)
     for M in rows:
-        r = analyse(M, exact_full=True)
+        r = analyse(M, mode="exact")
         fwd_str = f"fwd {r['fwd_lag']}" if r['fwd_lag'] else "carry graph"
+        pf_str = str(r['perron_factor']) if r['perron_factor'] is not None else "-"
         print(
             f"{M:>5} {r['states']:>7} {r['lambda']:>12.9f} {r['dim']:>10.6f}  "
-            f"{str(r['perron_factor']):<25} {fwd_str} [{r['certificate']}]"
+            f"{r['status']:<24} {pf_str:<20} {r['certificate']}"
         )
 
 
-def scan(limit):
-    attain, exceed = [], []
+def scan(limit, mode="exact"):
+    attain = []
+    exceed = []
+    cw_count = 0
+    sturm_count = 0
+
+    print(f"Starting Algebraic Scan 2 <= M <= {limit}, gcd(M,3) = 1 (mode: {mode})...")
     for M in range(2, limit + 1):
         if M % 3 == 0:
             continue
-        r = analyse(M, exact_full=False)
-        if not r["certified_le_phi"]:
+        r = analyse(M, mode=mode)
+        if r["status"] == "EXCEEDS_PHI":
             exceed.append((M, r["lambda"], r["certificate"]))
-        elif r["perron_factor"] is not None and r["perron_factor"].subs(r["perron_factor"].free_symbols.pop(), X) == X ** 2 - X - 1:
+        elif r["status"] == "EXACT_EQUAL_PHI":
             attain.append(M)
-            
+            sturm_count += 1
+        elif "Collatz-Wielandt" in r["certificate"]:
+            cw_count += 1
+        else:
+            sturm_count += 1
+
     predicted = sorted(
         {3 ** k + 1 for k in range(1, 12) if 3 ** k + 1 <= limit}
         | {3 ** (2 * a) - 3 ** a + 1 for a in range(1, 8) if 3 ** (2 * a) - 3 ** a + 1 <= limit}
     )
-    print(f"Exact Algebraic Scan 2 <= M <= {limit}, gcd(M,3) = 1")
-    print(f"  lambda(M) > phi (certified)  : {exceed if exceed else 'none'}")
-    print(f"  attaining lambda(M) = phi    : {attain}")
-    print(f"  predicted by Theorem 1       : {predicted}")
-    print(f"  exact theorem certificate   : {'PASSED (100% MATCH)' if attain == predicted and not exceed else 'FAILED'}")
-    return 0 if attain == predicted and not exceed else 1
+    
+    passed = (attain == predicted and not exceed)
+    print(f"\nExact Algebraic Scan Summary (2 <= M <= {limit}, gcd(M,3) = 1):")
+    print(f"  Exact CW integer certificates (lambda <= 1.60) : {cw_count}")
+    print(f"  Exact Sturm sequence certificates (in Q(sqrt5)): {sturm_count}")
+    print(f"  Multipliers with lambda(M) > phi               : {exceed if exceed else 'none'}")
+    print(f"  Multipliers attaining lambda(M) = phi          : {attain}")
+    print(f"  Extremizers predicted by Theorem 1             : {predicted}")
+    print(f"  Overall Verification Status                     : {'PASSED (100% UNCONDITIONAL EXACT CERTIFICATE)' if passed else 'FAILED'}")
+    return 0 if passed else 1
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--scan", type=int, default=0, metavar="N")
+    ap.add_argument("--scan", type=int, default=0, metavar="N", help="Run exact algebraic scan up to N")
+    ap.add_argument("--mode", choices=["exact", "numerical"], default="exact", help="Verification mode")
     args = ap.parse_args()
 
     if args.scan:
-        sys.exit(scan(args.scan))
+        sys.exit(scan(args.scan, mode=args.mode))
 
     print(f"log_3(phi) = {LOG3PHI:.9f}\n")
     table([1, 2, 3, 4, 7, 10, 19, 25, 28, 55, 61, 73, 79, 82, 163, 217, 235, 244])

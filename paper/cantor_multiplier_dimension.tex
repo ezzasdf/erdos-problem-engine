@@ -243,12 +243,31 @@ Y_\ell = \sum_{j=1}^k \left( \sum_{q=0}^d c_q z_{(\ell+q)k+j} \right) 3^{k-j} = 
 \end{equation}
 Because $z_m \in \{0, 1\}$, each $u_{\ell, j}$ is a subset-sum of $\{c_0, \dots, c_d\}$. Condition~(S) guarantees that every such subset-sum lies in $\{-1, 0, 1, 2\}$.
 
-Now we resolve the carry-normalization problem. The dilate $M x$ belongs to the middle-thirds Cantor set $\Sigma \subset [0, 1]$ if and only if $M x \in [0, 1]$ and its base-$3$ expansion consists exclusively of digits in $\{0, 2\}$. Equivalently, the half-dilate $M x / 2$ must coincide with the unique canonical expansion $\sum_{m=1}^\infty d_m 3^{-m}$ with $d_m \in \{0, 1\}$ and integer part zero.
-Writing $m = \ell k + j$ with $j \in \{1, \dots, k\}$, the raw digit series is:
+Now we establish the initial zero-prefix condition $z_1 = \dots = z_{dk} = 0$ directly from the requirement $M x \in [0, 1]$.
+Recall that any point $x \in \Sigma$ has ternary digits in $\{0, 2\}$. If $x$ is not identically zero on its first $dk$ digits, let $m \in \{1, \dots, dk\}$ be the index of the first non-zero digit. Since the ternary digit at position $m$ must be $2$, we obtain the strict lower bound:
 \begin{equation}
-\frac{M x}{2} = \sum_{m \le 0} u_m 3^{-m} + \sum_{m=1}^\infty u_m 3^{-m}, \quad u_m \in \{-1, 0, 1, 2\}.
+x \ge 2 \cdot 3^{-m} \ge 2 \cdot 3^{-dk}.
 \end{equation}
-For $M x \in [0, 1]$, the integer part must vanish ($\sum_{m \le 0} u_m 3^{-m} = 0$), forcing the initial prefix conditions $z_1 = \dots = z_{dk} = 0$. On the fractional digits $m \ge 1$, let $C_m \in \Z$ denote the carry into position $m$ from position $m+1$. The local base-$3$ carry equation is:
+We now examine the two safe families:
+\begin{enumerate}
+    \item \textbf{Family 1:} $M = 3^{ak} + 1$ with degree $d = a$, so $dk = ak$. If any of the first $ak$ digits is non-zero, then
+    \begin{equation}
+    M x \ge 2 \frac{3^{ak} + 1}{3^{ak}} = 2 + 2 \cdot 3^{-ak} > 1,
+    \end{equation}
+    which violates $M x \in [0, 1]$.
+    \item \textbf{Family 2:} $M = 3^{bk} - 3^{ak} + 1$ with degree $d = b$, so $dk = bk$. Since $1 \le a < b$, we have $ak \le bk - 1$, so $M \ge 3^{bk} - 3^{bk-1} + 1 > \frac{2}{3} 3^{bk}$. If any of the first $bk$ digits is non-zero, then
+    \begin{equation}
+    M x \ge 2 \frac{M}{3^{bk}} > 2 \cdot \frac{2}{3} = \frac{4}{3} > 1,
+    \end{equation}
+    again violating $M x \in [0, 1]$.
+\end{enumerate}
+Therefore, $M x \in [0, 1)$ strictly requires $z_1 = \dots = z_{dk} = 0$.
+
+Under this zero-prefix condition, all non-positive raw digit terms vanish identically: for any $m \le 0$, the index $m + qk \le qk \le dk$, so $z_{m + qk} = 0$ and $u_m = \sum_{q=0}^d c_q z_{m+qk} = 0$. Thus the expansion reduces to the purely fractional series:
+\begin{equation}
+\frac{M x}{2} = \sum_{m=1}^\infty u_m 3^{-m}, \quad u_m \in \{-1, 0, 1, 2\}.
+\end{equation}
+Equivalently, the half-dilate $M x / 2$ must coincide with the unique canonical expansion $\sum_{m=1}^\infty d_m 3^{-m}$ with $d_m \in \{0, 1\}$ and integer part zero. On the fractional digits $m \ge 1$, let $C_m \in \Z$ denote the carry into position $m$ from position $m+1$. The local base-$3$ carry equation is:
 \begin{equation}
 u_m + C_m = d_m + 3 C_{m-1}, \quad \text{with target } d_m \in \{0, 1\}.
 \end{equation}
@@ -352,7 +371,7 @@ We emphasize that each sub-chain is \emph{not} topologically conjugate to the go
 \begin{equation}
 h_{\mathrm{top}} = \lim_{L \to \infty} \frac{1}{L} \log N_{\mathrm{chain}}(L) = \lim_{L \to \infty} \frac{1}{L} \log(2 F_{L+1}) = \log \phi.
 \end{equation}
-Consequently, its transition matrix has Perron root $\lambda = \phi$. Combining the $a$ independent sub-chains yields the total word count $N(n) = (2 F_{n/a + 1})^a \sim (2/\sqrt{5})^a \phi^n$, establishing:
+Consequently, its transition matrix has Perron root $\lambda = \phi$. Combining the $a$ independent sub-chains yields the total word count $N(n) = (2 F_{n/a + 1})^a \sim \left(\frac{2\phi}{\sqrt{5}}\right)^a \phi^n$, establishing:
 \begin{equation}
 \dimH C(1, 3^{2a} - 3^a + 1) = \log_3 \phi.
 \end{equation}
@@ -393,7 +412,7 @@ Transposing the adjacency matrix ($M_{(b-a, b)} = P M_{(a, b)}^T P$) reverses al
     &< \dimH C(1, 19675) \approx \log_3(1.386536) \approx 0.297474.
     \end{align}
 \end{enumerate}
-Importantly, because the zero-reachable subgraph is a subgraph of the full SFT, its spectral radius can only decrease or remain equal: $\lambda_0(a, b) \le \lambda(a, b)$. Consequently, the Universal Upper Bound $\dimH C(1, M) \le \log_3 \phi$ and the Extremizer Classification ($\dimH = \log_3 \phi \iff b = 2a$ or $M = 3^k+1$) remain completely unconditional and invariant.
+Importantly, because the zero-reachable subgraph is a subgraph of the full SFT, its spectral radius can only decrease or remain equal: $\lambda_0(b-a, b) \le \lambda(a, b)$. Consequently, passing to the zero-reachable component cannot create new extremizers or exceed $\log_3 \phi$; conditioned on Hypothesis~(H) for the interior domain, the Universal Upper Bound $\dimH C(1, M) \le \log_3 \phi$ and the Extremizer Classification ($\dimH = \log_3 \phi \iff b = 2a$ or $M = 3^k+1$) remain fully invariant.
 
 \begin{corollary}[Reduction of Boundary Case 2]\label{cor:boundary_reduction}
 Boundary Case~2 ($b - a = 1, a \ge 2$) reduces via Time-Reversal Duality to Boundary Case~1 ($a = 1, b \ge 3$):
