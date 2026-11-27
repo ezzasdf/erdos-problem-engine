@@ -36,9 +36,12 @@ Three Explicit Verification Statuses:
 
 Scope and Limitations:
   The exact scan provides rigorous algebraic certificates for every individual
-  multiplier matrix examined in the finite range 2 <= M <= N. It verifies Hypothesis (H)
-  empirically up to N, but does not constitute an infinite proof of (H) for all interior
-  pairs (a, b), nor does it replace the analytical Frostman measure bridge on the real line.
+  multiplier matrix examined in the finite range 2 <= M <= N. It certifies that
+  the spectral radius of the zero-reachable forward SFT (and carry graph) satisfies
+  lambda_0(M) <= phi for all safe multipliers examined, with exact equality at the
+  predicted extremizers. It does not compute the full-graph SCC decomposition or
+  Parry cylinder weights required by Hypothesis (H), nor does it constitute an infinite
+  proof of (H) for all interior pairs (a, b) or replace the Frostman bridge.
 """
 
 import argparse
@@ -366,7 +369,7 @@ def scan(limit, mode="exact"):
     print(f"  Multipliers with lambda(M) > phi               : {exceed if exceed else 'none'}")
     print(f"  Multipliers attaining lambda(M) = phi          : {attain}")
     print(f"  Extremizers predicted by Theorem 1             : {predicted}")
-    print(f"  Overall Verification Status                     : {'PASSED (ALL MULTIPLIERS IN SCAN M <= ' + str(limit) + ' EXACTLY CERTIFIED)' if passed else 'FAILED'}")
+    print(f"  Overall Verification Status                     : {'PASSED (ALL MULTIPLIER GRAPHS IN SCAN M <= ' + str(limit) + ' EXACTLY CERTIFIED lambda_0 <= phi)' if passed else 'FAILED'}")
     return 0 if passed else 1
 
 
