@@ -17,6 +17,12 @@ Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
 Commercial use of the software is available only under a separate paid
 license; see `COMMERCIAL.md`.
 
+All 133 tracked Lean source files carry a header naming PolyForm Strict 1.0.0.
+Every one of them is first-party: the root library aggregator, the Lake build
+definition, the scratch and experiment files, and the axiom audit script. None
+carries a third-party or Mathlib copyright line, and Mathlib enters only as an
+imported dependency.
+
 ## Previously released versions
 
 The repository up to and including commit

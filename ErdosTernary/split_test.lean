@@ -1,3 +1,9 @@
+/-
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
+-/
+
 /-! Split n5_digitMod_covers into per-residue certificates.
     Each checks ~59049 k values for one N5 residue. -/
 

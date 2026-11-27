@@ -8,10 +8,24 @@ This repository is not open source. Each part carries its own terms.
 
 `ErdosTernary/`, `scripts/`, `verify_conjecture.py`, `verify_coverage.py`, and
 all other source code: **PolyForm Strict License 1.0.0**. The full text is in
-[`LICENSE-CODE`](LICENSE-CODE).
+[`LICENSE-CODE`](LICENSE-CODE). Every tracked Lean source file carries a header
+naming that license.
 
-You may read, download, and run this code for noncommercial purposes. You may
-not distribute it, modify it, or make new works based on it.
+You may read, download, run, and study this code for noncommercial purposes.
+
+The license grants no permission to:
+
+- distribute the software, including republishing it, mirroring it, or
+  publishing a copy, modified or not, anywhere else;
+- modify it, or make new works based on it;
+- use it for any commercial purpose.
+
+Public access is not a grant. This repository is public so the work can be read,
+checked, and cited; being able to read it does not give you the right to
+republish it. GitHub's Terms of Service permit forking a public repository on
+GitHub itself, and permit the hosting that makes it visible. A fork held under
+those terms is still bound by this license for anything beyond that hosting: it
+may not be distributed elsewhere, modified, or used commercially.
 
 Commercial use requires a separate paid license. See
 [`COMMERCIAL.md`](COMMERCIAL.md).
