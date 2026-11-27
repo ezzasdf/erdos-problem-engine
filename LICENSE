@@ -48,10 +48,15 @@ license. See [`COMMERCIAL.md`](COMMERCIAL.md).
 `paper/cantor_multiplier_dimension.pdf`: **Creative Commons Attribution 4.0
 International (CC BY 4.0)**, <https://creativecommons.org/licenses/by/4.0/>.
 
-## Paper 2 and other manuscripts
+## Paper 2
 
-`paper/erdos_ternary_repunit.tex`, `paper/erdos_ternary_repunit.pdf`, and other
-manuscripts in `paper/`: **all rights reserved**. No reproduction,
+`paper/erdos_ternary_repunit.tex` and `paper/erdos_ternary_repunit.pdf`:
+**Creative Commons Attribution 4.0 International (CC BY 4.0)**,
+<https://creativecommons.org/licenses/by/4.0/>.
+
+## Other manuscripts
+
+Any other manuscript in `paper/` is **all rights reserved**: no reproduction,
 redistribution, modification, or submission elsewhere without written
 permission and proper academic attribution.
 

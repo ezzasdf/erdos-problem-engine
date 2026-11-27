@@ -73,9 +73,9 @@ customer receives build instructions, not a bundle.
 
 ### C6 — Papers, separate
 
-Paper 1 is CC BY 4.0 and published at DOI `10.5281/zenodo.24595631`. Anyone may
-read, quote, and redistribute it, including commercially, and that cannot be
-sold. Paper 2 is all rights reserved and unpublished.
+Both papers are CC BY 4.0 and published on Zenodo; Paper 1 at
+`10.5281/zenodo.24595631`. Anyone may read, quote, and redistribute them,
+including commercially, and that cannot be sold.
 
 ## Out of scope, explicitly
 

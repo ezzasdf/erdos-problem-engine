@@ -12,7 +12,8 @@ Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
 | `verify_erdos_rs/`, `verify_middle/` (Rust crates) | PolyForm Strict License 1.0.0 (`LICENSE-CODE`) |
 | `*.csv`, `*.txt`, JSON manifests and other recorded outputs | PolyForm Strict License 1.0.0 (`LICENSE-CODE`) |
 | `paper/cantor_multiplier_dimension.*` (Paper 1) | CC BY 4.0 |
-| `paper/erdos_ternary_repunit.*` (Paper 2) and other manuscripts | All rights reserved |
+| `paper/erdos_ternary_repunit.*` (Paper 2) | CC BY 4.0 |
+| Other manuscripts in `paper/` | All rights reserved |
 | `contrib/palomar/**` | Apache License 2.0, as declared in that package |
 | `contrib/formal-conjectures/**` | Apache License 2.0, as required by the upstream project |
 
