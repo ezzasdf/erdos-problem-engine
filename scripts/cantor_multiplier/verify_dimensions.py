@@ -3,8 +3,10 @@
 
 Mathematical Certification Strategy
 -----------------------------------
-To guarantee 100% mathematical rigor without relying on floating-point approximations,
-this script provides exact algebraic certificates for every multiplier M:
+The script uses exact algebraic certificates for every accepted result.
+Floating-point calculations may propose candidate certificates, but never
+determine whether a certificate is valid. All acceptances are certified through
+pure integer arithmetic or exact algebraic number theory:
 
 1. Exact Rational Collatz-Wielandt Upper Bound Certificate:
    For any nonnegative integer transition matrix A, if there exists an integer

@@ -36,4 +36,5 @@ verify_middle/results_m1.csv
 
 # Upload packages
 paper/*.zip
-paper/arxiv_upload_cantor/
+paper/arxiv_upload_cantor/*
+!paper/arxiv_upload_cantor/cantor-multiplier-submission-v2.zip
