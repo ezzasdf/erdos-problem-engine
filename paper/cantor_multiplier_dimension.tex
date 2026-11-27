@@ -103,11 +103,11 @@ and fix $k \ge 1$ such that $M = P(3^k) > 0$. For any $x = \sum_{m=1}^\infty 2 z
     \sum_{q=0}^d c_q z_{(\ell+q)k + j} \in \{0, 1\}.
     \end{equation}
 \end{enumerate}
-Condition~(1) corresponds to $x \le 1/M$, guaranteeing that $M x \in [0, 1]$ with zero integer part. Under Condition~(1), the unconstrained digit tail decomposes into $k$ mutually independent single-column subshifts. Consequently,
+Condition~(1) is a necessary condition ensuring that $M x \in [0, 1)$ has vanishing integer part; combined with the recurrence~(2), it ensures $M x \in \Sigma$. Under Condition~(1), the unconstrained digit tail decomposes into $k$ mutually independent single-column subshifts of memory $d = \deg P$, each initialized in the state $0^d$. Consequently,
 \begin{equation}
 \dimH C(1, M) = \frac{\log \lambda_0(P)}{\log 3},
 \end{equation}
-where $\lambda_0(P)$ is the spectral radius of the transition matrix restricted to the recurrent components reachable from the initial zero state $0^{dk}$.
+where $\lambda_0(P)$ is the spectral radius of the single-column transition matrix restricted to the recurrent components reachable from the initial state $0^d$.
 \end{theorem}
 
 \begin{theorem}[Classification of the Safe Class]\label{thm:classification}
@@ -131,12 +131,17 @@ where $P$ is an involutive permutation matrix reversing binary words of length $
 \end{equation}
 \end{theorem}
 
-\begin{remark}[Two-Sided Cospectrality versus One-Sided Initial-State Reachability]\label{rem:reachability}
-Theorem~\ref{thm:time_reversal} establishes exact spectral duality for the abstract, two-sided subshift of finite type $\Sigma_{(a, b)}$ on $\Z$. For the arithmetic intersection $C(1, M) \subset [0, 1]$ on the real line, admissible ternary expansions are one-sided sequences on $\N$ that must satisfy the initial prefix condition $z_1 = \dots = z_{dk} = 0$. Admissible paths are thus restricted to the subgraph reachable from the zero state $0^b$.
+\begin{remark}[Two-Sided Cospectrality versus One-Sided Forward Reachability]\label{rem:reachability}
+For $M = 3^b - 3^a + 1$ with $1 \le a < b$, expanding $Mx = 3^b x - 3^a x + x$ yields the forward recurrence $u_{n-b} = z_n - z_{n-(b-a)} + z_{n-b} \in \{0, 1\}$ for $n \ge b+1$. Thus, the one-sided digit sequence of $x \in C(1, M)$ is governed by the forward SFT with lag pair $(b-a, b)$, namely $\Sigma_{(b-a, b)}$, initialized at $0^b$.
+Theorem~\ref{thm:time_reversal} establishes exact spectral duality for the abstract, two-sided subshift of finite type $\Sigma_{(a, b)}$ on $\Z$.
 Transposing the adjacency matrix ($M_{(b-a,b)} = P M_{(a,b)}^T P$) reverses all directed edges ($u \to v \iff v \to u$). Consequently, reachability from $0^b$ is a directional property that is not preserved under transposition.
-For all small parameters ($b \le 4$, covering all multipliers in Table~\ref{tab:dimension_table}) and all extremizers ($b = 2a$), the maximal strongly connected component remains zero-reachable, so $\lambda_0(a, b) = \lambda(a, b) = \lambda_0(b-a, b)$.
-However, for higher lags such as $(a, b) = (2, 9)$ ($M = 19675$) versus $(7, 9)$ ($M = 17497$), transposition breaks zero-reachability: the dominant SCC of $252$ states ($\lambda \approx 1.386536$) is unreachable from $0^9$ in $(2, 9)$ (yielding $\lambda_0(2, 9) \approx 1.304777$), but is reachable in $(7, 9)$ (yielding $\lambda_0(7, 9) \approx 1.386536$).
-Consequently, time-reversal cospectrality is exact on the full symbolic shift, while one-sided Cantor dimensions satisfy $\dimH C(1, M) = \log_3 \lambda_0(a, b) \le \log_3 \lambda(a, b) \le \log_3 \phi$.
+For all small parameters ($b \le 4$, covering all safe multipliers in Table~\ref{tab:dimension_table}) and all extremizers ($b = 2a$, where $b-a = a$ is self-dual), the maximal strongly connected component remains zero-reachable in both orientations, so $\lambda_0(b-a, b) = \lambda(a, b) = \phi$.
+However, for higher lags, transposition breaks zero-reachability. Under the forward mapping $M_{a, b} \leftrightarrow \Sigma_{(b-a, b)}$:
+\begin{itemize}
+    \item For $M = 19675 = 3^9 - 3^2 + 1$, the exponent parameters are $(a, b) = (2, 9)$, so the forward lag pair is $(b-a, b) = (7, 9)$. The zero-reachable subgraph $\mathcal{G}_0(7, 9)$ contains $510$ states including the dominant $252$-state component, giving $\lambda_0(7, 9) \approx 1.386536$ and $\dimH C(1, 19675) \approx 0.297474$.
+    \item For $M = 17497 = 3^9 - 3^7 + 1$, the exponent parameters are $(a, b) = (7, 9)$, so the forward lag pair is $(b-a, b) = (2, 9)$. Here transposition breaks reachability: the dominant SCC is unreachable from $0^9$, leaving only $74$ reachable states with $\lambda_0(2, 9) \approx 1.304777$ and $\dimH C(1, 17497) \approx 0.242153$.
+\end{itemize}
+Consequently, $\dimH C(1, 17497) < \dimH C(1, 19675)$, even though their unrestricted two-sided shifts are cospectral ($\lambda(2, 9) = \lambda(7, 9)$).
 \end{remark}
 
 \begin{theorem}[The Structural Connection to Carry Automata]\label{thm:connection_lemma}
@@ -257,15 +262,20 @@ Because $d_m \in \{0, 1\}$, the right-hand side is strictly restricted to $\{0, 
     \item If $u_m = 2$ or $u_m = -1$, then $u_m \equiv 2 \pmod 3$. But $d_m + 3 C_{m-1} \equiv d_m \in \{0, 1\} \pmod 3 \ne 2 \pmod 3$, so no integer carry $C_{m-1}$ can produce an admissible Cantor digit $d_m \in \{0, 1\}$.
 \end{enumerate}
 Thus, no non-zero carry can be spawned from $C_m = 0$.
-Furthermore, an infinite tail of non-zero carries is ruled out in both directions:
+Furthermore, any non-zero carry at position $m-1$ forces a persistent infinite tail of non-zero carries:
 \begin{enumerate}
     \item \emph{Boundedness of carries ($|C_m| \le 1$):} The exact carry from position $m$ to $m-1$ is given by the tail series $C_{m-1} = \sum_{j=m}^\infty (u_j - d_j) 3^{-(j-m+1)}$. Since $u_j \in \{-1, 0, 1, 2\}$ and $d_j \in \{0, 1\}$, we have $|u_j - d_j| \le 2$, whence $|C_{m-1}| \le \sum_{j=m}^\infty 2 \cdot 3^{-(j-m+1)} = 2 \cdot \frac{1/3}{1 - 1/3} = 1$. Since carries are integers, $C_m \in \{-1, 0, 1\}$ for all $m$.
-    \item \emph{Positive carry tail ($C_m = 1$):} Suppose a tail $C_m = 1$ persists for all $m \ge M_0$. The carry equation $u_m + 1 = d_m + 3$ forces $u_m = 2$ and $d_m = 0$ for all $m \ge M_0$.
+    \item \emph{Inductive deduction of persistent tails:} Suppose $C_{m-1} \ne 0$.
     \begin{itemize}
-        \item In Family~1, $u_m = z_m + z_{m+k} = 2$ forces $z_m = 1$ for all $m \ge M_0$. By the initial prefix condition $z_1 = \dots = z_{dk} = 0$, the sequence $(z_m)$ contains zeroes. Let $m^*$ be the \emph{last zero} in the sequence: $z_{m^*} = 0$ and $z_j = 1$ for all $j > m^*$. Then $u_{m^*} = z_{m^*} + z_{m^*+k} = 0 + 1 = 1$. Because $j > m^*$ has $C_j = 1$, the incoming carry into position $m^*$ is $C_{m^*} = 1$. Then $u_{m^*} + C_{m^*} = 1 + 1 = 2$. The carry equation requires $2 = d_{m^*} + 3 C_{m^*-1} \equiv d_{m^*} \pmod 3$. But $d_{m^*} \in \{0, 1\}$, which has no solution modulo $3$. This contradiction rules out any positive carry tail in Family~1.
-        \item In Family~2, $u_m = z_m - z_{m+a} + z_{m+b} = 2$ forces $z_{m+a} = 0$. But at step $m+a$, the condition $u_{m+a} = 2$ forces $z_{m+a} = 1$, an immediate contradiction.
+        \item If $C_{m-1} = 1$, the carry equation requires $u_m + C_m = d_m + 3$. Since $u_m \le 2$ (Condition~(S)) and $C_m \le 1$, the left-hand side is at most $3$. Since $d_m \in \{0, 1\}$, the right-hand side is at least $3$. Equality requires $u_m = 2$, $C_m = 1$, and $d_m = 0$. By forward induction, $C_{m-1} = 1$ forces an infinite persistent tail $C_j = 1$, $u_j = 2$, and $d_j = 0$ for all $j \ge m-1$.
+        \item If $C_{m-1} = -1$, the carry equation requires $u_m + C_m = d_m - 3 \in \{-3, -2\}$. Since $u_m \ge -1$ and $C_m \ge -1$, $u_m + C_m \ge -2$. Equality requires $u_m = -1$, $C_m = -1$, and $d_m = 1$. By forward induction, $C_{m-1} = -1$ forces an infinite persistent tail $C_j = -1$, $u_j = -1$, and $d_j = 1$ for all $j \ge m-1$.
     \end{itemize}
-    \item \emph{Negative carry tail ($C_m = -1$):} Suppose a tail $C_m = -1$ persists for all $m \ge M_0$. Then $u_m - 1 = d_m - 3 \implies u_m + 2 = d_m \in \{0, 1\}$. If $d_m = 0$, then $u_m = -2 \notin [-1, 2]$, violating Condition~(S). If $d_m = 1$, then $u_m = -1$ for all $m \ge M_0$. In Family~1, $u_m = z_m + z_{m+k} \ge 0$, so $u_m = -1$ is impossible. In Family~2, $u_m = z_m - z_{m+a} + z_{m+b} = -1$ forces $z_{m+a} = 1$, which gives $u_{m+a} = z_{m+a} - z_{m+2a} + z_{m+a+b} \ge 1 - 1 + 0 = 0 > -1$, so $u_{m+a} \ne -1$. Thus $u_m = -1$ cannot occur at two steps separated by $a$.
+    \item \emph{Positive carry tail ($C_m = 1$):} Suppose a tail $C_m = 1$ persists for all $m \ge M_0$, so $u_m = 2$ and $d_m = 0$ for all $m \ge M_0$.
+    \begin{itemize}
+        \item In Family~1, $u_m = z_m + z_{m+k} = 2$ forces $z_m = z_{m+k} = 1$ for all $m \ge M_0$. By the initial prefix condition $z_1 = \dots = z_{dk} = 0$, the sequence $(z_j)$ contains zeroes. Let $m^*$ be the \emph{last zero} in the entire sequence: $z_{m^*} = 0$ and $z_j = 1$ for all $j > m^*$. Then for all $j > m^*$, $u_j = z_j + z_{j+k} = 1 + 1 = 2$ and $d_j = 0$. Evaluating the tail series into position $m^*$ gives $C_{m^*} = \sum_{j=m^*+1}^\infty (2 - 0) 3^{-(j-m^*)} = 2 \cdot \frac{1/3}{1-1/3} = 1$. Then at position $m^*$, the local carry equation gives $u_{m^*} + C_{m^*} = (z_{m^*} + z_{m^*+k}) + 1 = (0 + 1) + 1 = 2 \equiv d_{m^*} \pmod 3$. But $d_{m^*} \in \{0, 1\}$, which has no solution modulo $3$. This contradiction rules out any positive carry tail in Family~1.
+        \item In Family~2, reindexing by the incoming forward digit $n = m+b$ gives $u_{n-b} = z_n - z_{n-(b-a)} + z_{n-b}$. The condition $u_{n-b} = 2$ forces $z_{n-(b-a)} = 0$. But at forward step $n' = n - (b-a)$, the condition $u_{n'-b} = 2$ forces $z_{n'} = z_{n-(b-a)} = 1$, an immediate contradiction ($0 = 1$).
+    \end{itemize}
+    \item \emph{Negative carry tail ($C_m = -1$):} Suppose a tail $C_m = -1$ persists for all $m \ge M_0$, so $u_m = -1$ and $d_m = 1$ for all $m \ge M_0$. In Family~1, $u_m = z_m + z_{m+k} \ge 0$, so $u_m = -1$ is impossible. In Family~2, $u_{n-b} = -1$ forces $z_{n-(b-a)} = 1$. But at forward step $n' = n - (b-a)$, the sum satisfies $u_{n'-b} = z_{n-(b-a)} - z_{n-2(b-a)} + z_{n-(b-a)-b} \ge 1 - 1 + 0 = 0 > -1$, so $u \ne -1$ at two steps separated by $b-a$.
 \end{enumerate}
 Therefore, all carries vanish identically: $C_m = 0$ for all $m$. Hence $M x \in \Sigma$ if and only if $z_1 = \dots = z_{dk} = 0$ and $u_m \in \{0, 1\}$ for all $m \ge 1$, with zero carry across all positions and block boundaries.
 
@@ -365,21 +375,22 @@ This is identically the defining constraint of $\Sigma_{(b-a, b)}$. In terms of 
 \end{proof}
 
 \subsection{One-Sided Initial-State Subshifts and Reachability Asymmetry}
-While Theorem~\ref{thm:time_reversal} proves that the full bi-infinite symbolic shifts $\Sigma_{(a, b)}$ and $\Sigma_{(b-a, b)}$ on $\Z$ are topologically conjugate under time reversal, the arithmetic intersection $C(1, M) \subset [0, 1]$ on the real line is a one-sided system initialized at the zero prefix $z_1 = \dots = z_{dk} = 0$. Admissible paths are thus restricted to the subgraph $\mathcal{G}_0(a, b)$ reachable from the initial state $0^b$.
+While Theorem~\ref{thm:time_reversal} proves that the full bi-infinite symbolic shifts $\Sigma_{(a, b)}$ and $\Sigma_{(b-a, b)}$ on $\Z$ are topologically conjugate under time reversal, the arithmetic intersection $C(1, M) \subset [0, 1]$ on the real line is a one-sided system initialized at the zero prefix $z_1 = \dots = z_{dk} = 0$.
+Under the forward recurrence $u_{n-b} = z_n - z_{n-(b-a)} + z_{n-b} \in \{0, 1\}$, a safe multiplier $M = 3^b - 3^a + 1$ is governed by the forward SFT with lag pair $(b-a, b)$, initialized at $0^b$. Admissible paths are thus restricted to the subgraph $\mathcal{G}_0(b-a, b)$ reachable from the initial state $0^b$.
 
 Transposing the adjacency matrix ($M_{(b-a, b)} = P M_{(a, b)}^T P$) reverses all directed edges ($u \to v \iff v \to u$). Consequently, reachability from the source state $0^b$ in $\mathcal{G}(b-a, b)$ is dual to reachability \emph{to} the sink state $0^b$ in $\mathcal{G}(a, b)$, a directional property that is not preserved under graph transposition.
 \begin{enumerate}
-    \item \textbf{Small parameters and extremizers:} For all parameters $b \le 4$ (covering all safe multipliers $M \le 300$ in Table~\ref{tab:dimension_table}) and all extremizers ($b = 2a$), the maximal strongly connected component remains zero-reachable in both graphs, so $\lambda_0(a, b) = \lambda(a, b) = \lambda_0(b-a, b)$.
-    \item \textbf{Reachability asymmetry at higher lags:} For higher lags, transposition can disconnect the dominant SCC from the initial state $0^b$. For example, at $(a, b) = (2, 9)$ ($M = 19675$) and its dual $(7, 9)$ ($M = 17497$), the full $512$-state graph decomposes into SCCs of sizes $252, 168, 72, 18, 2$, where the dominant $252$-state component has Perron root $\lambda \approx 1.386536$.
+    \item \textbf{Small parameters and extremizers:} For all parameters $b \le 4$ (covering all safe multipliers $M \le 300$ in Table~\ref{tab:dimension_table}) and all extremizers ($b = 2a$, where $b-a = a$), the maximal strongly connected component remains zero-reachable in both graphs, so $\lambda_0(b-a, b) = \lambda(a, b) = \lambda_0(a, b)$.
+    \item \textbf{Reachability asymmetry at higher lags:} For higher lags, transposition can disconnect the dominant SCC from the initial state $0^b$. For example, consider $M = 19675 = 3^9 - 3^2 + 1$ (exponent parameters $(2, 9)$, forward lag $(7, 9)$) and its dual $M = 17497 = 3^9 - 3^7 + 1$ (exponent parameters $(7, 9)$, forward lag $(2, 9)$). The full $512$-state graph decomposes into SCCs of sizes $252, 168, 72, 18, 2$, where the dominant $252$-state component has Perron root $\lambda \approx 1.386536$.
     Starting from $0^9$:
     \begin{itemize}
-        \item In $(2, 9)$, only $74$ states are reachable; the dominant $252$-state component is completely unreachable, so paths from $0^9$ grow at rate $\lambda_0(2, 9) \approx 1.304777$ (the root of the $72$-state reachable component).
-        \item In $(7, 9)$, $510$ states are reachable, including the entire $252$-state component, yielding growth rate $\lambda_0(7, 9) \approx 1.386536$.
+        \item In the forward graph $\mathcal{G}_0(7, 9)$ for $M = 19675$, $510$ states are reachable, including the entire $252$-state dominant component, yielding growth rate $\lambda_0(7, 9) \approx 1.386536$.
+        \item In the forward graph $\mathcal{G}_0(2, 9)$ for $M = 17497$, only $74$ states are reachable; the dominant $252$-state component is completely unreachable, so paths from $0^9$ grow at rate $\lambda_0(2, 9) \approx 1.304777$ (the root of the $72$-state reachable component).
     \end{itemize}
     Thus the two-sided shifts are cospectral ($\lambda(2, 9) = \lambda(7, 9) \approx 1.386536$), but the one-sided Cantor dimensions diverge:
     \begin{align}
-    \dimH C(1, 19675) &\approx \log_3(1.304777) \approx 0.242153 \nonumber \\
-    &< \dimH C(1, 17497) \approx \log_3(1.386536) \approx 0.297474.
+    \dimH C(1, 17497) &\approx \log_3(1.304777) \approx 0.242153 \nonumber \\
+    &< \dimH C(1, 19675) \approx \log_3(1.386536) \approx 0.297474.
     \end{align}
 \end{enumerate}
 Importantly, because the zero-reachable subgraph is a subgraph of the full SFT, its spectral radius can only decrease or remain equal: $\lambda_0(a, b) \le \lambda(a, b)$. Consequently, the Universal Upper Bound $\dimH C(1, M) \le \log_3 \phi$ and the Extremizer Classification ($\dimH = \log_3 \phi \iff b = 2a$ or $M = 3^k+1$) remain completely unconditional and invariant.
@@ -453,7 +464,7 @@ Hypothesis~\ref{hyp:parry} is the ``Frontier~A'' obligation of the formalization
 
 \section{Exact Hausdorff Dimension Table (\texorpdfstring{$M \le 300$}{M <= 300})}\label{sec:table}
 
-Table~\ref{tab:dimension_table} lists exact Hausdorff dimensions for representative multipliers $M \le 300$, computed from the carry graph of \S\ref{sec:interior}. The ``carry states'' column is the number of carries reachable from $0$ in the normalized-digit automaton; the Perron factor is the irreducible factor of the characteristic polynomial carrying $\lambda$.
+Table~\ref{tab:dimension_table} lists exact Hausdorff dimensions for representative multipliers $M \le 300$. For digitwise-safe multipliers $M = 3^b - 3^a + 1$, the forward single-column lag pair is $(b-a, b)$; the ``Reachable states'' column reports the number of vertices reachable from $0^b$ in the forward transition graph $\mathcal{G}_0(b-a, b)$. The Perron factor is the irreducible factor of the characteristic polynomial carrying $\lambda$.
 
 \begin{table}[htbp]
 \centering
@@ -461,25 +472,25 @@ Table~\ref{tab:dimension_table} lists exact Hausdorff dimensions for representat
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{rccll}
 \toprule
-$M$ & Exact $\dimH C(1, M)$ & Carry states & Perron factor & Classification \& Duality \\
+$M$ & Exact $\dimH C(1, M)$ & Reachable states & Perron factor & Classification \& Forward SFT \\
 \midrule
 $1$  & $\log_3 2 \approx 0.630930$ & $1$  & $x - 2$               & $3^0$ \\
 $2^{\dagger}$  & $0$                         & $1$  & $x - 1$               & $C(1, 2)$ finite \\
 $3$  & $\log_3 2 \approx 0.630930$ & $2$  & $x - 2$               & Pure $3$-power ($3^1$) \\
 $4$  & $\log_3 \phi \approx 0.438018$ & $2$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=1$) \\
-$7$  & $\log_3 \phi \approx 0.438018$ & $4$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 2, $(1,2)$) \\
+$7$  & $\log_3 \phi \approx 0.438018$ & $4$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 2, exp $(1,2) \to$ fwd $(1,2)$) \\
 $10$ & $\log_3 \phi \approx 0.438018$ & $4$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=2$) \\
-$19$ & $\log_3 \lambda_3 \approx 0.347934$ & $8$ & $x^3 - x^2 - 1$  & Family 2, $(2,3)$; dual of $25$ \\
-$25$ & $\log_3 \lambda_3 \approx 0.347934$ & $6$ & $x^3 - x^2 - 1$  & Family 2, $(1,3)$; cospectral with $19$ \\
+$19$ & $\log_3 \lambda_3 \approx 0.347934$ & $6$ & $x^3 - x^2 - 1$  & Family 2, exp $(2,3) \to$ fwd $(1,3)$; dual of $25$ \\
+$25$ & $\log_3 \lambda_3 \approx 0.347934$ & $8$ & $x^3 - x^2 - 1$  & Family 2, exp $(1,3) \to$ fwd $(2,3)$; dual of $19$ \\
 $28$ & $\log_3 \phi \approx 0.438018$ & $8$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=3$) \\
-$55$ & $\log_3 \lambda_4 \approx 0.293356$ & $16$ & $x^4 - x^3 - 1$  & Family 2, $(3,4)$; dual of $79$ \\
+$55$ & $\log_3 \lambda_4 \approx 0.293356$ & $8$ & $x^4 - x^3 - 1$  & Family 2, exp $(3,4) \to$ fwd $(1,4)$; dual of $79$ \\
 $61^{\dagger}$ & $\log_3 \lambda_{61} \approx 0.410672$ & $14$ & $x^5 - x^4 - x^2 - 1$ & not safe; cospectral with $5905$ \\
-$73$ & $\log_3 \phi \approx 0.438018$ & $16$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 2, $(2,4)$) \\
-$79$ & $\log_3 \lambda_4 \approx 0.293356$ & $8$  & $x^4 - x^3 - 1$  & Family 2, $(1,4)$; dual of $55$ \\
+$73$ & $\log_3 \phi \approx 0.438018$ & $16$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 2, exp $(2,4) \to$ fwd $(2,4)$) \\
+$79$ & $\log_3 \lambda_4 \approx 0.293356$ & $16$  & $x^4 - x^3 - 1$  & Family 2, exp $(1,4) \to$ fwd $(3,4)$; dual of $55$ \\
 $82$ & $\log_3 \phi \approx 0.438018$ & $16$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=4$) \\
-$163$& $\log_3 \psi \approx 0.255959$ & $32$ & $x^3 - x - 1$            & Family 2, $(4,5)$ ($3^5 - 3^4 + 1$) \\
-$217$& $\log_3 \lambda_{235} \approx 0.312255$ & $30$ & degree $10$ factor & Family 2, $(3,5)$; dual of $235$ \\
-$235$& $\log_3 \lambda_{235} \approx 0.312255$ & $22$ & degree $10$ factor & Family 2, $(2,5)$; dual of $217$ \\
+$163$& $\log_3 \psi \approx 0.255959$ & $10$ & $x^3 - x - 1$            & Family 2, exp $(4,5) \to$ fwd $(1,5)$ ($3^5 - 3^4 + 1$) \\
+$217$& $\log_3 \lambda_{235} \approx 0.312255$ & $22$ & degree $10$ factor & Family 2, exp $(3,5) \to$ fwd $(2,5)$; dual of $235$ \\
+$235$& $\log_3 \lambda_{235} \approx 0.312255$ & $30$ & degree $10$ factor & Family 2, exp $(2,5) \to$ fwd $(3,5)$; dual of $217$ \\
 $244$& $\log_3 \phi \approx 0.438018$ & $32$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 1, $k=5$) \\
 \bottomrule
 \end{tabular}%
@@ -497,7 +508,7 @@ i.e.\ exactly the union of $\{3^k+1\}$ and $\{3^{2a} - 3^a + 1\}$ in that range.
 \end{enumerate}
 This confirms Theorem~\ref{thm:universal_bound} and the conclusion of Hypothesis~\ref{hyp:parry} (namely $\lambda < \phi$ on the interior) computationally in the stated range. The script is \texttt{verify\_dimensions.py} under \texttt{scripts/}.
 
-\noindent\textbf{Cospectral phenomena.} The dual pairs $(25, 19)$, $(55, 79)$, $(73, 73)$ and $(217, 235)$ illustrate Time-Reversal Duality $\lambda(a,b) = \lambda(b-a,b)$. Two coincidences lie outside that theorem: $\lambda(13) = \lambda(25)$ (both $x^3 - x^2 - 1$) and $\lambda(16) = \lambda(163)$ (both $x^3 - x - 1$), with $13$ and $16$ not digitwise-safe. The polynomial $x^5 - x^4 - x^2 - 1$ at $M = 61$ ($\lambda_{61} \approx 1.570147$) also governs $M = 5905$, a cospectral coincidence across distinct multiplier orders that is not covered by any of the theorems above.
+\noindent\textbf{Cospectral phenomena.} The dual pairs $(19, 25)$ (forward lags $(1, 3)$ and $(2, 3)$), $(55, 79)$ (forward lags $(1, 4)$ and $(3, 4)$), $(73, 73)$ (self-dual lag $(2, 4)$), and $(217, 235)$ (forward lags $(2, 5)$ and $(3, 5)$) illustrate Time-Reversal Duality $\lambda(a,b) = \lambda(b-a,b)$. Two coincidences lie outside that theorem: $\lambda(13) = \lambda(25)$ (both $x^3 - x^2 - 1$) and $\lambda(16) = \lambda(163)$ (both $x^3 - x - 1$), with $13$ and $16$ not digitwise-safe. The polynomial $x^5 - x^4 - x^2 - 1$ at $M = 61$ ($\lambda_{61} \approx 1.570147$) also governs $M = 5905$, a cospectral coincidence across distinct multiplier orders that is not covered by any of the theorems above.
 
 \clearpage
 
