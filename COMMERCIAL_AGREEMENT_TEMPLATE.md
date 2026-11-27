@@ -35,8 +35,8 @@ incorporates the Software or a Modification.
 
 3.1 Licensor grants Licensee a non-exclusive, non-transferable right to:
 
-- (a) use, run, and reproduce the Software, including commercially;
-- (b) modify the Software and create Modifications;
+- (a) use, run, and reproduce the Software, including commercially; under Tier 1, this includes minor operational adaptations strictly necessary for internal compute execution;
+- (b) [TIER 2 AND 3 ONLY] modify the Software and create Modifications;
 - (c) [INCLUDE OR DELETE] distribute the Software and Modifications, in source
   or binary form, as part of a Product.
 
@@ -59,9 +59,14 @@ restrictions at least as protective as this agreement. A contractor may not use
 the Software for its own purposes or for another client.
 
 3.4 **Tier.** This agreement grants [TIER 1 / TIER 2 / TIER 3]. Tiers are
-cumulative, so the named tier includes every lower tier. Tier 3 does not include
-redistribution of source code; that requires the separate permission in clause
-3.1(c) to be selected and described, per component, in Schedule A.
+cumulative, so the named tier includes every lower tier. Tier 1 permits internal
+commercial research, execution, internal reporting, and minor operational adaptations
+strictly necessary to execute the software in Licensee's internal compute environment
+(e.g., path, harness, or environment configuration), but does not permit general
+modification or product embedding. Tier 2 grants full modification and internal
+embedding under clause 3.1(b). Tier 3 does not include redistribution of source code;
+that requires the separate permission in clause 3.1(c) to be selected and described,
+per component, in Schedule A.
 
 3.5 The Software covered is only what Schedule A lists, at the commit named
 there. Anything not listed is not licensed, including archived files and build
@@ -305,7 +310,7 @@ Walked through by hand against the clauses, not by a court:
 | Scenario | Expected outcome | Clauses relied on |
 | --- | --- | --- |
 | Tier 1 company runs the Lean build and writes an internal report from the results. | Permitted. No redistribution, no modification. | 3.1(a), 10.5 |
-| Tier 1 company patches a Python script and keeps the patch internal. | **Not permitted.** Modification requires Tier 2. | 3.4 |
+| Tier 1 company adjusts a Python script for its internal harness/environment paths. | **Permitted** as an operational adaptation strictly necessary for internal execution. General feature modification or embedding requires Tier 2. | 3.1(a), 3.4 |
 | Tier 2 company embeds the Rust verifier in its SaaS product and ships binaries to customers. | Permitted only if 3.1(c) is selected and the component named in Schedule A. Otherwise not. | 3.1(c), 4.1 |
 | Tier 3 company runs a million computational checks and sells the resulting certificates as a service. | Permitted for outputs it generates; the shipped reference certificates are not resold as its own. | 10.5, 10.6 |
 | Tier 3 company republishes the Lean source on its own GitHub. | **Not permitted.** Tier 3 does not include source redistribution. | 3.4, 4.1 |

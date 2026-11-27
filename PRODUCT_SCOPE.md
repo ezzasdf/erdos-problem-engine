@@ -128,9 +128,12 @@ computational workflows.
 | Execute internally | yes | yes | yes | — |
 | Analyse computational results | yes | yes | yes | yes |
 | Produce internal research reports | yes | yes | yes | yes |
-| Modify | no | no | no | no |
+| Operational adaptation (internal execution only) | minor | minor | minor | no |
+| General modification / product embedding | no | no | no | no |
 | Redistribute | no | no | no | no |
 | Sublicense | no | no | no | no |
+
+Operational adaptations under Tier 1 are strictly limited to minor technical adjustments (such as environment configuration, path settings, and runner harness integration) required to execute the software within Licensee's internal compute infrastructure, with no redistribution or commercial product embedding.
 
 ### Tier 2 — Integration and development
 
