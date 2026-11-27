@@ -33,17 +33,19 @@ them from first principles:
      the canonical carry automaton for multiplier M (checked via `--verify-derivation`).
      NOTICE: This proves agreement with the generator code, but does not independently
      prove the generator algorithm faithfully models the continuous Cantor problem.
-   - Level 3 (Verified Theorem): The full mathematical claim (Hausdorff dimension on R)
-     requires analytical proofs: Hypothesis (H) in the interior and the Frostman bridge.
+   - Level 3 (Full Theorem Target / Conditional Mathematical Conclusion): The full
+     universal dimension bound on R is unconditional on boundary rays and proven extremizers,
+     but conditional on Hypothesis (H) in the interior domain, with an analytical Frostman bridge.
 
 4. Trust Boundaries & Integrity:
    - Integrity Checksum: The SHA-256 payload digest detects accidental bit flips,
      transmission errors, or file corruption. It does NOT prove author authenticity
      or provide non-repudiation (anyone can rehash a modified JSON). Authenticity
      must be established via signed Git tags or the published Zenodo record.
-   - External Dependencies: Collatz-Wielandt has 0 external dependencies. Sturm root-counting
-     uses SymPy for characteristic polynomial and Sturm chain generation, evaluating all
-     signs in exact Q(sqrt(5)) arithmetic. Both are independent of EMVE search heuristics.
+   - External Dependencies: Collatz-Wielandt has ZERO external dependencies (operates
+     on stock Python 3 standard library; SymPy is NOT imported). Sturm root-counting
+     lazily imports SymPy for characteristic polynomial and Sturm chain generation,
+     evaluating all signs in exact Q(sqrt(5)) arithmetic.
 """
 
 import sys
@@ -54,11 +56,27 @@ import time
 import argparse
 from pathlib import Path
 from fractions import Fraction
-import sympy as sp
 
-CHECKER_VERSION = "EMVE Independent Certificate Auditor v0.9.1"
+CHECKER_VERSION = "EMVE Independent Certificate Auditor v1.0.0"
 SUPPORTED_FORMAT_VERSIONS = {"emve-cert-v1"}
-X = sp.Symbol("x")
+
+_SP = None
+_X = None
+
+def _get_sympy():
+    """Lazily load SymPy only when auditing Sturm sequence certificates."""
+    global _SP, _X
+    if _SP is None:
+        try:
+            import sympy as sp
+            _SP = sp
+            _X = sp.Symbol("x")
+        except ImportError:
+            raise ImportError(
+                "SymPy is required for Sturm sequence exact root-counting certificates. "
+                "Install it via `pip install sympy` or audit Collatz-Wielandt certificates which require 0 external dependencies."
+            )
+    return _SP, _X
 
 
 def is_strict_int(val):
@@ -109,6 +127,7 @@ class QSqrt5:
 
 def eval_poly_qsqrt5(poly, x_val):
     """Evaluate polynomial poly in Q[x] at x_val in Q(sqrt(5)) using Horner's method."""
+    sp, X = _get_sympy()
     coeffs = sp.Poly(poly, X).all_coeffs()
     res = QSqrt5(0)
     for c in coeffs:
@@ -167,7 +186,9 @@ def verify_sturm_extremizer_witness(A_matrix):
     """Independently audit an extremizer Sturm sequence certificate.
     
     Verifies that rho(A) == phi exactly using exact polynomial arithmetic in Q(sqrt(5)).
+    Requires SymPy (lazily imported).
     """
+    sp, X = _get_sympy()
     n = len(A_matrix)
     for i in range(n):
         if len(A_matrix[i]) != n:
@@ -231,15 +252,18 @@ def verify_matrix_derivation(cert_data):
 
         states, A_derived, fam, params, fwd_lag = get_graph_for_M(M)
 
-        # 1. Check family
+        # 1. Check family (strictly required)
         cert_fam = m_ctx.get("family")
-        if cert_fam is not None:
-            norm_cert_fam = str(cert_fam).upper().replace("FAMILY", "").strip()
-            norm_derived_fam = str(fam).upper().replace("FAMILY", "").strip()
-            if norm_cert_fam not in (norm_derived_fam, norm_derived_fam.lstrip("F")):
-                return False, f"Metadata derivation mismatch: stated family {cert_fam} != derived family {fam} for M={M}"
+        if cert_fam is None:
+            return False, f"Metadata derivation mismatch: missing required 'family' in mathematical_context for M={M}"
+        norm_cert_fam = str(cert_fam).upper().replace("FAMILY", "").strip()
+        norm_derived_fam = str(fam).upper().replace("FAMILY", "").strip()
+        if norm_cert_fam not in (norm_derived_fam, norm_derived_fam.lstrip("F")):
+            return False, f"Metadata derivation mismatch: stated family {cert_fam} != derived family {fam} for M={M}"
 
-        # 2. Check forward_lag
+        # 2. Check forward_lag (strictly required)
+        if "forward_lag" not in m_ctx:
+            return False, f"Metadata derivation mismatch: missing required 'forward_lag' in mathematical_context for M={M}"
         cert_lag = m_ctx.get("forward_lag")
         expected_lag = list(fwd_lag) if fwd_lag else None
         if cert_lag != expected_lag:

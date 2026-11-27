@@ -38,7 +38,7 @@ The evaluation kit consists of four self-contained components:
 
 | Asset | Location | Role in Technical Due Diligence |
 | :--- | :--- | :--- |
-| **1. Standalone Checker** | [`scripts/check_certificate.py`](./scripts/check_certificate.py) | Lightweight mathematical auditor. Operates with **zero external dependencies** for Collatz–Wielandt (pure arbitrary-precision Python integers in $\mathbb{Z}$). |
+| **1. Standalone Checker** | [`scripts/check_certificate.py`](./scripts/check_certificate.py) | Lightweight mathematical auditor. Operates with **zero external dependencies** for Collatz–Wielandt certificates (pure Python standard library; SymPy is lazily imported only for Sturm sequence checks). |
 | **2. Sample Portable Certificate** | [`certificates/M19_collatz_wielandt.json`](./certificates/M19_collatz_wielandt.json) | Self-contained JSON witness containing explicit $6 \times 6$ transition matrix $A$, integer vector $v$, and 64-character SHA-256 integrity checksum. |
 | **3. Extremizer Certificate** | [`certificates/M7_sturm_extremizer.json`](./certificates/M7_sturm_extremizer.json) | Exact Sturm sequence witness in $\mathbb{Q}(\sqrt{5})$ proving $\rho(A_7) = \phi$ exactly. |
 | **4. End-to-End Regression Test** | [`scripts/test_reproducibility.py`](./scripts/test_reproducibility.py) | Automated 6-stage test suite validating numerical consistency, raw witnesses, portable JSON certificates, and security hardening in $< 0.15$s. |
@@ -53,25 +53,27 @@ To avoid confusing algebraic checks with global mathematical claims, EMVE strict
 flowchart TD
     L1["Level 1: Verified Certificate\n(Pure Matrix Property)"]
     L2["Level 2: Verified Derivation\n(Automaton Construction Agreement)"]
-    L3["Level 3: Verified Theorem\n(Full Measure-Theoretic Conclusion)"]
+    L3["Level 3: Full Theorem Target\n(Conditional Mathematical Conclusion)"]
     
     L1 -->|Does not prove derivation| L2
-    L2 -->|Does not prove Frostman bridge| L3
+    L2 -->|Does not prove Frostman bridge / (H)| L3
 ```
 
 ### Level 1: Verified Certificate (Witness Property)
 - **What is verified:** The checker proves an exact mathematical property of the explicit matrix and vector inside the JSON ($5 A v \le 8 v \implies \rho(A) \le 8/5 = 1.60 < \phi$).
 - **Trust base:** Pure arbitrary-precision integer arithmetic in $\mathbb{Z}$ (immune to floating-point and rounding errors).
-- **Independence:** 100% independent of EMVE's BFS search engine, heuristic lag selection, and graph generation code.
+- **Independence:** 100% independent of EMVE's BFS search engine, heuristic lag selection, and graph generation code. Requires 0 external packages.
 
 ### Level 2: Verified Derivation (Automaton Construction Agreement)
-- **What is verified:** The checker verifies that the matrix $A$ and metadata (`family`, `forward_lag`, state counts) agree with the project's canonical carry automaton generator (`python3 scripts/check_certificate.py --verify-derivation`).
+- **What is verified:** The checker verifies that the matrix $A$ and metadata (`family`, `forward_lag`, state counts) strictly agree with the project's canonical carry automaton generator (`python3 scripts/check_certificate.py --verify-derivation`).
 - **Trust base:** EMVE forward SFT graph traversal algorithm (`get_graph_for_M(M)`).
 - **Limitation:** Verifies agreement with the generator code; it does *not* independently prove that the generator algorithm faithfully models the continuous Cantor problem.
 
-### Level 3: Verified Theorem (Full Mathematical Conclusion)
-- **What is verified:** The universal Hausdorff dimension bound $\dim_H C(1, M) \le \log_3 \phi$ on $\mathbb{R}$.
-- **Trust base:** Kernel-checked Lean 4 theorems (`BridgeUniform.lean`), analytical Parry measure cylinder weight slack inequality (Hypothesis (H)), and the measure-theoretic Frostman bridge connecting symbolic path counts to Hausdorff measure on $\mathbb{R}$.
+### Level 3: Full Theorem Target / Conditional Mathematical Conclusion
+- **Scope & Claim:** The universal Hausdorff dimension bound $\dim_H C(1, M) \le \log_3 \phi$ on $\mathbb{R}$.
+- **Unconditional Domain:** Proved unconditionally for the boundary rays ($M = 3^k+1$ and $M = 3^{2a}-3^a+1$) and proven extremizers ($M \in \{4, 7, 10, 28, 73, 82, 244\}$).
+- **Conditional Status in the Interior:** For general interior coprime pairs $(a, b)$, the extremal classification remains **conditional on Hypothesis (H)** (uniqueness of the dominating component $\mathcal{C}_*$ and the Parry cylinder weight slack inequality $1 + \lambda - \lambda^2 \ge \mu_{\mathcal{C}_*}([W_*]) > 0$).
+- **Analytical Bridges:** The measure-theoretic Frostman bridge connecting symbolic language growth to Hausdorff dimension on $\mathbb{R}$ is an analytical paper proof (§3), not an automated kernel check.
 
 ---
 
@@ -83,4 +85,4 @@ flowchart TD
 | **Can a corrupted or malformed certificate pass?** | **No.** Mandatory 64-character SHA-256 integrity checksums are enforced. Missing, empty, or mismatched checksums fail immediately. |
 | **Can boolean values pass as integers?** | **No.** The auditor strictly rejects boolean values (`True`/`False`) in both matrix entries and witness vectors. |
 | **Does the SHA-256 checksum prove author identity?** | **No.** The checksum is an integrity check against corruption. Authenticity requires out-of-band verification against signed Git release tags or the official Zenodo archive ([DOI: 10.5281/zenodo.24595631](https://zenodo.org/records/24595631)). |
-| **Does the checker rely on heavy external libraries?** | Collatz-Wielandt has **zero external dependencies**. Sturm root-counting uses SymPy for polynomial algebra, evaluating root signs in exact field arithmetic. Both are decoupled from EMVE search heuristics. |
+| **Does the checker rely on heavy external libraries?** | Collatz-Wielandt operates with **zero external dependencies** on stock Python 3. Sturm root-counting lazily imports SymPy for polynomial algebra, evaluating root signs in exact field arithmetic. Both are decoupled from EMVE search heuristics. |

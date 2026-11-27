@@ -51,13 +51,13 @@ To maintain rigorous scientific standards, the auditor enforces explicit trust b
 
 ### B. The Three-Level Verification Hierarchy
 We distinguish three distinct levels of verification:
-1. **Level 1 (Verified Certificate):** Proves an exact mathematical property ($5Av \le 8v$ or $\rho(A)=\phi$) of the supplied matrix $A$. 100% independent of graph generation code.
-2. **Level 2 (Verified Derivation):** Proves that the supplied matrix and metadata match the project's canonical carry automaton generator (`--verify-derivation`). *Notice:* This proves agreement with the generator code; it does not independently prove the generator algorithm faithfully models the continuous Cantor problem.
-3. **Level 3 (Verified Theorem):** The full mathematical conclusion ($\dim_H C(1, M) \le \log_3 \phi$ on $\mathbb{R}$) requires Lean 4 kernel proofs and analytical paper proofs (Hypothesis (H) and Frostman bridge).
+1. **Level 1 (Verified Certificate):** Proves an exact mathematical property ($5Av \le 8v$ or $\rho(A)=\phi$) of the supplied matrix $A$. 100% independent of graph generation code and search heuristics.
+2. **Level 2 (Verified Derivation):** Proves that the supplied matrix and metadata strictly match the project's canonical carry automaton generator (`--verify-derivation`). *Notice:* This proves agreement with the generator code; it does not independently prove the generator algorithm faithfully models the continuous Cantor problem.
+3. **Level 3 (Full Theorem Target / Conditional Mathematical Conclusion):** The universal dimension bound on $\mathbb{R}$ is proved unconditionally for boundary rays and proven extremizers, but remains **conditional on Hypothesis (H)** in the interior domain, with an analytical Frostman measure bridge.
 
 ### C. Third-Party Dependencies
-- **Collatz–Wielandt:** Completely self-contained with **zero external dependencies** (uses pure Python arbitrary-precision integers in $\mathbb{Z}$).
-- **Sturm Sequence Root Counter:** Independent of EMVE's search heuristics, but relies on **SymPy** for characteristic polynomial calculation and Sturm polynomial remainder chains. Root isolation signs are evaluated in exact quadratic field arithmetic $\mathbb{Q}(\sqrt{5})$.
+- **Collatz–Wielandt:** Completely self-contained with **zero external dependencies** (runs on stock Python 3 standard library; SymPy is not imported).
+- **Sturm Sequence Root Counter:** Independent of EMVE's search heuristics, but lazily imports **SymPy** for characteristic polynomial calculation and Sturm polynomial remainder chains. Root isolation signs are evaluated in exact quadratic field arithmetic $\mathbb{Q}(\sqrt{5})$.
 
 ### D. Strict Integer Typing
 - Because Python treats `bool` as a subclass of `int` (`isinstance(True, int) == True`), the auditor explicitly rejects boolean values in matrix entries $A_{ij}$ and witness vector entries $v_i$.

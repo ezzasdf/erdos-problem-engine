@@ -166,7 +166,38 @@ def run_test():
     ok_meta, msg_meta = verify_portable_certificate_dict(bad_meta_cert, check_derivation=True)
     assert not ok_meta and "Metadata derivation mismatch" in msg_meta, f"Derivation check failed to catch metadata mismatch: {msg_meta}"
 
-    print("  -> TEST 6 PASSED: SHA-256 enforcement (missing/empty/corrupt), boolean typing (vector/CW/Sturm), and derivation metadata checks verified.")
+    # 6h. Derivation metadata missing family must fail derivation check
+    bad_no_fam = {
+        "format_version": "emve-cert-v1",
+        "certificate_type": "collatz_wielandt",
+        "problem_id": "erdos-cantor-multiplier:M=19:family=2:lag=(1,3)",
+        "mathematical_context": {
+            "multiplier_M": 19,
+            "forward_lag": [1, 3]
+        },
+        "witness": bad_meta_cert["witness"]
+    }
+    bad_no_fam["payload_sha256"] = compute_payload_sha256(bad_no_fam)
+    ok_nf, msg_nf = verify_portable_certificate_dict(bad_no_fam, check_derivation=True)
+    assert not ok_nf and "missing required 'family'" in msg_nf, f"Failed to reject missing family: {msg_nf}"
+
+    # 6i. Derivation metadata wrong forward_lag must fail derivation check
+    bad_wrong_lag = {
+        "format_version": "emve-cert-v1",
+        "certificate_type": "collatz_wielandt",
+        "problem_id": "erdos-cantor-multiplier:M=19:family=2:lag=(1,3)",
+        "mathematical_context": {
+            "multiplier_M": 19,
+            "family": "F2",
+            "forward_lag": [99, 99]
+        },
+        "witness": bad_meta_cert["witness"]
+    }
+    bad_wrong_lag["payload_sha256"] = compute_payload_sha256(bad_wrong_lag)
+    ok_wl, msg_wl = verify_portable_certificate_dict(bad_wrong_lag, check_derivation=True)
+    assert not ok_wl and "stated forward_lag [99, 99]" in msg_wl, f"Failed to reject wrong forward_lag: {msg_wl}"
+
+    print("  -> TEST 6 PASSED: SHA-256 enforcement (missing/empty/corrupt), boolean typing (vector/CW/Sturm), and strict derivation metadata checks (family/lag/missing) verified.")
 
     elapsed = time.time() - start_time
     print("\n" + "=" * 70)
