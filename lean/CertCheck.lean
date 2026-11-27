@@ -51,11 +51,11 @@ def checkInequality (c d : Nat) (Av : List Nat) (v : List Nat) : Bool :=
 /--
 Hardened Collatz–Wielandt verification predicate:
 Given nonnegative square matrix A, strictly positive vector v, and positive integers c, d:
-  - c > 0 and d > 0
-  - n = v.length > 0
+  - c > 0 and d > 0 (strictly positive scaling constants)
+  - n = v.length > 0 (non-empty vector)
   - A has exactly n rows
   - Every row of A has length exactly n (strictly square, guards against zip truncation)
-  - All v_i > 0
+  - All v_i > 0 (strictly positive witness vector)
   - c * (A * v)_i <= d * v_i for all i
 -/
 def verifyCollatzWielandt (matrix : List (List Nat)) (v : List Nat) (c d : Nat) : Bool :=
@@ -66,7 +66,7 @@ def verifyCollatzWielandt (matrix : List (List Nat)) (v : List Nat) (c d : Nat) 
   allStrictlyPositive v &&
   checkInequality c d (mulVec matrix v) v
 
-/-! ### Certified Instance: Multiplier M = 19 (Family 2) -/
+/-! ### Positive Test: Multiplier M = 19 (Family 2) -/
 
 def m19_matrix : List (List Nat) :=
   [ [1, 0, 0, 1, 0, 0],
@@ -86,6 +86,52 @@ Proof: Evaluated by definitional reflexivity in Lean's trusted kernel (zero axio
 -/
 theorem m19_witness_inequality_verified :
     verifyCollatzWielandt m19_matrix m19_witness 5 8 = true := by
+  rfl
+
+/-! ### Negative Regression Tests: Hardening Verification -/
+
+-- Negative Test 1: Inconsistent row lengths must be rejected (guard against zip truncation)
+def malformed_rows_matrix : List (List Nat) :=
+  [ [1, 0, 0],
+    [0, 1] ]
+
+theorem test_reject_inconsistent_row_lengths :
+    verifyCollatzWielandt malformed_rows_matrix [1, 1] 5 8 = false := by
+  rfl
+
+-- Negative Test 2: Matrix row count not matching vector dimension must be rejected
+def mismatched_dim_matrix : List (List Nat) :=
+  [ [1, 0],
+    [0, 1] ]
+
+theorem test_reject_dimension_mismatch :
+    verifyCollatzWielandt mismatched_dim_matrix [1, 1, 1] 5 8 = false := by
+  rfl
+
+-- Negative Test 3: Zero or non-positive witness vector entry must be rejected
+def zero_entry_witness : List Nat := [1, 0]
+
+theorem test_reject_zero_witness_entry :
+    verifyCollatzWielandt [[1, 0], [0, 1]] zero_entry_witness 5 8 = false := by
+  rfl
+
+-- Negative Test 4: Non-positive scalar multiplier (c = 0 or d = 0) must be rejected
+theorem test_reject_zero_scalar_c :
+    verifyCollatzWielandt [[1]] [1] 0 8 = false := by
+  rfl
+
+theorem test_reject_zero_scalar_d :
+    verifyCollatzWielandt [[1]] [1] 5 0 = false := by
+  rfl
+
+-- Negative Test 5: A deliberately false inequality must evaluate to false
+-- Matrix = [[2, 0], [0, 2]], v = [1, 1], c = 1, d = 1: (1 * 2 <= 1 * 1 is false)
+def scaling_matrix : List (List Nat) :=
+  [ [2, 0],
+    [0, 2] ]
+
+theorem test_reject_false_inequality :
+    verifyCollatzWielandt scaling_matrix [1, 1] 1 1 = false := by
   rfl
 
 #eval verifyCollatzWielandt m19_matrix m19_witness 5 8
