@@ -159,5 +159,10 @@ with a coverage table mapping each to a clause. It is unreviewed and says so.
 - The university and public-research carve-out cannot be narrowed by the
   author's own wording; it is in the license text.
 - The Apache-2.0 tail is permanent and free to competitors.
+- The template now separates ownership of the Software, of Modifications, and
+  of the Licensee's own material (clause 10), names affiliates explicitly rather
+  than assuming the word "organization" covers them (clause 3.2 and Schedule A),
+  and states that a perpetual grant is still terminable for breach with a
+  defined wind-down (clauses 6.2 and 7). All three remain unreviewed.
 - None of this has been read by a lawyer. The template is a starting point that
   a later reviewer can correct, not a substitute for one.

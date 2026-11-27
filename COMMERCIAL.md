@@ -9,11 +9,27 @@ Apache-2.0; see `NOTICE`.
 
 ## The model
 
-Noncommercial use, including use by universities, public research
-organizations, and government institutions, is free. PolyForm Strict 1.0.0
-implements that through its own noncommercial definition. Private companies
-using the code commercially pay. `COMMERCIAL_AGREEMENT_TEMPLATE.md` is the
-document that sells that use.
+Noncommercial use is free, private commercial use is paid. That is the intent,
+but three groups use the software without paying, and it is better to say so
+than to imply otherwise.
+
+1. **Holders of an earlier copy.** Everything up to commit `6d68a98` was
+   released under Apache-2.0 and stays there permanently. A company that
+   obtained it under that license owes nothing for that copy, and may use,
+   modify, and redistribute it commercially. See `NOTICE`.
+2. **Qualifying noncommercial organizations.** PolyForm Strict 1.0.0 permits
+   use by educational institutions, public research organizations, charities,
+   public safety and health organizations, environmental protection
+   organizations, and government institutions, regardless of funding source. A
+   university working on an industry grant is inside that permission.
+3. **Work performed under such an organization's authority** is that same
+   permission seen from the other side. It is not an additional right, and a
+   company cannot acquire one by arranging for a university to do the work.
+   Whether a particular arrangement is the university using the software or the
+   company using it through the university is a question of fact.
+
+A company that wants the current version for its own commercial use, outside
+those three cases, is who `COMMERCIAL_AGREEMENT_TEMPLATE.md` is for.
 
 Academics and noncommercial users do not need a license, but PolyForm Strict
 does not permit them to modify the code either. If you are one of those users

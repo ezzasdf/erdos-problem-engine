@@ -1,7 +1,7 @@
 # Commercial license agreement — template
 
 **This is a template, not legal advice, and not a substitute for a lawyer.**
-It is a plain-language starting point built from the eight questions a customer
+It is a plain-language starting point built from the questions a customer
 agreement has to answer. Fill every bracketed field. If you ever can afford a
 review, this is the document to hand over.
 
@@ -19,29 +19,46 @@ This agreement is between [LICENSOR LEGAL NAME], [ADDRESS], ("Licensor") and
 
 **2. The Software**
 
-"Software" means the source code, build files, and scripts at
+2.1 "Software" means the source code, build files, and scripts at
 [REPOSITORY URL] as of commit [FULL COMMIT SHA], together with any part of it
 the Licensee uses. It excludes the papers in `paper/`, which carry their own
 terms, and excludes third-party components such as Lean 4 and Mathlib, which
 remain under their own licenses.
 
-**3. What the Licensee may do**
+2.2 "Modification" means any change to the Software, and any work that
+incorporates or is derived from it.
+
+2.3 "Product" means anything Licensee makes, sells, or distributes that
+incorporates the Software or a Modification.
+
+**3. Grant**
 
 3.1 Licensor grants Licensee a non-exclusive, non-transferable right to:
 
 - (a) use, run, and reproduce the Software, including commercially;
-- (b) modify the Software and create derivative works from it;
-- (c) [INCLUDE OR DELETE] distribute the Software and derivative works, in
-  source or binary form, to end users as part of [PRODUCT OR SERVICE].
+- (b) modify the Software and create Modifications;
+- (c) [INCLUDE OR DELETE] distribute the Software and Modifications, in source
+  or binary form, as part of a Product.
 
-3.2 Choose one:
+3.2 **Who may use it.** Choose one:
 
-- [OPTION A — per organization] The grant covers all employees and contractors
-  of Licensee and its subsidiaries, but no other entity.
-- [OPTION B — per product] The grant covers only [PRODUCT NAME] and no other
-  product.
+- [OPTION A — organization with listed affiliates] The grant covers Licensee and
+  the affiliates listed in Schedule A. Each listed affiliate is bound by this
+  agreement as if it were the Licensee. Licensee remains responsible for each
+  affiliate's compliance and for payment. Adding an affiliate requires written
+  notice to Licensor and Licensor's written acceptance; a subsidiary acquired
+  after signature is not covered until accepted.
+- [OPTION B — single legal entity] The grant covers Licensee only. Parents,
+  subsidiaries, sister companies, and other affiliates are separate legal
+  persons, are not covered, and must each sign their own agreement or be added
+  to Schedule A.
 
-**4. What the Licensee may not do**
+3.3 Employees and individual contractors acting on Licensee's behalf and under
+its direction are covered, provided they are bound by confidentiality and use
+restrictions at least as protective as this agreement. A contractor may not use
+the Software for its own purposes or for another client.
+
+**4. Restrictions**
 
 4.1 Licensee may not sublicense, resell, or provide the Software as a
 standalone product, or as a competing library, dataset, or service.
@@ -71,28 +88,50 @@ Licensor's income tax.
 
 6.1 Choose one:
 
-- [PERPETUAL] The grant is perpetual and irrevocable for the Software version
-  named in clause 2, subject to termination under clause 7.
+- [PERPETUAL] The grant is perpetual in duration for the Software version named
+  in clause 2, conditional on continued compliance with this agreement.
 - [FIXED TERM] The grant runs from [START DATE] for [N] months and renews only
   by written agreement.
+
+6.2 "Perpetual" describes duration only. It does not make the grant
+unconditional, and it does not survive termination under clause 7 except as
+clause 7.4 provides.
 
 **7. Termination**
 
 7.1 Either party may terminate on [30] days' written notice of a material
 breach that is not cured within that period.
 
-7.2 Licensor may terminate immediately if Licensee fails to pay within [15] days
+7.2 Licensor may terminate if an undisputed invoice remains unpaid [15] days
 after written notice.
 
-7.3 On termination, Licensee must stop all use of the Software and delete or
-destroy copies, except that:
+7.3 **Effect on the grant.** Termination under 7.1 or 7.2 ends the grant
+prospectively. From the termination date Licensee may no longer use, modify, or
+distribute the Software, except as 7.4 allows. This applies to a perpetual grant
+under 6.1 as well; see 6.2.
 
-- (a) Licensee may retain one archival copy for legal and compliance purposes;
-- (b) products already shipped to end users before termination may continue to
-  be used by those end users;
-- (c) Licensee has [30] days to wind down live deployments.
+7.4 **Wind-down.** On termination:
 
-7.4 Clauses 4, 8, 9, 10, and 12 survive termination.
+- (a) Licensee has [30] days to cease new deployments and to stop shipping
+  Products that incorporate the Software;
+- (b) Products already delivered to end users before the termination date may
+  continue to be used by those end users, and Licensee may continue to support
+  them to the extent necessary;
+- (c) Licensee may retain one archival copy for legal and compliance purposes;
+- (d) Licensee must certify in writing, within [45] days, that it has complied
+  with (a).
+
+7.5 **Money already owed.** Termination does not relieve Licensee of fees
+accrued before the termination date.
+
+7.6 **Refunds.** Fees paid are non-refundable, except that if Licensee
+terminates under 7.1 for Licensor's uncured breach, or Licensor terminates
+without cause, Licensor refunds prepaid fees for the unused part of the term.
+
+7.7 **No damages for termination.** Neither party is liable for damages arising
+solely from terminating in accordance with this clause.
+
+7.8 Clauses 4, 7.5, 7.6, 8, 9, 10, 12, and 13 survive termination.
 
 **8. No warranty**
 
@@ -113,16 +152,35 @@ damages, or lost profits.
 
 **10. Intellectual property**
 
-10.1 Licensor retains all copyright and other rights in the Software. No rights
-are granted except those stated in clause 3.
+10.1 **The Software.** Licensor owns and retains all copyright and other rights
+in the Software as delivered under clause 2. Nothing in this agreement transfers
+ownership of the Software, and no rights are granted except those in clause 3.
 
-10.2 Licensee retains all rights in its own modifications and products.
+10.2 **Licensee's independent material.** Licensee owns and retains all rights
+in material it creates that neither incorporates nor derives from the Software.
 
-10.3 Choose one:
+10.3 **Modifications.** Licensee owns the original expression it contributes to
+a Modification, but a Modification as a whole incorporates Licensor's
+copyrightable code and remains subject to this agreement. Licensee's rights in a
+Modification do not extend to the Software, and Licensee may not exploit a
+Modification except as clause 3 permits. If the grant ends, Licensee's rights in
+the Modification do not survive as a right to use the Software, but Licensee
+retains whatever it independently authored.
+
+10.4 **Products.** Licensee owns its Products. Where a Product incorporates the
+Software or a Modification, Licensor's rights in the Software are unaffected,
+and Licensee's right to distribute the Product depends on clause 3.1(c)
+remaining in force.
+
+10.5 **No implied licenses.** No license is granted by implication, estoppel, or
+otherwise, except as stated in clause 3.
+
+10.6 Choose one:
 
 - [GRANT BACK] Licensee grants Licensor a non-exclusive, perpetual, royalty-free
-  right to use any modifications Licensee chooses to contribute back.
-- [NO GRANT BACK] Licensee keeps its modifications private.
+  right to use any Modification Licensee chooses to contribute back. This does
+  not apply to Modifications Licensee does not contribute.
+- [NO GRANT BACK] Licensee keeps all Modifications private, subject to 10.3.
 
 **11. Support**
 
@@ -166,20 +224,31 @@ Name and title: ______________________
 
 ---
 
-## Coverage check
+**Schedule A — affiliates covered under clause 3.2, Option A**
 
-Each requirement, and the clause that answers it:
+| Legal name | Registration number | Jurisdiction | Date accepted |
+| --- | --- | --- | --- |
+|  |  |  |  |
+|  |  |  |  |
+
+An entity not listed here is not covered. Licensee is responsible for each
+listed entity's compliance and for payment.
+
+---
+
+## Coverage check
 
 | Requirement | Clause |
 | --- | --- |
-| What may they use? | 2, 3.1, 3.2 |
-| May they modify? | 3.1(b), 10.2, 10.3 |
-| May they redistribute? | 3.1(c) |
-| May they sell products containing it? | 3.1(a) with 4.1 limits |
+| What may they use? | 2, 3.1, 3.2, 3.3 |
+| May they modify? | 3.1(b), 10.3, 10.6 |
+| May they redistribute? | 3.1(c), 4.1 |
+| May they sell products containing it? | 3.1(a), 4.1, 10.4 |
 | One-time or recurring payment? | 5.1 |
-| How long does permission last? | 6.1 |
-| What if they stop paying? | 7.2, 7.3 |
+| How long does permission last? | 6.1, 6.2 |
+| What if they stop paying? | 7.2, 7.3, 7.5, 7.6 |
 | What if the project is acquired? | 12.1, 12.2 |
+| Who inside the customer may use it? | 3.2, 3.3, Schedule A |
 
 ## What this template does not do
 
@@ -189,3 +258,6 @@ Each requirement, and the clause that answers it:
 - It does not decide whether the older Apache-2.0 users still get a free
   license. They do, and clause 2 names the commit precisely so that the scope of
   what you are selling is unambiguous.
+- It has not been reviewed. Clauses 7 and 10 in particular are the ones most
+  likely to be tested in a dispute, and they are the ones a reviewer should read
+  first.
