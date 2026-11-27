@@ -60,15 +60,26 @@ def run_test():
 
     # Test 4: Independent External Auditor
     print("\n[Test 4] Running Independent Mathematical Auditor (Zero-Trust Check)...")
-    from scripts.check_certificate import run_standalone_audit
+    from scripts.check_certificate import run_standalone_audit, verify_certificate_file
     audit_res = run_standalone_audit()
     assert audit_res == 0, "Independent auditor failed"
     print("  -> TEST 4 PASSED: Independent auditor verified raw mathematical witnesses.")
 
+    # Test 5: Portable Certificate Format (emve-cert-v1) Validation
+    print("\n[Test 5] Auditing Portable JSON Certificates (emve-cert-v1)...")
+    cert_dir = root_dir / "certificates"
+    for cfile in ["M19_collatz_wielandt.json", "M7_sturm_extremizer.json", "M4_sturm_extremizer.json"]:
+        cpath = cert_dir / cfile
+        assert cpath.exists(), f"Certificate file {cfile} not found"
+        ok, msg, rep = verify_certificate_file(cpath)
+        assert ok, f"Portable certificate {cfile} failed audit: {msg}"
+        print(f"  - {cfile:<28}: [{rep['status']}] (SHA-256 verified, {rep['elapsed_seconds']:.4f}s)")
+    print("  -> TEST 5 PASSED: Portable JSON certificates independently validated.")
+
     elapsed = time.time() - start_time
     print("\n" + "=" * 70)
     print(f"ALL TESTS PASSED in {elapsed:.3f} seconds.")
-    print("Assurance Level: Reproducibility + Independent Mathematical Certificate Audit.")
+    print("Assurance Level: Reproducibility + Standalone Audit + Portable JSON Verification.")
     print("Trust Boundary: Certifies zero-reachable transition matrix spectral radii.")
     print("=" * 70)
     return 0

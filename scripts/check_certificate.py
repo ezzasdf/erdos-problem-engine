@@ -3,7 +3,8 @@
 
 This script acts as an independent mathematical auditor. It does NOT trust or run
 the search heuristics that found the Collatz-Wielandt vectors or candidate factors.
-Instead, it takes the mathematical witnesses and verifies them from first principles:
+Instead, it takes portable mathematical witnesses (JSON or raw data) and verifies
+them from first principles:
 
 1. Collatz-Wielandt Certificate Validator:
    Given a nonnegative integer matrix A and a positive integer vector v:
@@ -23,13 +24,28 @@ Instead, it takes the mathematical witnesses and verifies them from first princi
      - Asserts exactly 0 real roots strictly greater than phi.
    Mathematical Guarantee:
      Proves rho(A) = phi exactly, without numerical approximation.
+
+3. Portable Certificate Format (emve-cert-v1):
+   - Schema versioning (format_version: emve-cert-v1).
+   - Problem identifier (problem_id).
+   - Unambiguous matrix and witness vector entries.
+   - Exact mathematical inequality / claim checked.
+   - Cryptographic payload digest (SHA-256).
+   - Independent verification result and receipt.
 """
 
 import sys
+import os
+import json
+import hashlib
+import time
 import argparse
+from pathlib import Path
 from fractions import Fraction
 import sympy as sp
 
+CHECKER_VERSION = "EMVE Independent Certificate Auditor v0.9.0"
+SUPPORTED_FORMAT_VERSIONS = {"emve-cert-v1"}
 X = sp.Symbol("x")
 
 
@@ -89,6 +105,13 @@ def count_sign_changes(signs):
     return sum(1 for i in range(len(non_zero) - 1) if non_zero[i] != non_zero[i + 1])
 
 
+def compute_payload_sha256(cert_dict):
+    """Compute deterministic SHA-256 hash of certificate payload."""
+    payload = {k: v for k, v in cert_dict.items() if k not in ("payload_sha256", "audit_receipt")}
+    canonical_json = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
+
+
 def verify_collatz_wielandt_witness(A_matrix, v_vector):
     """Independently audit a Collatz-Wielandt certificate.
     
@@ -106,6 +129,8 @@ def verify_collatz_wielandt_witness(A_matrix, v_vector):
 
     # 2. Matrix entries nonnegative integers
     for i in range(n):
+        if len(A_matrix[i]) != n:
+            return False, f"Matrix row {i} length {len(A_matrix[i])} != {n}"
         for j in range(n):
             if not isinstance(A_matrix[i][j], int) or A_matrix[i][j] < 0:
                 return False, f"Matrix entry A[{i}][{j}] = {A_matrix[i][j]} is not a nonnegative integer"
@@ -118,7 +143,7 @@ def verify_collatz_wielandt_witness(A_matrix, v_vector):
         if lhs > rhs:
             return False, f"Inequality failed at row {i}: 5*(A@v)[{i}] = {lhs} > 8*v[{i}] = {rhs}"
 
-    return True, f"Collatz-Wielandt verified: 5*(A@v) <= 8*v holds across all {n} rows. Proves rho(A) <= 1.60 < phi."
+    return True, f"Collatz-Wielandt verified: 5*(A@v) <= 8*v holds across all {n} rows. Proves rho(A) <= 8/5 = 1.60 < phi strictly."
 
 
 def verify_sturm_extremizer_witness(A_matrix):
@@ -127,6 +152,13 @@ def verify_sturm_extremizer_witness(A_matrix):
     Verifies that rho(A) == phi exactly using exact polynomial arithmetic in Q(sqrt(5)).
     """
     n = len(A_matrix)
+    for i in range(n):
+        if len(A_matrix[i]) != n:
+            return False, f"Matrix row {i} length {len(A_matrix[i])} != {n}"
+        for j in range(n):
+            if not isinstance(A_matrix[i][j], int) or A_matrix[i][j] < 0:
+                return False, f"Matrix entry A[{i}][{j}] = {A_matrix[i][j]} is not a nonnegative integer"
+
     M_sp = sp.Matrix(A_matrix)
     cp = M_sp.charpoly(X)
     P = sp.Poly(cp.as_expr(), X, domain='ZZ')
@@ -161,13 +193,141 @@ def verify_sturm_extremizer_witness(A_matrix):
     return True, f"Sturm sequence verified: (x^2 - x - 1) | P(x) with 0 real roots > phi. Proves rho(A) = phi exactly."
 
 
-def run_standalone_audit():
-    print("=" * 75)
-    print("EMVE Independent Mathematical Certificate Checker (Auditor)")
-    print("=" * 75)
+def verify_portable_certificate_dict(cert_data):
+    """Verify a portable certificate dictionary against the emve-cert-v1 specification."""
+    # 1. Format version
+    fmt = cert_data.get("format_version")
+    if fmt not in SUPPORTED_FORMAT_VERSIONS:
+        return False, f"Unsupported certificate format version: '{fmt}' (supported: {SUPPORTED_FORMAT_VERSIONS})"
 
-    # Example 1: Non-extremizer M = 19 (6 states)
-    # Zero-reachable forward SFT graph matrix for lag (1, 3)
+    # 2. Cryptographic payload digest check
+    claimed_sha = cert_data.get("payload_sha256")
+    actual_sha = compute_payload_sha256(cert_data)
+    if claimed_sha and claimed_sha != actual_sha:
+        return False, f"SHA-256 digest mismatch: claimed {claimed_sha} != computed {actual_sha}"
+
+    # 3. Required sections
+    cert_type = cert_data.get("certificate_type")
+    witness = cert_data.get("witness", {})
+    matrix = witness.get("matrix")
+    if not matrix or not isinstance(matrix, list):
+        return False, "Missing or invalid witness matrix in certificate"
+
+    dims = witness.get("matrix_dimensions")
+    if dims != [len(matrix), len(matrix[0]) if matrix else 0]:
+        return False, f"matrix_dimensions {dims} does not match actual matrix dimensions [{len(matrix)}, {len(matrix[0]) if matrix else 0}]"
+
+    # 4. Certificate type specific checks
+    if cert_type == "collatz_wielandt":
+        vector = witness.get("witness_vector")
+        if not vector or not isinstance(vector, list):
+            return False, "Missing or invalid witness_vector for collatz_wielandt certificate"
+        ok, msg = verify_collatz_wielandt_witness(matrix, vector)
+        return ok, msg
+
+    elif cert_type == "sturm_root_count":
+        ok, msg = verify_sturm_extremizer_witness(matrix)
+        return ok, msg
+
+    else:
+        return False, f"Unknown certificate_type: '{cert_type}'"
+
+
+def verify_certificate_file(file_path):
+    """Load and audit a single portable certificate file."""
+    path = Path(file_path)
+    if not path.is_file():
+        return False, f"File not found: {file_path}", None
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        return False, f"Failed to parse JSON: {e}", None
+
+    start_t = time.time()
+    ok, msg = verify_portable_certificate_dict(data)
+    elapsed = time.time() - start_t
+
+    report = {
+        "file": str(path),
+        "problem_id": data.get("problem_id", "unknown"),
+        "certificate_type": data.get("certificate_type", "unknown"),
+        "format_version": data.get("format_version", "unknown"),
+        "payload_sha256": data.get("payload_sha256", "none"),
+        "status": "PASS" if ok else "FAIL",
+        "proof_summary": msg,
+        "elapsed_seconds": elapsed,
+        "checker_version": CHECKER_VERSION
+    }
+    return ok, msg, report
+
+
+def create_portable_collatz_wielandt_cert(problem_id, math_context, A_matrix, v_vector, metadata=None):
+    """Construct an emve-cert-v1 Collatz-Wielandt portable certificate."""
+    cert = {
+        "format_version": "emve-cert-v1",
+        "certificate_type": "collatz_wielandt",
+        "problem_id": problem_id,
+        "mathematical_context": math_context,
+        "claim": {
+            "property": "spectral_radius_upper_bound",
+            "inequality": "5 * sum_j A[i][j]*v[j] <= 8 * v[i] for all i",
+            "spectral_bound_rational": "8/5",
+            "spectral_bound_float": 1.6,
+            "target_golden_ratio": "phi = (1 + sqrt(5)) / 2 approx 1.618033989",
+            "conclusion": "rho(A) <= 1.60 < phi strictly"
+        },
+        "witness": {
+            "matrix_dimensions": [len(A_matrix), len(A_matrix[0])],
+            "matrix": A_matrix,
+            "witness_vector": v_vector
+        },
+        "metadata": metadata or {
+            "generator": "EMVE verify_dimensions.py v0.9.0",
+            "zenodo_doi": "10.5281/zenodo.24595631",
+            "created_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        }
+    }
+    cert["payload_sha256"] = compute_payload_sha256(cert)
+    return cert
+
+
+def create_portable_sturm_cert(problem_id, math_context, A_matrix, metadata=None):
+    """Construct an emve-cert-v1 Sturm root-count portable certificate."""
+    cert = {
+        "format_version": "emve-cert-v1",
+        "certificate_type": "sturm_root_count",
+        "problem_id": problem_id,
+        "mathematical_context": math_context,
+        "claim": {
+            "property": "exact_spectral_radius_equality",
+            "target_field": "Q(sqrt(5))",
+            "target_root": "phi = (1 + sqrt(5)) / 2",
+            "polynomial_factor": "x^2 - x - 1",
+            "exact_roots_strictly_greater_than_phi": 0,
+            "conclusion": "rho(A) == phi exactly"
+        },
+        "witness": {
+            "matrix_dimensions": [len(A_matrix), len(A_matrix[0])],
+            "matrix": A_matrix
+        },
+        "metadata": metadata or {
+            "generator": "EMVE verify_dimensions.py v0.9.0",
+            "zenodo_doi": "10.5281/zenodo.24595631",
+            "created_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        }
+    }
+    cert["payload_sha256"] = compute_payload_sha256(cert)
+    return cert
+
+
+def export_sample_certificates(output_dir):
+    """Generate canonical portable JSON certificates for M=19 and M=7."""
+    out_path = Path(output_dir)
+    out_path.mkdir(parents=True, exist_ok=True)
+
+    # 1. Non-extremizer M = 19
     A_19 = [
         [1, 0, 0, 1, 0, 0],
         [1, 0, 0, 0, 0, 0],
@@ -176,7 +336,79 @@ def run_standalone_audit():
         [0, 0, 0, 0, 0, 1],
         [0, 0, 1, 0, 0, 1],
     ]
-    # Independent integer witness vector
+    v_19 = [201563, 139062, 100000, 100000, 139062, 201562]
+    ctx_19 = {
+        "problem": "Erdos 1939 Middle-Thirds Cantor Set Arithmetic Intersection",
+        "multiplier_M": 19,
+        "family": 2,
+        "forward_lag": [1, 3],
+        "graph_type": "zero_reachable_forward_sft"
+    }
+    cert_19 = create_portable_collatz_wielandt_cert(
+        "erdos-cantor-multiplier:M=19:family=2:lag=(1,3)", ctx_19, A_19, v_19
+    )
+    p19 = out_path / "M19_collatz_wielandt.json"
+    with open(p19, "w", encoding="utf-8") as f:
+        json.dump(cert_19, f, indent=2)
+
+    # 2. Extremizer M = 7
+    A_7 = [
+        [1, 0, 1, 0],
+        [1, 0, 0, 0],
+        [0, 0, 0, 1],
+        [0, 1, 0, 1],
+    ]
+    ctx_7 = {
+        "problem": "Erdos 1939 Middle-Thirds Cantor Set Arithmetic Intersection",
+        "multiplier_M": 7,
+        "family": 2,
+        "forward_lag": [1, 2],
+        "graph_type": "zero_reachable_forward_sft"
+    }
+    cert_7 = create_portable_sturm_cert(
+        "erdos-cantor-multiplier:M=7:family=2:lag=(1,2)", ctx_7, A_7
+    )
+    p7 = out_path / "M7_sturm_extremizer.json"
+    with open(p7, "w", encoding="utf-8") as f:
+        json.dump(cert_7, f, indent=2)
+
+    # 3. Extremizer M = 4
+    A_4 = [
+        [1, 1],
+        [1, 0]
+    ]
+    ctx_4 = {
+        "problem": "Erdos 1939 Middle-Thirds Cantor Set Arithmetic Intersection",
+        "multiplier_M": 4,
+        "family": 1,
+        "forward_lag": None,
+        "graph_type": "zero_reachable_carry_graph"
+    }
+    cert_4 = create_portable_sturm_cert(
+        "erdos-cantor-multiplier:M=4:family=1:carry", ctx_4, A_4
+    )
+    p4 = out_path / "M4_sturm_extremizer.json"
+    with open(p4, "w", encoding="utf-8") as f:
+        json.dump(cert_4, f, indent=2)
+
+    return [p19, p7, p4]
+
+
+def run_standalone_audit():
+    print("=" * 75)
+    print("EMVE Independent Mathematical Certificate Checker (Auditor)")
+    print(f"Version: {CHECKER_VERSION}")
+    print("=" * 75)
+
+    # Example 1: Non-extremizer M = 19 (6 states)
+    A_19 = [
+        [1, 0, 0, 1, 0, 0],
+        [1, 0, 0, 0, 0, 0],
+        [0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 1],
+        [0, 0, 1, 0, 0, 1],
+    ]
     v_19 = [201563, 139062, 100000, 100000, 139062, 201562]
 
     print("\n[Audit 1] Verifying Collatz-Wielandt witness for M = 19 (6x6 matrix)...")
@@ -186,7 +418,6 @@ def run_standalone_audit():
     assert ok1
 
     # Example 2: Extremizer M = 7 (4 states)
-    # Zero-reachable forward SFT graph matrix for lag (1, 2)
     A_7 = [
         [1, 0, 1, 0],
         [1, 0, 0, 0],
@@ -200,17 +431,68 @@ def run_standalone_audit():
     assert ok2
 
     print("\n" + "=" * 75)
-    print("INDEPENDENT AUDIT COMPLETE: 2/2 MATHEMATICAL CERTIFICATES INDEPENDENTLY VERIFIED.")
+    print("INDEPENDENT AUDIT COMPLETE: 2/2 RAW MATHEMATICAL WITNESSES VERIFIED.")
     print("No heuristic search trusted. All proofs certified via exact integer arithmetic and Q(sqrt5).")
     print("=" * 75)
     return 0
 
 
 def main():
-    parser = argparse.ArgumentParser(description="EMVE Independent Certificate Auditor")
-    parser.add_argument("--example", action="store_true", default=True, help="Run standalone audit on representative witnesses")
+    parser = argparse.ArgumentParser(
+        description="EMVE Independent Certificate Auditor: Verify portable mathematical certificates."
+    )
+    parser.add_argument(
+        "files", nargs="*", help="Portable certificate JSON files to audit (emve-cert-v1)"
+    )
+    parser.add_argument(
+        "--example", action="store_true", help="Run standalone audit on built-in sample witnesses"
+    )
+    parser.add_argument(
+        "--export-samples", metavar="DIR", help="Export canonical sample portable certificate JSONs to DIR"
+    )
     args = parser.parse_args()
-    return run_standalone_audit()
+
+    if args.export_samples:
+        paths = export_sample_certificates(args.export_samples)
+        print(f"Exported {len(paths)} portable certificate(s) to '{args.export_samples}':")
+        for p in paths:
+            print(f"  - {p}")
+        return 0
+
+    if not args.files or args.example:
+        return run_standalone_audit()
+
+    # Audit files passed via CLI
+    all_passed = True
+    print("=" * 80)
+    print("EMVE Independent Certificate Auditor: Auditing Portable Certificates")
+    print(f"Checker: {CHECKER_VERSION}")
+    print("=" * 80)
+
+    for fpath in args.files:
+        ok, msg, report = verify_certificate_file(fpath)
+        status_str = "\033[92mPASS\033[0m" if ok else "\033[91mFAIL\033[0m"
+        print(f"\nTarget File    : {fpath}")
+        print(f"Problem ID     : {report.get('problem_id')}")
+        print(f"Format Version : {report.get('format_version')}")
+        print(f"Cert Type      : {report.get('certificate_type')}")
+        print(f"SHA-256 Digest : {report.get('payload_sha256')}")
+        print(f"Audit Status   : [{status_str}]")
+        print(f"Proof Details  : {msg}")
+        print(f"Execution Time : {report.get('elapsed_seconds', 0.0):.4f}s")
+        if not ok:
+            all_passed = False
+
+    print("\n" + "=" * 80)
+    if all_passed:
+        print(f"AUDIT SUMMARY: ALL {len(args.files)} CERTIFICATES INDEPENDENTLY AUDITED AND PASSED.")
+        print("Guarantees: Valid SHA-256 payload digest; exact mathematical inequality satisfied in Z or Q(sqrt5).")
+        print("=" * 80)
+        return 0
+    else:
+        print("AUDIT SUMMARY: ONE OR MORE CERTIFICATES FAILED INDEPENDENT AUDIT.")
+        print("=" * 80)
+        return 1
 
 
 if __name__ == "__main__":

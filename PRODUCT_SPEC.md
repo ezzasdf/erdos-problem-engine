@@ -24,7 +24,7 @@ Standard numerical packages rely on floating-point linear algebra, which is susc
 | **C1: Interactive Formal Kernel** | **Lean 4 (Mathlib 4.12.0)** | Foundational, machine-checked proofs with zero `sorry`. Kernel-verified transfer-matrix dualities ($P M P = M^T$), orbit reachability, Parry measure cylinder weight positivity on the primitive component $\mathcal{C}_*$, and boundary-case bounds. |
 | **C2: Exact Algebraic Spectral Engine** | **Python 3 / SymPy** | Dual certification of zero-reachable transition spectra: (1) Arbitrary-precision integer Collatz-Wielandt certificates ($5 A v \le 8 v \in \mathbb{Z}$); (2) Exact Sturm sequences in $\mathbb{Q}(\sqrt{5})$ counting real roots strictly greater than $\phi$ for candidate extremizers. |
 | **C3: High-Throughput Exploration Engines** | **Rust (Edition 2021)** | Parallelized binary automata and carry propagation scanners (`verify_erdos_rs`, `verify_middle`) for large-scale combinatorial state space exploration. |
-| **C4: Exact Certificate Artifacts** | **Structured CSV / JSON** | Machine-readable verification certificates documenting exact Perron roots, minimal polynomials, integer bounding vectors, and reachable state counts. |
+| **C4: Portable Exact Certificates** | **JSON (`emve-cert-v1`)** | Standalone, machine-auditable verification certificates with cryptographic SHA-256 digests. Documents exact matrix entries, integer witness vectors, and inequalities independently auditable via `scripts/check_certificate.py` in milliseconds without running search heuristics. |
 
 ---
 
@@ -63,4 +63,4 @@ All performance metrics are measured under reproducible workloads on standard mo
 
 - **Operating Systems:** Linux (Ubuntu 22.04+, Debian 12+, Arch), macOS (Sonoma+, Apple Silicon or Intel).
 - **Software Dependencies:** Python $\ge 3.10$ (`numpy==2.5.3`, `sympy==1.14.0`), Lean 4 (`v4.12.0`), Rust (`stable`).
-- **Independent Verification:** Any recipient can independently run `python3 scripts/test_reproducibility.py` or the standalone auditor `python3 scripts/check_certificate.py` to confirm that all certificates validate in < 0.2 seconds without external network access.
+- **Independent Verification:** Any recipient can independently run `python3 scripts/test_reproducibility.py` or audit portable certificates via `python3 scripts/check_certificate.py certificates/*.json` in < 0.2 seconds without external network access or running the search engine.

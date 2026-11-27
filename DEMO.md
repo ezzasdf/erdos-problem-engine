@@ -52,9 +52,14 @@ python3 scripts/cantor_multiplier/verify_dimensions.py
 python3 scripts/test_reproducibility.py
 ```
 
-### Test D: Standalone Independent Certificate Auditor (Zero-Trust Check)
+### Test D: Standalone Independent Certificate Auditor (Raw Witnesses)
 ```bash
-python3 scripts/check_certificate.py
+python3 scripts/check_certificate.py --example
+```
+
+### Test E: Portable Certificate Verification (Zero-Trust JSON Check)
+```bash
+python3 scripts/check_certificate.py certificates/M19_collatz_wielandt.json certificates/M7_sturm_extremizer.json
 ```
 
 ---
@@ -102,6 +107,37 @@ log_3(phi) = 0.438017879
 Note: 'inferred_dim' is log_3(lambda_0), the symbolic growth rate of the zero-reachable forward SFT graph.
       It equals the true Hausdorff dimension dim_H on R when the reachability correspondence and
       analytical Frostman bridge hold (proven for extremizers and boundary rays; conditional on Hypothesis (H) in interior).
+```
+
+### Test E Output (Portable Certificate Audit):
+```text
+================================================================================
+EMVE Independent Certificate Auditor: Auditing Portable Certificates
+Checker: EMVE Independent Certificate Auditor v0.9.0
+================================================================================
+
+Target File    : certificates/M19_collatz_wielandt.json
+Problem ID     : erdos-cantor-multiplier:M=19:family=2:lag=(1,3)
+Format Version : emve-cert-v1
+Cert Type      : collatz_wielandt
+SHA-256 Digest : 49fdbcaac0f47ba27a9653147d1d5df64d4efff5f9f59d69d44dcc454892bfbc
+Audit Status   : [PASS]
+Proof Details  : Collatz-Wielandt verified: 5*(A@v) <= 8*v holds across all 6 rows. Proves rho(A) <= 8/5 = 1.60 < phi strictly.
+Execution Time : 0.0001s
+
+Target File    : certificates/M7_sturm_extremizer.json
+Problem ID     : erdos-cantor-multiplier:M=7:family=2:lag=(1,2)
+Format Version : emve-cert-v1
+Cert Type      : sturm_root_count
+SHA-256 Digest : 970de11745cd4f47fe42113f8072e918a72076c1fcc30cad2f6ae080cf9d569e
+Audit Status   : [PASS]
+Proof Details  : Sturm sequence verified: (x^2 - x - 1) | P(x) with 0 real roots > phi. Proves rho(A) = phi exactly.
+Execution Time : 0.0689s
+
+================================================================================
+AUDIT SUMMARY: ALL 2 CERTIFICATES INDEPENDENTLY AUDITED AND PASSED.
+Guarantees: Valid SHA-256 payload digest; exact mathematical inequality satisfied in Z or Q(sqrt5).
+================================================================================
 ```
 
 ---

@@ -49,65 +49,69 @@ Rather than treating all mathematical or computational groups as equally immedia
 
 ---
 
-## 2. The Technical Evaluation Proposal Framework
+## 2. Technical Outreach Strategy & Engagement Funnel
 
-Rather than pitching rigid enterprise software tiers (\$10,000–\$75,000) upfront before validating customer requirements, approach prospects with a **Structured Technical Evaluation**:
+Rather than treating prominent researchers or engineering leads as immediate enterprise buyers or leading with a commercial evaluation proposal, our strategy follows a **peer-to-peer, question-first technical engagement model**.
 
-### The 5-Step Evaluation Workflow
+### Our 4 Strategic Milestones
 
 ```mermaid
 flowchart LR
-    A["1. Customer Problem\nDefinition"] --> B["2. Feasibility &\nTrust Boundary Assessment"]
-    B --> C["3. Prototype Verifier &\nCertificate Generation"]
-    C --> D["4. Written Technical\nVerification Report"]
-    D --> E["5. Follow-on Tier 1/2\nLicensing Agreement"]
+    M1["1. Five Carefully\nSelected Contacts"] --> M2["2. Three Meaningful\nTechnical Conversations"]
+    M2 --> M3["3. One Independent Run\nof Certificate Checker"]
+    M3 --> M4["4. One Scoped Paid\nTechnical Evaluation"]
 ```
 
-1. **Customer Problem Definition:**  
-   The customer specifies a discrete dynamical system, transition graph, or arithmetic carry constraint matrix whose spectral radius, boundedness, or invariant language needs rigorous certification.
-2. **Feasibility & Trust Boundary Assessment:**  
-   We assess whether the problem can be reduced to an affine SFT, carry automaton, or quadratic number field Sturm sequence, and deliver an explicit written statement of what can and cannot be certified.
-3. **Prototype Verifier Execution:**  
-   Execute the exact certificate generator to produce machine-auditable certificates (integer Collatz-Wielandt vectors or Sturm sign chains) free of floating-point error.
-4. **Written Technical Verification Report:**  
-   Deliver a comprehensive technical report documenting:
-   - The exact algebraic witnesses generated.
-   - The execution runtime and memory benchmarks.
-   - The precise trust boundary (assumptions made vs. properties certified).
-   - An independent reproducibility script for customer validation.
-5. **Commercial Conversion:**  
-   Upon successful validation of the deliverable, negotiate an ongoing commercial license (Tier 1 internal research or Tier 2 system integration) priced according to the customer's operational scale.
+1. **Five Carefully Selected Technical Contacts:** Identify specific researchers and engineering leads whose ongoing work directly intersects automated proof synthesis, integer linear programming, or carry automata.
+2. **Three Meaningful Technical Conversations:** Approach them with a concrete mathematical inquiry and architectural question—not a sales pitch or pricing tier.
+3. **One Person Independently Running the Certificate Checker:** Provide a zero-friction, 5-second reproducible command so they can independently verify a portable JSON certificate on their own machine.
+4. **One Opportunity to Scope a Paid Evaluation:** Once technical alignment and mutual interest are established, collaborate to scope a paid evaluation or custom certificate generation for their problem domain.
+
+### Rules of Engagement
+- **Lead with a technical question, not a commercial pitch:** Do not mention enterprise licensing tiers or pricing.
+- **Demonstrate a concrete mathematical problem:** Center the communication on the arithmetic intersection of Cantor sets and transition matrix spectral certification.
+- **Provide a 5-second reproducible witness:** Point directly to a portable JSON certificate and the standalone auditor.
+- **Transparently disclose limitations:** Be upfront that the code certifies the zero-reachable forward component, while the full-graph spectral gap relies on Hypothesis~(H) and the dimension bridge is analytical.
+- **Ask for technical feedback:** Seek their perspective on certificate ingestion and proof witness standards.
 
 ---
 
-## 3. Concrete Priority Prospects & Technical Alignment
+## 3. Concrete Priority Prospects & Technical Inquiry Angles
 
-| Lead & Organization | Focus Area | Technical Evaluation Fit & Angle |
+| Lead & Organization | Focus Area | Technical Inquiry Angle |
 | :--- | :--- | :--- |
-| **1. Leonardo de Moura / Sebastian Ullrich**<br>*(Lean FRO)* | Lean 4 core system, automated proof tactics, Mathlib infrastructure | **Verified External Certificates:** Demonstrates how external computational algebra (pure integer Collatz-Wielandt & $\mathbb{Q}(\sqrt{5})$ Sturm sequences) can produce lightweight, machine-auditable witnesses for Lean 4 formalization without expanding the trusted kernel. |
-| **2. Christian Szegedy / Alex Davies**<br>*(Google DeepMind Formal Mathematics / AlphaProof)* | Auto-formalization, IMO-level automated reasoning, neural-symbolic math | **Ground-Truth Benchmark Suite:** EMVE provides a hard, finite-to-infinite dimensional transition benchmark where neural search can propose witnesses, and exact integer/algebraic engines provide non-heuristic ground-truth verification. |
-| **3. Joe Hendrix / David Thrane Christiansen**<br>*(Galois, Inc.)* | High-assurance software/hardware verification, SMT solvers, Cryptol | **Exact Invariant & Carry Verification:** Galois specializes in mission-critical discrete state automata. EMVE's exact carry-chain enumeration ($8.75 \times 10^7$ transitions/sec) and floating-point-free integer linear certificates offer a model for certified boundary analysis. |
-| **4. Grigore Roșu**<br>*(Runtime Verification, Inc.)* | K framework, blockchain virtual machines, proof-carrying code | **Auditor-Decoupled Verification Architecture:** Runtime Verification emphasizes decoupled proof checkers. EMVE’s architecture separates heavy combinatorial BFS graph exploration from a 100-line zero-trust certificate checker (`scripts/check_certificate.py`). |
-| **5. Kevin Buzzard / Heather Macbeth**<br>*(Lean Mathematical Community / Imperial College / Fordham)* | Formalization of modern geometry & analysis in Lean 4 | **Discrete Dynamical Systems & Measure Bridge:** Formalization of symbolic dynamics, Perron-Frobenius transfer operators, and Hausdorff dimension in Mathlib. Offers concrete candidate theorems for formalization sprints. |
+| **1. Leonardo de Moura / Sebastian Ullrich**<br>*(Lean FRO)* | Lean 4 core system, automated proof tactics, Mathlib infrastructure | **Inquiry on External Certificate Ingestion:** How does the Lean FRO view decoupled oracle/witness architectures where Python/Rust generates integer Collatz-Wielandt vectors or Sturm sign chains that a Lean tactic simply audits without executing the search? |
+| **2. Christian Szegedy / Alex Davies**<br>*(Google DeepMind Formal Mathematics / AlphaProof)* | Auto-formalization, IMO-level automated reasoning, neural-symbolic math | **Inquiry on Ground-Truth Benchmark Suites:** Would formalization of non-linear carry-chains and affine SFT transition spectra serve as a useful benchmark for neural proof synthesis, where the neural model proposes vectors $v \in \mathbb{Z}^n$ and exact integer arithmetic validates them? |
+| **3. Joe Hendrix / David Thrane Christiansen**<br>*(Galois, Inc.)* | High-assurance software/hardware verification, SMT solvers, Cryptol | **Inquiry on Discrete Carry Automata Verification:** Galois frequently handles carry-propagation verification. How do your automated reasoning pipelines handle discrete transition matrix spectral bounds without falling back to floating-point numerical solvers? |
+| **4. Grigore Roșu**<br>*(Runtime Verification, Inc.)* | K framework, blockchain virtual machines, proof-carrying code | **Inquiry on Portable Proof-Carrying Artifacts:** Runtime Verification champions proof-carrying code. We have defined a portable JSON certificate format (`emve-cert-v1`) with SHA-256 payload digests that an auditor checks in 0.001s. Does this schema match your requirements for external certification? |
+| **5. Kevin Buzzard / Heather Macbeth**<br>*(Lean Mathematical Community / Imperial College / Fordham)* | Formalization of modern geometry & analysis in Lean 4 | **Inquiry on Symbolic Dynamics & Measure Formalization:** Mathlib's measure theory is expanding rapidly into dynamical systems. Would the combinatorial core of the Erdős 1939 problem (transfer matrix symmetry $P M P = M^T$) be of interest for an upcoming Mathlib formalization sprint? |
 
 ---
 
-## 4. Cold Outreach Email Template (Technical Evaluation Proposal)
+## 4. Technical Outreach Email Template (Question-First, Zero Sales Pitch)
 
-**Subject:** Machine-auditable algebraic certificates for discrete transition spectra & Lean 4
+**Subject:** Technical inquiry: Decoupled integer certificates for transition matrix spectra (Erdős 1939 problem)
 
 **Dear [Dr./Name],**
 
-I have been following your team’s work on [specific topic: formal verification / Lean 4 auto-formalization / high-assurance reasoning]. In our recent research on arithmetic Cantor set intersections (Erdős 1939 problem; Zenodo DOI: 10.5281/zenodo.24595631), we developed the **Erdős Mathematical Verification Engine (EMVE)**—a hybrid verification pipeline combining Lean 4 kernel theorems with exact, floating-point-free certificate generation.
+I have been following your work on [specific topic: Lean 4 tactics / automated reasoning / proof-carrying code]. In our recent investigation of arithmetic Cantor set intersections (Erdős 1939 problem; Zenodo DOI: [10.5281/zenodo.24595631](https://zenodo.org/records/24595631)), we encountered a recurring verification challenge: standard floating-point eigenvalue algorithms are susceptible to numerical instability when bounding spectral radii on ill-conditioned discrete transition matrices.
 
-Standard computational tools rely on floating-point eigenvalue approximations, which introduce rounding risks on ill-conditioned transition matrices. EMVE solves this by decoupling heuristic graph search from mathematical witness verification:
-1. **Integer Collatz-Wielandt Witnesses:** Positive integer vectors $v \in \mathbb{Z}^n$ proving strict spectral bounds ($5 A v \le 8 v$) in pure arbitrary-precision arithmetic.
-2. **Exact Algebraic Root Counting:** Sturm sign chains in the quadratic number field $\mathbb{Q}(\sqrt{5})$ proving exact golden Perron roots without numerical error.
-3. **Decoupled Standalone Auditor:** A lightweight, independent checker (`scripts/check_certificate.py`) that audits exported witnesses in milliseconds without trusting the search heuristics.
+To eliminate floating-point error, we developed a decoupled certificate pattern:
+1. **Integer Collatz-Wielandt Witness:** A strictly positive integer vector $v \in \mathbb{Z}_{>0}^n$ proving $\rho(A) \le 8/5 = 1.60 < \phi$ via exact arbitrary-precision integer inequality ($5 A v \le 8 v$).
+2. **Exact Algebraic Root Counting:** Exact Sturm sign chains in the quadratic field $\mathbb{Q}(\sqrt{5})$ proving candidate extremizers attain $\rho(A) = \phi$ exactly.
+3. **Portable JSON Certificates (`emve-cert-v1`):** Self-contained, SHA-256 hashed JSON artifacts that a recipient can audit in milliseconds without running or trusting our search engine:
+   ```bash
+   python3 scripts/check_certificate.py certificates/M19_collatz_wielandt.json
+   ```
 
-We are currently offering a complimentary, structured **Technical Evaluation** to high-assurance reasoning groups. If you have a discrete transition system, carry automaton, or matrix spectral problem requiring certified bounds, we would be pleased to run a feasibility assessment and deliver an exact certificate report for your team to audit.
+**Trust boundary transparency:** We explicitly distinguish what is automated from what is analytical: our software certifies the spectral radius of the zero-reachable forward subgraph; global two-sided uniqueness in the interior domain remains conditional on an analytical spectral-gap hypothesis (H), and the measure-theoretic Frostman bridge connecting word counts to Hausdorff dimension on $\mathbb{R}$ is an analytical paper proof.
 
-The reproducibility test suite and standalone auditor are available for inspection at https://github.com/ezzasdf/erdos-problem-engine. Would you be open to a brief 15-minute technical conversation next week?
+I would value your technical critique: from your perspective in [their specific area], do you see utility in decoupling heuristic graph searches from lightweight, portable integer certificates for proof verification pipelines?
+
+The standalone auditor and portable certificates are open for inspection at:  
+https://github.com/ezzasdf/erdos-problem-engine
+
+Thank you very much for your time and research.
 
 Best regards,
 
