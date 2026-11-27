@@ -22,8 +22,8 @@ MD_CONTENT = """# Decoupled High-Assurance Verification for Discrete Dynamical S
 
 ---
 
-### 1. The Challenge: Floating-Point Instability in Discrete Transition Systems
-Modern verification pipelines for discrete dynamical systems, carry automata, and state-transition graphs frequently evaluate spectral radius bounds $\\rho(A) \\le \\lambda^*$ to guarantee contractivity, safety invariants, or dimension bounds. Standard numerical packages rely on floating-point eigensolvers (e.g., LAPACK/BLAS). In ill-conditioned or borderline state-transition matrices, floating-point rounding errors and cancellation drift introduce undetected false positives, failing the deductive certainty required by interactive theorem provers (Lean 4, Coq) and safety-critical audit pipelines.
+### 1. The Challenge: Numerical Uncertainty in Discrete Transition Spectra
+Verification pipelines for discrete dynamical systems, carry automata, and state-transition graphs frequently evaluate spectral radius bounds $\\rho(A) \\le \\lambda^*$ to guarantee contractivity, safety invariants, or dimension bounds. Standard numerical packages rely on floating-point eigensolvers (e.g., LAPACK/BLAS). In borderline or ill-conditioned cases, floating-point methods can introduce numerical uncertainty and precision loss. EMVE offers an exact integer-based verification path for supported certificate forms, eliminating floating-point rounding error from the witness audit.
 
 ---
 
@@ -43,22 +43,23 @@ To eliminate ambiguity, EMVE enforces explicit epistemic boundaries across three
 
 ---
 
-### 4. Reproducible Performance Benchmarks & 23-Multiplier Catalog
-All performance benchmarks were conducted on a reference AMD Ryzen 9 5950X (16C/32T, 3.4 GHz base / 4.9 GHz boost, 64 GB DDR4, Linux 6.8):
-- **Standalone Auditor:** Evaluates $M=19$ ($6 \\times 6$ matrix) in **~0.0002 seconds** (mean over 100 runs, stock Python 3 stdlib, zero external dependencies, SHA-256 payload integrity check).
+### 4. Measured Performance Benchmarks (AMD Ryzen 9 5950X, Linux 6.8)
+All benchmarks were measured on a reference AMD Ryzen 9 5950X (16C/32T, 3.4 GHz base / 4.9 GHz boost, 64 GB DDR4 RAM, Ubuntu Linux kernel 6.8):
+- **Standalone Auditor (`scripts/check_certificate.py`):** Evaluates $M=19$ ($6 \\times 6$ matrix) in **~0.0002 seconds** (mean over 100 runs, stock Python 3.12 standard library, zero external dependencies, SHA-256 payload integrity check).
 - **23-Modulus Verified Catalog:** All 23 multipliers ($2 \\le M \\le 35, \\gcd(M, 3) = 1$) independently audited with 100% pass rate (19 Collatz–Wielandt bounds + 4 Sturm extremizers).
-- **Standalone Lean 4 Module:** Compact Lean 4 file (`CertCheck.lean`, ~130 lines) verified in Lean 4 core (`Init`) without Mathlib, including 5 negative regression unit tests rejecting ragged rows, dimension mismatches, non-positive entries, and false inequalities.
-- **High-Throughput Exploration Engines:** Rust scanner (`verify_middle`) evaluates $2.8 \\times 10^7$ candidate transitions in **0.32 seconds** across 16 threads ($\\approx 87.5$ million transitions/sec); Python engine sequentially generates and certifies 1,333 moduli ($2 \\le M \\le 2000$) in **29.1 seconds** ($\\approx 45.8$ certified moduli/sec).
+- **Standalone Lean 4 Module:** Compact Lean 4 file (`CertCheck.lean`, ~130 lines) verified in Lean 4 core (`Init`) without Mathlib, including **six negative regression theorems covering five failure categories** (ragged rows, dimension mismatches, non-positive witness entries, zero multipliers $c$ and $d$, and false inequalities).
+- **Rust Exploration Engine (`verify_middle`):** Single-run timing of **0.32 seconds** across 16 threads (`cargo run --release`, evaluating $2.8 \\times 10^7$ candidate transitions across window $k=17$, yielding $\\approx 87.5$ million transitions/sec).
+- **Python Sequential Scan (`verify_dimensions.py`):** Single-run timing of **29.1 seconds** sequentially generating graphs and certifying all 1,333 moduli $2 \\le M \\le 2000$ (`python3 scripts/cantor_multiplier/verify_dimensions.py --scan 2000`, Python 3.12, SymPy 1.14, yielding $\\approx 45.8$ certified moduli/sec).
 
 ---
 
 ### 5. Target Domains for Evaluation & Collaborative Pilot Roadmap
 - **Target Applications for Evaluation:**
-  - *Cryptographic Carry Circuits & SMT Pipelines:* Proving absence of carry-chain overflow without floating-point relaxation.
-  - *Discrete Control Automata & State Machines:* Bounding transition matrix growth rates with deductive certainty.
-  - *Interactive Theorem Prover Tactics:* Ingesting machine-checkable witness vectors directly into Lean 4, Coq, and Isabelle/HOL.
+  - *Cryptographic Carry Circuits & SMT Pipelines:* Target domain for proving absence of carry-chain overflow without floating-point relaxation.
+  - *Discrete Control Automata & State Machines:* Target domain for bounding transition matrix growth rates with deductive certainty.
+  - *Interactive Theorem Prover Tactics:* Target domain for direct ingestion of integer witness vectors into Lean 4, Coq, and Isabelle/HOL.
 - **Collaborative Pilot Framework:**
-  - 4-week structured technical evaluation to assess solver scalability, generate domain-specific witness certificates, and validate integration feasibility into client audit toolchains.
+  - Structured 4-week technical evaluation to assess solver scalability, generate domain-specific witness certificates, and validate integration feasibility into client audit toolchains.
 """
 
 def generate_pdf():
@@ -74,13 +75,13 @@ def generate_pdf():
     BORDER_COLOR = (0.80, 0.85, 0.92)
     
     # 1. Header Banner
-    page.draw_rect(fitz.Rect(30, 25, 565, 88), color=NAVY, fill=LIGHT_BG)
-    page.insert_text((42, 45), "DECOUPLED HIGH-ASSURANCE VERIFICATION", fontsize=15, fontname="helv", color=NAVY)
-    page.insert_text((42, 60), "FOR DISCRETE DYNAMICAL SYSTEMS & CARRY AUTOMATA", fontsize=11, fontname="helv", color=ACCENT_BLUE)
-    page.insert_text((42, 75), "Erdős Mathematical Verification Engine (EMVE) — Executive Technical Brief (v1.0.0)", fontsize=8.5, fontname="helv", color=DARK_GRAY)
-    page.insert_text((42, 84), "Author: Ezzeldin Ashraf | DOI: 10.5281/zenodo.24595631 | GitHub: github.com/ezzasdf/erdos-problem-engine", fontsize=7.5, fontname="helv", color=DARK_GRAY)
+    page.draw_rect(fitz.Rect(30, 24, 565, 87), color=NAVY, fill=LIGHT_BG)
+    page.insert_text((42, 44), "DECOUPLED HIGH-ASSURANCE VERIFICATION", fontsize=15, fontname="helv", color=NAVY)
+    page.insert_text((42, 59), "FOR DISCRETE DYNAMICAL SYSTEMS & CARRY AUTOMATA", fontsize=11, fontname="helv", color=ACCENT_BLUE)
+    page.insert_text((42, 74), "Erdős Mathematical Verification Engine (EMVE) — Executive Technical Brief (v1.0.0)", fontsize=8.5, fontname="helv", color=DARK_GRAY)
+    page.insert_text((42, 83), "Author: Ezzeldin Ashraf | DOI: 10.5281/zenodo.24595631 | GitHub: github.com/ezzasdf/erdos-problem-engine", fontsize=7.5, fontname="helv", color=DARK_GRAY)
 
-    y = 98
+    y = 96
 
     def draw_section(title, lines, box_height):
         nonlocal y
@@ -107,11 +108,11 @@ def generate_pdf():
 
     # Section 1: The Problem
     draw_section(
-        "1. The Core Problem: Floating-Point Instability in Discrete Spectral Bounds",
+        "1. The Core Challenge: Numerical Uncertainty in Discrete Spectral Bounds",
         [
             "• Modern verification of state-transition graphs and carry automata relies on spectral radius bounds: rho(A) <= lambda*.",
-            "• Standard toolchains rely on numerical eigensolvers (LAPACK/BLAS) vulnerable to rounding errors and ill-conditioned drift.",
-            "• Result: Catastrophic false positives in discrete control systems, cryptographic hardware, and formal provers (Lean 4)."
+            "• Floating-point methods can introduce numerical uncertainty and precision loss in borderline or ill-conditioned cases.",
+            "• EMVE offers an exact integer-based verification path for supported certificate forms, eliminating floating-point rounding errors."
         ],
         box_height=36
     )
@@ -141,12 +142,12 @@ def generate_pdf():
 
     # Section 4: Benchmarks & Catalog
     draw_section(
-        "4. Reproducible Performance Benchmarks (AMD Ryzen 9 5950X, Linux 6.8)",
+        "4. Measured Performance Benchmarks (AMD Ryzen 9 5950X, Linux 6.8)",
         [
-            ("• Standalone Auditor (Python stdlib): ", "M=19 (6x6 matrix) audited in ~0.0002s (mean over 100 runs, 0 external dependencies)."),
+            ("• Standalone Auditor (Python 3.12 stdlib): ", "M=19 (6x6 matrix) audited in ~0.0002s (mean over 100 runs, 0 external dependencies)."),
             ("• 23-Modulus Verified Catalog: ", "All 23 multipliers (2 <= M <= 35, gcd(M,3)=1) audited with 100% PASS rate (19 CW + 4 Sturm)."),
-            ("• Compact Lean 4 Module (~130 lines): ", "Verified in Lean 4 core without Mathlib, including 5 negative tests (zip truncation guards)."),
-            ("• High-Throughput Engines: ", "Rust scanner: 2.8e7 transitions in 0.32s (87.5M trans/sec); Python: 1,333 moduli in 29.1s (45.8 mod/sec).")
+            ("• Lean 4 Core Module (~130 lines): ", "Verified in core Lean 4 (0 Mathlib); includes 6 negative regression theorems across 5 failure modes."),
+            ("• Exploration Benchmarks (Single-run): ", "Rust cargo --release: 2.8e7 transitions in 0.32s (87.5M/s); Python --scan 2000: 1,333 moduli in 29.1s (45.8/s).")
         ],
         box_height=47
     )
