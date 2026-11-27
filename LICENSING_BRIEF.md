@@ -4,6 +4,10 @@ A factual summary for an intellectual-property / software licensing review.
 Prepared 2026-11-27. Everything below is verifiable from the repository and the
 public records cited.
 
+No professional review has been commissioned. The questions below are answered
+in the final section as working positions, adopted by the author from the
+license texts themselves, not by counsel.
+
 ## Who and what
 
 Sole author and copyright holder named in the repository: Ezzeldin Ashraf
@@ -108,3 +112,52 @@ agreement, and it grants nothing until signed.
 the extent copyright subsists", and that the interaction between GitHub's fork
 permission and this license is a question for counsel. Those statements are
 intent, not adjudication, and are open to correction by the review.
+
+## Working answers, adopted without counsel
+
+These are the author's positions after reading the license texts. They are not
+legal advice, they have not been reviewed, and they are written down so that a
+later reviewer can see exactly what was decided and when.
+
+**1. Is PolyForm Strict suitable for the model?**
+Yes, for the model as stated: universities and public research free, private
+companies pay. The noncommercial-organizations clause is not a defect here, it
+is the intended half of the split. Three costs come with it: noncommercial
+users cannot modify the code without written permission, so that channel is
+opened separately in `COMMERCIAL.md`; the license is not open source, which
+rules out some funders and venues; and a company can route work through a
+university and pay nothing. The third cannot be closed by wording.
+
+**2. Can private companies be charged while the university exception stays?**
+Yes, and this already works. PolyForm Strict grants the noncommercial half;
+`COMMERCIAL_AGREEMENT_TEMPLATE.md` grants the commercial half to a named
+licensee. Nothing further is needed structurally.
+
+**3. What do the pre-`6d68a98` Apache-2.0 users keep?**
+Everything Apache-2.0 gives: perpetual, worldwide, royalty-free use,
+modification, and redistribution, including commercially, for every copy
+obtained under it. That grant cannot be withdrawn. A company that cloned before
+that commit never needs to pay for that copy. The commercial license therefore
+sells the current version, later work, and support, not the old one. Clause 2 of
+the template names the commit so buyers know what they are getting.
+
+**4. Do the certificates need a separate license?**
+Numerical values and mathematical facts are not copyrightable. What may be
+protectable is the selection, arrangement, and original expression in the files.
+`LICENSE` already limits the claim to "to the extent copyright subsists". No
+separate data license is adopted, because a permissive one would hand companies
+the datasets for free while the code still costs money.
+
+**5. Can an agreement be drafted?**
+`COMMERCIAL_AGREEMENT_TEMPLATE.md` exists and covers all eight required points,
+with a coverage table mapping each to a clause. It is unreviewed and says so.
+
+## Residual risk after these answers
+
+- No jurisdiction, entity, or tax position has been chosen, so the template
+  cannot be signed as it stands.
+- The university and public-research carve-out cannot be narrowed by the
+  author's own wording; it is in the license text.
+- The Apache-2.0 tail is permanent and free to competitors.
+- None of this has been read by a lawyer. The template is a starting point that
+  a later reviewer can correct, not a substitute for one.

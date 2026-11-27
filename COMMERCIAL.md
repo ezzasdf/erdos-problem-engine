@@ -7,6 +7,19 @@ modification, and derivative works.
 Versions released up to and including 2026-11-27 remain available under
 Apache-2.0; see `NOTICE`.
 
+## The model
+
+Noncommercial use, including use by universities, public research
+organizations, and government institutions, is free. PolyForm Strict 1.0.0
+implements that through its own noncommercial definition. Private companies
+using the code commercially pay. `COMMERCIAL_AGREEMENT_TEMPLATE.md` is the
+document that sells that use.
+
+Academics and noncommercial users do not need a license, but PolyForm Strict
+does not permit them to modify the code either. If you are one of those users
+and want to modify it for your own research, write to the address below;
+permission is granted free, in writing, and normally the same day.
+
 If you want to do any of the following, and you are not one of the
 organizations listed in the next section, you need a commercial license:
 
@@ -63,6 +76,10 @@ Write to **ezzeldinashraf.web@gmail.com** with:
 
 Fees are quoted per case. Academic and noncommercial use needs no license and
 costs nothing.
+
+The agreement to sign is `COMMERCIAL_AGREEMENT_TEMPLATE.md`. It is written and
+ready to fill in, but it has not been reviewed by a lawyer, and it says so at
+the top. Fill every bracketed field before sending it to anyone.
 
 ## This file is not an agreement
 
