@@ -31,6 +31,12 @@ Three Explicit Verification Statuses:
   - EXACT_STRICTLY_LESS_PHI: Exactly certified lambda < phi via integer CW vector or Sturm chain.
   - NUMERICALLY_SCREENED: Floating-point eigenvalue approximation (exploration only).
   - EXCEEDS_PHI / UNRESOLVED: Counterexample or failure.
+
+Scope and Limitations:
+  The exact scan provides rigorous algebraic certificates for every individual
+  multiplier matrix examined in the finite range 2 <= M <= N. It verifies Hypothesis (H)
+  empirically up to N, but does not constitute an infinite proof of (H) for all interior
+  pairs (a, b), nor does it replace the analytical Frostman measure bridge on the real line.
 """
 
 import argparse
@@ -358,7 +364,7 @@ def scan(limit, mode="exact"):
     print(f"  Multipliers with lambda(M) > phi               : {exceed if exceed else 'none'}")
     print(f"  Multipliers attaining lambda(M) = phi          : {attain}")
     print(f"  Extremizers predicted by Theorem 1             : {predicted}")
-    print(f"  Overall Verification Status                     : {'PASSED (100% UNCONDITIONAL EXACT CERTIFICATE)' if passed else 'FAILED'}")
+    print(f"  Overall Verification Status                     : {'PASSED (ALL MULTIPLIERS IN SCAN M <= ' + str(limit) + ' EXACTLY CERTIFIED)' if passed else 'FAILED'}")
     return 0 if passed else 1
 
 
