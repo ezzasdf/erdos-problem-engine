@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Step D: Complete algebraic & combinatorial verification of Delta negativity
 (Delta(delta) = |E_L^{(k)} cap Free_L| - |Z'_L^{(k)} cap Free_L| <= -1 < 0 for all delta = k - (L - a) >= 2).
 

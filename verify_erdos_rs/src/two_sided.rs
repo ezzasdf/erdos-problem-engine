@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+// Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+// Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 //! Two-sided pruning engine: Saye trailing-digit candidates + certified
 //! leading-digit check. Completeness (spec): if `deep == {0,2,8}` and small n
 //! are brute-forced, every n <= 2·3^{K-1} is verified.

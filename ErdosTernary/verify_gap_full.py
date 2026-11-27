@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """For each gap case (r' with no digit2 at pos 5-14), check the full r.
 Question: for EVERY q ≥ 1, does 2^r have digit2 at some position in [15, K_star)?"""
 

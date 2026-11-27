@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Magnitude/Pillai + continued-fraction session for the critical gap.
 
 Q1 answered: digit_{K*}(G) = 0 iff theta_r = {r log_3 2} < log_3 2 (density 0.63093).

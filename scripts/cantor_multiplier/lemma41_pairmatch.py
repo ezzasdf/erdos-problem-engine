@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Pair-level matching: each conflict pair {x,y} must get ONE fresh target
 (outside all first-fit images, size<=3 flips, lands in Z) for either x or y;
 keeper takes contested w. Bipartite: pairs -> union of fresh sets.

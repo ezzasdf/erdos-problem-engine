@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Test greedy injection rules: process E-part elements in a canonical order,
 each takes the first admissible target (size<=2 flips first, then size 3)
 not yet used. Orders:

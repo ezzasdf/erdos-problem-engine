@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Lemma 4.1: is there a single fixed 2-flip set S (per a,b,n) with
 u xor S in A_{n-1} for ALL u in G n E, landing in Z?
 

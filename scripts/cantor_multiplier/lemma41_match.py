@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Lemma 4.1 collision diagnosis: for each (a,b,n), build the bipartite graph
 E-part of G  ->  admissible targets (safe, c_j=1) via flips of size <= 2,
 and test whether a perfect matching exists (i.e. can all contested elements

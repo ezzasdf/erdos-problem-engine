@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Lemma 4.1: find a uniform repair rule for the hard cases.
 
 Hard u in G=X=(c_{j-1},c_j)=(0,0) with c_{j-a}=1 (flip_j unsafe) and

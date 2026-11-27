@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Prove dim C(1, M) = log_3(phi) for family 2: M = 3^(2k) - 3^k + 1.
 
 Proof strategy (checked here computationally, written up in ledger):

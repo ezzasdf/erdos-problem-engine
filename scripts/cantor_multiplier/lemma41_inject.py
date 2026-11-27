@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Lemma 4.1 crux: balance inequalities and flip injections.
 
 Setup (a>=2, g=b-a, j=n-a, c_m = z_m xor z_{m-g}, z_{<0}=0):

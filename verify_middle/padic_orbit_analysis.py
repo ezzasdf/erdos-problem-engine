@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """p-Adic orbit-Cantor intersection analysis for the Erdős Ternary Conjecture.
 
 Computes the intersection of the ×2 orbit in Z_3 with the Cantor set Σ_{3,2}

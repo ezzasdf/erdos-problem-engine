@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Is there a FIXED flip set S (independent of u) with
    forall u in G: u^S admissible and c_j(u^S)=1 ?
 Sizes up to 4. Also same with G split by c_{j-a} (D/E): fixed S on each part.

@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Third family hunt + log-bound push via the family-2 proof framework.
 
 Framework (from x2p_family2_proof.py): if M = P(3^k) with signed block filter

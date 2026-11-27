@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+// Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+// Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 /// Fixed-precision arithmetic modulo 3^KAPPA.
 ///
 /// Represented as a number in base B = 3^DIGIT_BITS, stored as [d0, d1, ..., d_{NUM_DIGITS-1}]

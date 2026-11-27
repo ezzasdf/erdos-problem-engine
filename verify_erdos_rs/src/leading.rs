@@ -1,3 +1,6 @@
+// Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+// Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+// Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 //! Certified leading ternary digits of 3^{frac(n·log_3 2)} (2^n's leading digits).
 //!
 //! Port of verify_middle/src/certified.rs interval arithmetic, trimmed to the

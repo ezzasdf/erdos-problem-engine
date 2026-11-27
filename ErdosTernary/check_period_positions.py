@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Check: for each gap case, does position 15 alone have digit2 for all q mod 81?
 If yes, we can handle all q by checking 81 residues per gap case.
 If not, try positions 15-16 (period 3^5=243), etc."""

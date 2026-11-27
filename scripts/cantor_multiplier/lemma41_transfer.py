@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Lemma 4.1 residual [C]: exact all-L sign certificate for
 h_L = |Z'(L)| - |E(L)| at the crux window k = L-a+1
 (Z' = Z1 | Z2; E = class 00 with flip_k destroying admissibility).

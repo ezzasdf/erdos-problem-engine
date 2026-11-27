@@ -7,14 +7,28 @@ modification, and derivative works.
 Versions released up to and including 2026-11-27 remain available under
 Apache-2.0; see `NOTICE`.
 
-If you want to do any of the following, you need a commercial license:
+If you want to do any of the following, and you are not one of the
+organizations listed in the next section, you need a commercial license:
 
 - use the code, in whole or in part, in a commercial product or service;
-- use it in paid research, consulting, or contract work;
+- deliver the code or work built on it to a paying client;
 - modify it, extend it, or build on it;
 - redistribute it, with or without changes, inside an organization or to
   third parties;
 - use it to train, evaluate, or benchmark a commercial model or system.
+
+## What the public license already permits
+
+PolyForm Strict 1.0.0 defines what counts as a noncommercial purpose, and that
+definition includes use by a charitable organization, educational institution,
+public research organization, public safety or health organization,
+environmental protection organization, or government institution, **regardless
+of the source of funding or obligations resulting from the funding**.
+
+A university running industry-funded research, or a public research institute
+doing contract work, therefore already falls inside the public permission. This
+is a limit on the offer below, not a marketing detail: a license is needed only
+for use outside that definition.
 
 ## Scope of a commercial license
 
@@ -61,8 +75,15 @@ above.
 These headings describe what an agreement should cover; they are not a contract
 template. Before selling the first license, have the signed form drafted or
 reviewed by a lawyer who works with software licensing in your jurisdiction, and
-check how it interacts with the Apache-2.0 grant that already covers earlier
-versions.
+check three things in particular:
+
+- how it interacts with the Apache-2.0 grant that already covers earlier
+  versions;
+- where the noncommercial boundary actually falls, since PolyForm Strict 1.0.0
+  already permits use by educational and public research organizations
+  regardless of funding;
+- whether the fee, term, and termination clauses survive a change of control or
+  a subcontractor.
 
 ## Third-party components
 

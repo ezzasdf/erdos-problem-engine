@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Step 2 follow-up: anatomy of the M(r)=1 exceptions.
 
 The main test showed max_{k>=5} b_k(r) >= 2 FAILS universally (a thin

@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """Hunt OUTSIDE the digitwise-safe class:
   S1: phi-max violator scan  dim C(1,M) > log_3 phi  (M <= 5000)
   S2: Lemma 4.1 chain bound  lambda(a,b) <= phi  for coprime a<b <= 24

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """
 Key check: for K >= 29 and j >= 38 with Q(j)+18 < uK(K),
 is Q(j)+18 < uK(28)? If so, the K=28 native_decide covers it.

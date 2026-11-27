@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+# Released under the PolyForm Strict License 1.0.0 as described in the file LICENSE-CODE.
+# Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
 """For every collision pair {u1 in D3-side, u2 = theta(u1) in D2-side}:
 is psi2(u1) = flip{t, r-b} safe (admissible, c_j=1)?
 Also: is psi2(u2) safe? And chi0/pairs for both sides.
