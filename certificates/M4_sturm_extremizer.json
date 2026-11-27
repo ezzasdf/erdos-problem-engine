@@ -5,9 +5,12 @@
   "mathematical_context": {
     "problem": "Erdos 1939 Middle-Thirds Cantor Set Arithmetic Intersection",
     "multiplier_M": 4,
-    "family": 1,
-    "forward_lag": null,
-    "graph_type": "zero_reachable_carry_graph"
+    "family": "F1",
+    "forward_lag": [
+      1,
+      1
+    ],
+    "graph_type": "zero_reachable_forward_sft"
   },
   "claim": {
     "property": "exact_spectral_radius_equality",
@@ -36,8 +39,8 @@
   "metadata": {
     "generator": "EMVE verify_dimensions.py v0.9.1",
     "zenodo_doi": "10.5281/zenodo.24595631",
-    "created_at_utc": "2026-11-27T18:30:48Z",
+    "created_at_utc": "2026-11-27T18:38:28Z",
     "checksum_type": "sha256_canonical_payload_integrity"
   },
-  "payload_sha256": "4ff645d69d4626c74702031bbc486106743b273e50c97d75e884305c9b54c38b"
+  "payload_sha256": "9c5bafdc5b3d4bcc47ab199a9e97804b22a82b242d48bbc69ff387b3d3e9d8c9"
 }

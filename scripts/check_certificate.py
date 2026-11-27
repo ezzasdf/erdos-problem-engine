@@ -25,17 +25,25 @@ them from first principles:
    Mathematical Guarantee:
      Proves rho(A) = phi exactly, without numerical approximation.
 
-3. Trust Boundaries & Verification Limits:
+3. The Three-Level Verification Hierarchy:
+   - Level 1 (Verified Certificate): Verifies mathematical properties of the supplied
+     matrix and witness (Collatz-Wielandt inequality or Sturm golden root equality)
+     independent of EMVE graph search and heuristics.
+   - Level 2 (Verified Derivation): Verifies that the matrix and metadata match
+     the canonical carry automaton for multiplier M (checked via `--verify-derivation`).
+     NOTICE: This proves agreement with the generator code, but does not independently
+     prove the generator algorithm faithfully models the continuous Cantor problem.
+   - Level 3 (Verified Theorem): The full mathematical claim (Hausdorff dimension on R)
+     requires analytical proofs: Hypothesis (H) in the interior and the Frostman bridge.
+
+4. Trust Boundaries & Integrity:
    - Integrity Checksum: The SHA-256 payload digest detects accidental bit flips,
      transmission errors, or file corruption. It does NOT prove author authenticity
      or provide non-repudiation (anyone can rehash a modified JSON). Authenticity
      must be established via signed Git tags or the published Zenodo record.
-   - Matrix-to-Problem Derivation: Standalone mode proves mathematical bounds on the
-     matrix inside the certificate; it does NOT reconstruct the carry automaton from M
-     unless run with the optional `--verify-derivation` flag.
    - External Dependencies: Collatz-Wielandt has 0 external dependencies. Sturm root-counting
      uses SymPy for characteristic polynomial and Sturm chain generation, evaluating all
-     signs in exact Q(sqrt(5)) arithmetic. It is independent of EMVE search heuristics.
+     signs in exact Q(sqrt(5)) arithmetic. Both are independent of EMVE search heuristics.
 """
 
 import sys
@@ -203,7 +211,13 @@ def verify_sturm_extremizer_witness(A_matrix):
 
 
 def verify_matrix_derivation(cert_data):
-    """Verify that the matrix inside the certificate matches the canonical automaton for M."""
+    """Verify that the matrix and contextual metadata inside the certificate match the canonical automaton for M.
+    
+    Level 2 Verification (Derivation Consistency):
+    Confirms that the matrix and contextual metadata match EMVE's canonical zero-reachable graph generator.
+    NOTICE: This verifies agreement with the generator code; it does NOT by itself prove that the generator
+    faithfully models the original real-line intersection problem (Level 3 Theorem obligation).
+    """
     try:
         root_dir = Path(__file__).resolve().parent.parent
         sys.path.insert(0, str(root_dir))
@@ -216,12 +230,33 @@ def verify_matrix_derivation(cert_data):
             return False, "Cannot verify derivation: missing 'multiplier_M' in mathematical_context"
 
         states, A_derived, fam, params, fwd_lag = get_graph_for_M(M)
-        A_cert = np.array(cert_data["witness"]["matrix"], dtype=int)
 
+        # 1. Check family
+        cert_fam = m_ctx.get("family")
+        if cert_fam is not None:
+            norm_cert_fam = str(cert_fam).upper().replace("FAMILY", "").strip()
+            norm_derived_fam = str(fam).upper().replace("FAMILY", "").strip()
+            if norm_cert_fam not in (norm_derived_fam, norm_derived_fam.lstrip("F")):
+                return False, f"Metadata derivation mismatch: stated family {cert_fam} != derived family {fam} for M={M}"
+
+        # 2. Check forward_lag
+        cert_lag = m_ctx.get("forward_lag")
+        expected_lag = list(fwd_lag) if fwd_lag else None
+        if cert_lag != expected_lag:
+            return False, f"Metadata derivation mismatch: stated forward_lag {cert_lag} != derived forward_lag {expected_lag} for M={M}"
+
+        # 3. Check matrix dimensions vs states
+        n_states = len(states)
+        dims = cert_data.get("witness", {}).get("matrix_dimensions")
+        if dims != [n_states, n_states]:
+            return False, f"Metadata derivation mismatch: derived {n_states} states != certificate matrix_dimensions {dims}"
+
+        # 4. Check matrix entries
+        A_cert = np.array(cert_data["witness"]["matrix"], dtype=int)
         if not np.array_equal(A_derived, A_cert):
             return False, f"Matrix derivation mismatch: derived {A_derived.shape} matrix != certificate matrix"
 
-        return True, f"Matrix derivation verified: canonical zero-reachable graph for M={M} matches certificate matrix exactly."
+        return True, f"Matrix & metadata derivation verified: canonical zero-reachable graph for M={M} (family={fam}, lag={fwd_lag}, {n_states} states) matches certificate exactly."
     except Exception as e:
         return False, f"Matrix derivation verification error: {e}"
 
@@ -385,7 +420,7 @@ def export_sample_certificates(output_dir):
     ctx_19 = {
         "problem": "Erdos 1939 Middle-Thirds Cantor Set Arithmetic Intersection",
         "multiplier_M": 19,
-        "family": 2,
+        "family": "F2",
         "forward_lag": [1, 3],
         "graph_type": "zero_reachable_forward_sft"
     }
@@ -406,7 +441,7 @@ def export_sample_certificates(output_dir):
     ctx_7 = {
         "problem": "Erdos 1939 Middle-Thirds Cantor Set Arithmetic Intersection",
         "multiplier_M": 7,
-        "family": 2,
+        "family": "F2",
         "forward_lag": [1, 2],
         "graph_type": "zero_reachable_forward_sft"
     }
@@ -425,9 +460,9 @@ def export_sample_certificates(output_dir):
     ctx_4 = {
         "problem": "Erdos 1939 Middle-Thirds Cantor Set Arithmetic Intersection",
         "multiplier_M": 4,
-        "family": 1,
-        "forward_lag": None,
-        "graph_type": "zero_reachable_carry_graph"
+        "family": "F1",
+        "forward_lag": [1, 1],
+        "graph_type": "zero_reachable_forward_sft"
     }
     cert_4 = create_portable_sturm_cert(
         "erdos-cantor-multiplier:M=4:family=1:carry", ctx_4, A_4

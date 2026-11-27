@@ -94,7 +94,19 @@ def run_test():
     ok_nh, _ = verify_portable_certificate_dict(bad_no_hash)
     assert not ok_nh, "Auditor accepted certificate with missing payload_sha256"
 
-    # 6b. Boolean in vector must fail
+    # 6b. Empty hash must fail
+    bad_empty_hash = dict(dummy_cert)
+    bad_empty_hash["payload_sha256"] = ""
+    ok_eh, _ = verify_portable_certificate_dict(bad_empty_hash)
+    assert not ok_eh, "Auditor accepted certificate with empty payload_sha256"
+
+    # 6c. Corrupted hash must fail
+    bad_corrupt_hash = dict(dummy_cert)
+    bad_corrupt_hash["payload_sha256"] = "0" * 64
+    ok_ch, _ = verify_portable_certificate_dict(bad_corrupt_hash)
+    assert not ok_ch, "Auditor accepted certificate with corrupted payload_sha256"
+
+    # 6d. Boolean in CW vector must fail
     bad_bool_v = {
         "format_version": "emve-cert-v1",
         "certificate_type": "collatz_wielandt",
@@ -105,7 +117,7 @@ def run_test():
     ok_bv, _ = verify_portable_certificate_dict(bad_bool_v)
     assert not ok_bv, "Auditor accepted boolean True in witness_vector"
 
-    # 6c. Boolean in matrix must fail
+    # 6e. Boolean in CW matrix must fail
     bad_bool_m = {
         "format_version": "emve-cert-v1",
         "certificate_type": "collatz_wielandt",
@@ -114,8 +126,47 @@ def run_test():
     }
     bad_bool_m["payload_sha256"] = compute_payload_sha256(bad_bool_m)
     ok_bm, _ = verify_portable_certificate_dict(bad_bool_m)
-    assert not ok_bm, "Auditor accepted boolean True in matrix"
-    print("  -> TEST 6 PASSED: SHA-256 enforcement and boolean type rejection verified.")
+    assert not ok_bm, "Auditor accepted boolean True in CW matrix"
+
+    # 6f. Boolean in Sturm matrix must fail
+    bad_bool_sturm = {
+        "format_version": "emve-cert-v1",
+        "certificate_type": "sturm_root_count",
+        "problem_id": "hardening-test",
+        "witness": {"matrix_dimensions": [2, 2], "matrix": [[True, 0], [0, 1]]}
+    }
+    bad_bool_sturm["payload_sha256"] = compute_payload_sha256(bad_bool_sturm)
+    ok_bs, _ = verify_portable_certificate_dict(bad_bool_sturm)
+    assert not ok_bs, "Auditor accepted boolean True in Sturm matrix"
+
+    # 6g. Derivation metadata mismatch (wrong family) must fail derivation check
+    bad_meta_cert = {
+        "format_version": "emve-cert-v1",
+        "certificate_type": "collatz_wielandt",
+        "problem_id": "erdos-cantor-multiplier:M=19:family=2:lag=(1,3)",
+        "mathematical_context": {
+            "multiplier_M": 19,
+            "family": "F99_MISMATCH",
+            "forward_lag": [1, 3]
+        },
+        "witness": {
+            "matrix_dimensions": [6, 6],
+            "matrix": [
+                [1, 0, 0, 1, 0, 0],
+                [1, 0, 0, 0, 0, 0],
+                [0, 1, 0, 0, 0, 0],
+                [0, 0, 0, 0, 1, 0],
+                [0, 0, 0, 0, 0, 1],
+                [0, 0, 1, 0, 0, 1]
+            ],
+            "witness_vector": [201563, 139062, 100000, 100000, 139062, 201562]
+        }
+    }
+    bad_meta_cert["payload_sha256"] = compute_payload_sha256(bad_meta_cert)
+    ok_meta, msg_meta = verify_portable_certificate_dict(bad_meta_cert, check_derivation=True)
+    assert not ok_meta and "Metadata derivation mismatch" in msg_meta, f"Derivation check failed to catch metadata mismatch: {msg_meta}"
+
+    print("  -> TEST 6 PASSED: SHA-256 enforcement (missing/empty/corrupt), boolean typing (vector/CW/Sturm), and derivation metadata checks verified.")
 
     elapsed = time.time() - start_time
     print("\n" + "=" * 70)

@@ -49,9 +49,11 @@ To maintain rigorous scientific standards, the auditor enforces explicit trust b
 - It is **strictly enforced**: missing, empty, or mismatched checksums are immediately rejected.
 - **Authenticity Limit:** A SHA-256 hash does *not* prove author identity or prevent deliberate re-hashing of modified files. Authenticity must be verified out-of-band against signed Git release tags or the official Zenodo archive record ([DOI: 10.5281/zenodo.24595631](https://zenodo.org/records/24595631)).
 
-### B. Matrix-to-Problem Derivation
-- **Default Standalone Mode:** The checker proves exact algebraic and spectral properties ($5 A v \le 8 v$ or $\rho(A) = \phi$) of the **explicit matrix** supplied inside the JSON. It does not re-run graph construction.
-- **Derivation Mode (`--verify-derivation`):** When `--verify-derivation` is passed, the checker imports the canonical carry automaton generator for multiplier $M$ and asserts that the derived matrix is identical to the certificate matrix.
+### B. The Three-Level Verification Hierarchy
+We distinguish three distinct levels of verification:
+1. **Level 1 (Verified Certificate):** Proves an exact mathematical property ($5Av \le 8v$ or $\rho(A)=\phi$) of the supplied matrix $A$. 100% independent of graph generation code.
+2. **Level 2 (Verified Derivation):** Proves that the supplied matrix and metadata match the project's canonical carry automaton generator (`--verify-derivation`). *Notice:* This proves agreement with the generator code; it does not independently prove the generator algorithm faithfully models the continuous Cantor problem.
+3. **Level 3 (Verified Theorem):** The full mathematical conclusion ($\dim_H C(1, M) \le \log_3 \phi$ on $\mathbb{R}$) requires Lean 4 kernel proofs and analytical paper proofs (Hypothesis (H) and Frostman bridge).
 
 ### C. Third-Party Dependencies
 - **Collatz–Wielandt:** Completely self-contained with **zero external dependencies** (uses pure Python arbitrary-precision integers in $\mathbb{Z}$).
