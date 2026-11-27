@@ -54,7 +54,7 @@ In a self-contained analysis of obstructions, we prove why elementary methods fa
 
 \newpage
 \tableofcontents
-\vspace{1em}
+\clearpage
 
 \section{Introduction}
 
@@ -378,8 +378,10 @@ The principal results in this paper are supported by Lean~4 formalizations (vers
 We distinguish two precise verification tiers across the formalization:
 \begin{enumerate}\setlength{\itemsep}{0.5pt}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}
     \item \textbf{Foundational Kernel Theorems:} Across the nine core theoretical modules (\texttt{RepunitBase4} through \texttt{RepunitCarryConnection}), \textbf{100\% of declarations are pure foundational}. They are checked strictly by the Lean~4 kernel, relying exclusively on standard foundational axioms \texttt{[propext, Classical.choice, Quot.sound]}, with zero unproved axioms (\texttt{sorryAx} / \texttt{sorry}) and no reliance on computational reflection or decision-procedure oracles (\texttt{Lean.ofReduceBool} / \texttt{native\_decide}).
-    \item {\sloppy \textbf{Computational Verification Certificates:} The combinatorial searches establishing the finite First-Period Bridge Theorem ($K \in \{5, \dots, 18\}$ covering periods $u_K \le 258,280,326$ in \texttt{BridgeCandidates} and \texttt{BridgeK13}--\texttt{BridgeK18}) and the companion paper's \texttt{Lemma41Finite} certificates utilize native evaluation (\texttt{native\_decide} / \texttt{Lean.ofReduceBool}). While standard for finite computational claims, \texttt{native\_decide} compiles Lean definitions to executable bytecode/C++, extending the trusted computing base (TCB) beyond the foundational Lean kernel to include the Lean compiler and runtime environment. The unproved asymptotic behavior for $K > 18$ is cleanly isolated in \texttt{BridgeUniform} under an explicit hypothesis (\texttt{ostrowski\_invariant}), ensuring that the finite verification for $K \le 18$ remains completely free of asymptotic axioms. Crucially, \texttt{native\_decide} is strictly quarantined to these finite-certificate modules, and zero \texttt{sorry} placeholders exist across the entire repository.\par}
+    \item {\sloppy \textbf{Computational Verification Certificates:} The combinatorial searches establishing the finite First-Period Bridge Theorem ($K \in \{5, \dots, 18\}$ covering periods $u_K \le 258,280,326$ in \texttt{BridgeCandidates} and \texttt{BridgeK13}--\texttt{BridgeK18}) and the companion paper's \texttt{Lemma41Finite} certificates utilize native evaluation (\texttt{native\_decide} / \texttt{Lean.ofReduceBool}). While standard for finite computational claims, \texttt{native\_decide} compiles Lean definitions to executable bytecode/C++, extending the trusted computing base (TCB) beyond the foundational Lean kernel to include the Lean compiler and runtime environment. The unproved asymptotic behavior for $K > 18$ is cleanly isolated in \texttt{BridgeUniform} under an explicit hypothesis (\texttt{ostrowski\_invariant}), ensuring that the finite verification for $K \le 18$ remains completely free of asymptotic axioms. Crucially, \texttt{native\_decide} is strictly quarantined to these finite-certificate modules, and zero \texttt{sorry} placeholders exist in the built target set; the two modules that each contained one are archived outside the Lake target (\texttt{ErdosTernary/attic/}).\par}
 \end{enumerate}
+
+\clearpage
 
 \bibliographystyle{amsplain}
 \bibliography{references}

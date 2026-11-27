@@ -16,6 +16,10 @@ import ErdosTernary.BridgeCompute
 
 open ErdosTernary.BridgeCompute
 
+-- Elaborating the 4096-entry candidate arrays with the `3^50` modulus exceeds the
+-- default heartbeat budget; the check itself is a `native_decide` evaluation.
+set_option maxHeartbeats 4000000
+
 namespace ErdosTernary.BridgeCandidates
 
 /-- Check bridge: all non-special candidates have digit 2 in ternary positions 0..49. -/

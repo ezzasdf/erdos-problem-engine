@@ -87,7 +87,7 @@ Equality $\dimH C(1, M) = \log_3 \phi$ holds if and only if $M$ belongs to one o
     \item \textbf{Family 1:} $M = 3^k + 1$ for some $k \ge 1$;
     \item \textbf{Family 2 Extremizers:} $M = 3^{b} - 3^{a} + 1$ with $b = 2a$ ($a \ge 1$).
 \end{enumerate}
-In Family~1 the language is the product of $k$ independent copies of the golden mean shift $\Sigma_{\mathrm{gold}}$, with word counts $N(n) = F_{n/k+2}^{\,k}$ for $n \equiv 0 \pmod{k}$; in Family~2 it is the product of $g = \gcd(a,b) = a$ independent sub-chains with word count $N(n) = (2 F_{n/a+1})^a$ for $n \equiv 0 \pmod{a}$. While Family~1 is topologically conjugate to $\Sigma_{\mathrm{gold}}^k$, each Family~2 factor is a $2$-to-$1$ extension of $\Sigma_{\mathrm{gold}}$ admitting two fixed points ($0^\infty$ and $1^\infty$) rather than one, but sharing identical topological entropy $h_{\mathrm{top}} = \log \phi$ and growth dimension $\log_3 \phi$. Hypothesis~(H) is not needed for the boundary rays and is verified computationally for all $M \le 2000$ (\S\ref{sec:table}).
+In Family~1, the residue-class decomposition partitions the coordinates into $k$ independent copies of the golden mean language; while the $k$-step shift $\sigma^k$ acts as the Cartesian product $\Sigma_{\mathrm{gold}}^{\times k}$, the $1$-step shift $\sigma$ acts by cyclically permuting the columns, yielding topological entropy $\frac{1}{k}\log(\phi^k) = \log \phi$. In Family~2, each of the $a$ sub-chains is a $2$-to-$1$ extension of $\Sigma_{\mathrm{gold}}$ admitting two fixed points ($0^\infty$ and $1^\infty$) rather than one, with identical topological entropy $\log \phi$. In both families, the resulting growth dimension is $\log_3 \phi$. Hypothesis~(H) is not needed for the boundary rays and is verified computationally for all $M \le 2000$ (\S\ref{sec:table}).
 \end{theorem}
 
 \begin{theorem}[Digitwise Factorization and Dimension Bridge]\label{thm:factorization_bridge}
@@ -113,7 +113,7 @@ where $\lambda_0(P)$ is the spectral radius of the transition matrix restricted 
 \begin{theorem}[Classification of the Safe Class]\label{thm:classification}
 Let $P(y) \in \Z[y]$ satisfy Condition~(S) with $M = P(3^k) > 0$. Then exactly one of the following holds:
 \begin{enumerate}
-    \item $P(y) = 1$, yielding pure $3$-powers $M = 3^k$ with $\dimH = \log_3 2$;
+    \item $P(y) = 1$, yielding the identity multiplier $M = 1$ (and by $3$-power scaling $M = 3^s$, the pure $3$-powers with $\dimH = \log_3 2$);
     \item $P(y) = 1 + y^a$ for some $a \ge 1$, yielding Family~1 ($M = 3^{ak} + 1$);
     \item $P(y) = 1 - y^a + y^b$ for some $b > a \ge 1$, yielding Family~2 ($M = 3^{bk} - 3^{ak} + 1$).
 \end{enumerate}
@@ -186,7 +186,7 @@ Consequently, any polynomial satisfying Condition~(S) has at most three non-zero
 \textbf{Step 3 (Positivity and Exhaustiveness):}
 We evaluate $M = P(3^k)$ for $k \ge 1$ across all remaining configurations:
 \begin{enumerate}
-    \item \emph{No extra terms:} $P(y) = 1$, giving $M = 3^k$ (the pure $3$-power family (1)).
+    \item \emph{No extra terms:} $P(y) = 1$, giving $M = P(3^k) = 1$ (the identity multiplier $M = 1$, and more generally pure $3$-powers $M = 3^s$ via Bernoulli digit shifting with $\dimH = \log_3 2$).
     \item \emph{One extra $+1$ only:} $P(y) = 1 + y^a$ ($a \ge 1$), giving $M = 3^{ak} + 1$ (Family~1, (2)).
     \item \emph{One extra $-1$ only:} $P(y) = 1 - y^a$ ($a \ge 1$). Here $P(3^k) = 1 - 3^{ak} \le 1 - 3 = -2 < 0$. Because integer dilation of the Cantor set requires $M > 0$, this configuration is strictly excluded.
     \item \emph{Both $+1$ and $-1$:} $P(y) = 1 - y^a + y^b$ with $a, b \ge 1$ and $a \ne b$.
@@ -259,36 +259,46 @@ Because $d_m \in \{0, 1\}$, the right-hand side is strictly restricted to $\{0, 
 Thus, no non-zero carry can be spawned from $C_m = 0$.
 Furthermore, an infinite tail of non-zero carries is ruled out in both directions:
 \begin{enumerate}
-    \item \emph{Positive carry tail ($C_m = 1$):} A tail $C_m = 1$ for all large $m$ requires $u_m + 1 = d_m + 3$, which forces $u_m = 2$ and $d_m = 0$. In Family~1, $u_m = z_m + z_{m+k} = 2$ forces $z_m = 1$ for all $m$, which yields $x = 1 \notin C(1, M)$ (since $M x = M > 1$). In Family~2, $u_m = z_m - z_{m+a} + z_{m+b} = 2$ forces $z_{m+a} = 0$, but at step $m+a$ the condition $u_{m+a} = 2$ forces $z_{m+a} = 1$, an immediate contradiction.
-    \item \emph{Negative carry tail ($C_m = -1$):} A tail $C_m = -1$ for all large $m$ requires $u_m - 1 = d_m - 3$, or $u_m + 2 = d_m \in \{0, 1\}$. If $d_m = 0$, then $u_m = -2$, which violates Condition~(S) since all subset sums lie in $[-1, 2]$. If $d_m = 1$, then $u_m = -1$. In Family~1, $u_m = z_m + z_{m+k} \ge 0$, so $u_m = -1$ is impossible. In Family~2, $u_m = z_m - z_{m+a} + z_{m+b} = -1$ forces $z_{m+a} = 1$ and $z_m = z_{m+b} = 0$. But then at step $m+a$, $u_{m+a} = z_{m+a} - z_{m+2a} + z_{m+a+b} = 1 - z_{m+2a} + z_{m+a+b} \ge 1 - 1 + 0 = 0 > -1$. Thus $u_{m+a}$ cannot be $-1$, proving that $u_m = -1$ cannot occur at two steps separated by $a$, ruling out any infinite negative carry cascade.
+    \item \emph{Boundedness of carries ($|C_m| \le 1$):} The exact carry from position $m$ to $m-1$ is given by the tail series $C_{m-1} = \sum_{j=m}^\infty (u_j - d_j) 3^{-(j-m+1)}$. Since $u_j \in \{-1, 0, 1, 2\}$ and $d_j \in \{0, 1\}$, we have $|u_j - d_j| \le 2$, whence $|C_{m-1}| \le \sum_{j=m}^\infty 2 \cdot 3^{-(j-m+1)} = 2 \cdot \frac{1/3}{1 - 1/3} = 1$. Since carries are integers, $C_m \in \{-1, 0, 1\}$ for all $m$.
+    \item \emph{Positive carry tail ($C_m = 1$):} Suppose a tail $C_m = 1$ persists for all $m \ge M_0$. The carry equation $u_m + 1 = d_m + 3$ forces $u_m = 2$ and $d_m = 0$ for all $m \ge M_0$.
+    \begin{itemize}
+        \item In Family~1, $u_m = z_m + z_{m+k} = 2$ forces $z_m = 1$ for all $m \ge M_0$. By the initial prefix condition $z_1 = \dots = z_{dk} = 0$, the sequence $(z_m)$ contains zeroes. Let $m^*$ be the \emph{last zero} in the sequence: $z_{m^*} = 0$ and $z_j = 1$ for all $j > m^*$. Then $u_{m^*} = z_{m^*} + z_{m^*+k} = 0 + 1 = 1$. Because $j > m^*$ has $C_j = 1$, the incoming carry into position $m^*$ is $C_{m^*} = 1$. Then $u_{m^*} + C_{m^*} = 1 + 1 = 2$. The carry equation requires $2 = d_{m^*} + 3 C_{m^*-1} \equiv d_{m^*} \pmod 3$. But $d_{m^*} \in \{0, 1\}$, which has no solution modulo $3$. This contradiction rules out any positive carry tail in Family~1.
+        \item In Family~2, $u_m = z_m - z_{m+a} + z_{m+b} = 2$ forces $z_{m+a} = 0$. But at step $m+a$, the condition $u_{m+a} = 2$ forces $z_{m+a} = 1$, an immediate contradiction.
+    \end{itemize}
+    \item \emph{Negative carry tail ($C_m = -1$):} Suppose a tail $C_m = -1$ persists for all $m \ge M_0$. Then $u_m - 1 = d_m - 3 \implies u_m + 2 = d_m \in \{0, 1\}$. If $d_m = 0$, then $u_m = -2 \notin [-1, 2]$, violating Condition~(S). If $d_m = 1$, then $u_m = -1$ for all $m \ge M_0$. In Family~1, $u_m = z_m + z_{m+k} \ge 0$, so $u_m = -1$ is impossible. In Family~2, $u_m = z_m - z_{m+a} + z_{m+b} = -1$ forces $z_{m+a} = 1$, which gives $u_{m+a} = z_{m+a} - z_{m+2a} + z_{m+a+b} \ge 1 - 1 + 0 = 0 > -1$, so $u_{m+a} \ne -1$. Thus $u_m = -1$ cannot occur at two steps separated by $a$.
 \end{enumerate}
 Therefore, all carries vanish identically: $C_m = 0$ for all $m$. Hence $M x \in \Sigma$ if and only if $z_1 = \dots = z_{dk} = 0$ and $u_m \in \{0, 1\}$ for all $m \ge 1$, with zero carry across all positions and block boundaries.
 
 \textbf{Step 3 (Independent Column SFTs):}
 Since $u_{\ell k + j} = \sum_{q=0}^d c_q z_{(\ell+q)k + j} \in \{0, 1\}$ involves only digits whose indices have residue $j \pmod k$, the condition completely decouples across the $k$ residue classes $j \in \{1, \dots, k\}$. There is zero interaction between distinct residue classes. Hence, the symbolic system on $\{0, 1\}^\N$ defining $C(1, M)$ is the Cartesian product of $k$ identical, mutually independent 1D subshifts of finite type (SFTs), each governed by the linear recurrence $\sum_{q=0}^d c_q z_{\ell+q} \in \{0, 1\}$.
 
-\textbf{Step 4 (Analytical Dimension Bridge via Frostman Measure):}
-Let $\lambda = \lambda(P)$ be the spectral radius (Perron root) of the single-column SFT adjacency matrix. By Perron-Frobenius theory for primitive SFTs, let $v > 0$ and $u > 0$ be the left and right eigenvectors associated with $\lambda$, normalized so that $\langle v, u \rangle = 1$. The Parry measure $\mu_{\mathrm{col}}$ on the admissible sequences $\{z_r\}_{r=0}^\infty$ defined on cylinders by:
-\begin{equation}
-\mu_{\mathrm{col}}([w_0 \dots w_{L-1}]) = v_{w_0} A_{w_0, w_1} \dots A_{w_{L-2}, w_{L-1}} u_{w_{L-1}} \lambda^{-(L-1)}
-\end{equation}
-satisfies $\mu_{\mathrm{col}}([w]) \le C_{\mathrm{col}} \lambda^{-L}$ for all cylinders of length $L$.
-Taking the product measure $\mu = \mu_{\mathrm{col}}^{\otimes k}$ on the product SFT and pushing forward by $\pi$ defines a Borel probability measure $\nu = \pi_* \mu$ supported on $C(1, M)$.
+\textbf{Step 4 (Analytical Dimension Bridge via Frostman Measure on the Zero-Reachable Subshift):}
+The single-column recurrence has memory $d = \deg P$. In each column $j \in \{1, \dots, k\}$, a state is a binary block $w \in \{0, 1\}^d$. Under the zero-prefix condition $z_1 = \dots = z_{dk} = 0$, column $j$ is initialized in the state $0^d$. Let $\mathcal{G}_0$ denote the subgraph of the single-column state graph reachable from $0^d$.
+Decompose $\mathcal{G}_0$ into its strongly connected components (SCCs) $\mathcal{C}_1, \dots, \mathcal{C}_r$, and let $\lambda_0 = \max_{1 \le i \le r} \rho(A_{\mathcal{C}_i})$ be the spectral radius of the dominant recurrent component in $\mathcal{G}_0$.
 
-For any metric ball $B(x, r) \subset \R$ with $3^{-(n+1)} \le r < 3^{-n}$, the cylinder separation $\ge 3^{-n}$ from Step~1 ensures that $B(x, r)$ intersects at most $O(1)$ length-$n$ cylinder sets $\pi([w])$. A length-$n$ block word consists of $n/k$ blocks across $k$ columns, giving total column length $L = n/k$ for each of the $k$ independent columns. Thus:
-\begin{equation}
-\mu([w]) = \prod_{j=0}^{k-1} \mu_{\mathrm{col}}([z^{(j)}_0 \dots z^{(j)}_{L-1}]) \le (C_{\mathrm{col}} \lambda^{-n/k})^k = C_{\mathrm{col}}^k \lambda^{-n} = C_{\mathrm{col}}^k (3^{-n})^{\log_3 \lambda}.
-\end{equation}
-Consequently, $\nu(B(x, r)) \le C' r^{\log_3 \lambda}$ for all $x \in C(1, M)$ and $r \in (0, 1)$. By Frostman's Lemma (the Mass Distribution Principle), this gives:
-\begin{equation}
-\dimH C(1, M) \ge \log_3 \lambda.
-\end{equation}
-Conversely, covering $C(1, M)$ with the $N(n)$ cylinders of length $n$ (where $N(n) \le C \lambda^n$) and diameter $3^{-n}$ gives:
+\textbf{Upper bound on Hausdorff dimension:}
+The number of admissible paths of length $L$ in $\mathcal{G}_0$ starting from $0^d$ satisfies $N_0(L) \le C_0 L^{r-1} \lambda_0^L$ by standard Perron--Frobenius theory for reducible non-negative matrices. Across the $k$ independent columns, a word of total length $n$ consists of $L = n/k$ steps per column, giving total cylinder count $N(n) = (N_0(n/k))^k \le C n^{k(r-1)} \lambda_0^n$.
+Covering $C(1, M)$ by these $N(n)$ cylinders of diameter $3^{-n}$ gives:
 \begin{align*}
-\mathcal{H}^d(C(1, M)) &\le \liminf_{n \to \infty} N(n) (3^{-n})^d \\
-&\le \liminf_{n \to \infty} C (3^{\log_3 \lambda - d})^n = 0 \quad \text{for all } d > \log_3 \lambda.
+\mathcal{H}^s(C(1, M)) &\le \liminf_{n \to \infty} N(n) (3^{-n})^s \\
+&\le \liminf_{n \to \infty} C n^{k(r-1)} (3^{\log_3 \lambda_0 - s})^n = 0 \quad \text{for all } s > \log_3 \lambda_0.
 \end{align*}
-Therefore, $\dimH C(1, M) = \log_3 \lambda(P)$ identically.
+Thus $\dimH C(1, M) \le \log_3 \lambda_0$.
+
+\textbf{Lower bound via Frostman measure:}
+Let $\mathcal{C}_*$ be a maximal recurrent component of $\mathcal{G}_0$ achieving $\rho(A_{\mathcal{C}_*}) = \lambda_0$. Because $\mathcal{C}_*$ is reachable from $0^d$, fix a finite path $p_0$ in $\mathcal{G}_0$ of length $L_0$ from $0^d$ to an entrance state $v_* \in \mathcal{C}_*$.
+On the subshift of paths in $\mathcal{C}_*$ starting at $v_*$, let $\mu_*$ be the Parry measure associated with the Perron root $\lambda_0$, satisfying $\mu_*([w]) \le C_* \lambda_0^{-L}$ for all cylinders of length $L$.
+Define the single-column probability measure $\mu_{\mathrm{col}}$ on paths starting at $0^d$ by conditioning on the fixed initial prefix $p_0$ and following $\mu_*$ thereafter.
+Taking the product measure $\mu = \mu_{\mathrm{col}}^{\otimes k}$ across the $k$ independent columns and pushing forward by $\pi$ defines a Borel probability measure $\nu = \pi_* \mu$ supported on $C(1, M)$.
+For any metric ball $B(x, r) \subset \R$ with $3^{-(n+1)} \le r < 3^{-n}$, the cylinder separation $\ge 3^{-n}$ from Step~1 ensures that $B(x, r)$ intersects at most $O(1)$ length-$n$ cylinder sets $\pi([w])$. Since the prefix length $k L_0$ is a fixed finite constant, the measure of each intersecting cylinder satisfies:
+\begin{equation}
+\mu([w]) \le \prod_{j=1}^k C_* \lambda_0^{-(n/k - L_0)} = C_*^k \lambda_0^{k L_0} \lambda_0^{-n} \le C' r^{\log_3 \lambda_0}.
+\end{equation}
+Consequently, $\nu(B(x, r)) \le C' r^{\log_3 \lambda_0}$ for all $x \in C(1, M)$ and $r \in (0, 1)$. By Frostman's Lemma (the Mass Distribution Principle), this gives:
+\begin{equation}
+\dimH C(1, M) \ge \log_3 \lambda_0.
+\end{equation}
+Therefore, $\dimH C(1, M) = \log_3 \lambda_0(P)$ identically.
 \end{proof}
 
 \section{The Two Extremal Families and the Golden Mean Shift}
@@ -489,29 +499,33 @@ This confirms Theorem~\ref{thm:universal_bound} and the conclusion of Hypothesis
 
 \noindent\textbf{Cospectral phenomena.} The dual pairs $(25, 19)$, $(55, 79)$, $(73, 73)$ and $(217, 235)$ illustrate Time-Reversal Duality $\lambda(a,b) = \lambda(b-a,b)$. Two coincidences lie outside that theorem: $\lambda(13) = \lambda(25)$ (both $x^3 - x^2 - 1$) and $\lambda(16) = \lambda(163)$ (both $x^3 - x - 1$), with $13$ and $16$ not digitwise-safe. The polynomial $x^5 - x^4 - x^2 - 1$ at $M = 61$ ($\lambda_{61} \approx 1.570147$) also governs $M = 5905$, a cospectral coincidence across distinct multiplier orders that is not covered by any of the theorems above.
 
+\clearpage
+
 \section{Formalization in Lean 4}\label{sec:formalization}
 
+{\small
 The Lean~4 formalization (version 4.12.0, Mathlib commit \texttt{809c3fb3b})~\cite{Lean4Community} is hosted at the companion repository \href{https://github.com/ezzasdf/erdos-problem-engine}{\texttt{ezzasdf/erdos-problem-engine}}. We separate what is kernel-verified from what is not, because the distinction directly governs Theorem~\ref{thm:universal_bound}.
 
 \textbf{Kernel-verified.}
-\begin{itemize}
-    \item \texttt{TimeReversal.lean}: the transition-matrix identity $P M_{(a,b)} P = M_{(b-a,b)}^{T}$ for the concrete matrices, and the resulting characteristic-polynomial equality (Theorem~\ref{thm:time_reversal}).
-    \item \texttt{PeriodicOrbit.lean}: reachability of $0^b \leftrightarrow 1^b$, primitivity of the recurrent component, and the embedding of the universal $2b$-periodic word $w_*$ (Theorem~\ref{thm:periodic_obstruction}).
-    \item \texttt{RepunitCarryConnection.lean}: for $M = 4$, the carry automaton characteristic polynomial $t^2 - t - 1$, its Perron root $\phi$, and the equality of orbit counts with the golden word counts (Theorem~\ref{thm:connection_lemma}).
-    \item \texttt{Lemma41Finite.lean}: the finite-window certificate instances of Lemma~4.1, discharged by \texttt{decide}/\texttt{native\_decide}.
-    \item \texttt{CantorMultiplier.lean}: Condition~(S) as a predicate, the reduction of Family~2 parameters, the criterion $b = 2a$ for extremizers, and the exact $\phi$-computations of §\ref{sec:interior}.
+\begin{itemize}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}\setlength{\topsep}{1pt}\setlength{\partopsep}{0pt}
+    \item \texttt{TimeReversal.lean}: transition-matrix identity $P M_{(a,b)} P = M_{(b-a,b)}^{T}$ and resulting characteristic-polynomial equality (Theorem~\ref{thm:time_reversal}).
+    \item \texttt{PeriodicOrbit.lean}: reachability of $0^b \leftrightarrow 1^b$, primitivity of the recurrent component, and embedding of the universal $2b$-periodic word $w_*$ (Theorem~\ref{thm:periodic_obstruction}).
+    \item \texttt{RepunitCarryConnection.lean}: for $M = 4$, carry automaton polynomial $t^2 - t - 1$, Perron root $\phi$, and orbit count equality with golden words (Theorem~\ref{thm:connection_lemma}).
+    \item \texttt{Lemma41Finite.lean}: finite-window certificate instances of Lemma~4.1, discharged by \texttt{decide}/\texttt{native\_decide}.
+    \item \texttt{CantorMultiplier.lean}: Condition~(S) predicate, Family~2 parameter reduction, criterion $b = 2a$ for extremizers, and exact $\phi$-computations of §\ref{sec:interior}.
 \end{itemize}
 
 \textbf{Not kernel-verified.}
-\begin{itemize}
-    \item \emph{Model constants vs transfer spectra:} In \texttt{CantorMultiplier.lean}, \texttt{lambda\_SFT} is assigned as a closed-form model constant ($\phi$ for $(a,b)=(1,2)$ and $(1+\phi)/2$ elsewhere) rather than calculated dynamically as the Perron root of an instantiated transfer matrix or derived from admissible word counts. Consequently, \texttt{safe\_class\_dimension\_upper\_bound} is an algebraic verification on that model assignment rather than a derived spectral theorem.
-    \item \emph{Conditional classification in the interior:} The classification theorem \path{safe_class_extremizer_classification} takes an explicit hypothesis \texttt{h\_gap} asserting strict spectral gap for all non-extremizers (corresponding to Hypothesis~\ref{hyp:parry}). Discharging this hypothesis unconditionally in Lean requires formalizing an SFT ergodic/Birkhoff theorem for cylinder count convergence.
-    \item \emph{External theorems:} In the imported module \path{LagariasHausdorff.lean}, definitions and conjectures from Lagarias~\cite{Lagarias2009} are formalized, but dimension theorems are explicitly recorded as definitions rather than kernel-verified proofs.
-    \item \emph{Frostman dimension bridge:} Theorem~\ref{thm:factorization_bridge} connecting symbolic word counts to Hausdorff measures on the real line is proved analytically in §\ref{sec:bridge}, but its measure-theoretic machinery is not formalized in Mathlib.
+\begin{itemize}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}\setlength{\topsep}{1pt}\setlength{\partopsep}{0pt}
+    \item \emph{Model constants vs transfer spectra:} In \texttt{CantorMultiplier.lean}, \texttt{lambda\_SFT} is assigned as a closed-form model constant ($\phi$ for $(a,b)=(1,2)$ and $(1+\phi)/2$ elsewhere) rather than computed dynamically from transfer matrices. Consequently, \texttt{safe\_class\_dimension\_upper\_bound} is an algebraic check on this assignment rather than a derived spectral theorem.
+    \item \emph{Conditional interior classification:} Theorem \path{safe_class_extremizer_classification} takes an explicit hypothesis \texttt{h\_gap} asserting strict spectral gap for non-extremizers (Hypothesis~\ref{hyp:parry}). Discharging this in Lean requires formalizing an SFT ergodic theorem for cylinder count convergence.
+    \item \emph{External theorems:} In \path{LagariasHausdorff.lean}, definitions and conjectures from Lagarias~\cite{Lagarias2009} are formalized, but dimension theorems are recorded as definitions rather than kernel proofs.
+    \item \emph{Frostman dimension bridge:} Theorem~\ref{thm:factorization_bridge} connecting symbolic counts to Hausdorff measures is proved analytically in §\ref{sec:bridge}, but its measure-theoretic machinery is not formalized in Mathlib.
 \end{itemize}
 Accordingly, no claim is made that the universal bound or extremizer classification is unconditionally kernel-verified in the interior; their status rests on the analytical proofs and the exhaustive verification of \S\ref{sec:table}.
 
-\textbf{Audit.} The build of the library is green and the built target contains no \texttt{sorry}. Two modules that did contain one \texttt{sorry} each, together with three files whose imports no longer resolve, have been moved to \texttt{ErdosTernary/attic/} with a README recording the restoration conditions; they are outside the Lake target. For the declarations audited here, \texttt{\#print axioms} reports at most \texttt{[propext, Classical.choice, Quot.sound]}; declarations proved by \texttt{native\_decide} additionally depend on \texttt{Lean.ofReduceBool}, extending the trusted base to the Lean compiler and runtime, as is standard for finite certificates. A snapshot audit of 270 declarations in the core modules (2026-11-20) classified 182 as foundational and 88 as \texttt{native\_decide}-based; that snapshot predates the current module set and excludes the bridge modules.
+\textbf{Audit.} The library builds with no \texttt{sorry}. Two modules with one \texttt{sorry} each and three files with unresolving imports were moved to \texttt{ErdosTernary/attic/} with a restoration README outside the Lake target. For audited declarations, \texttt{\#print axioms} reports at most \texttt{[propext, Classical.choice, Quot.sound]}; proofs via \texttt{native\_decide} additionally invoke \texttt{Lean.ofReduceBool}, extending the trusted base to the compiler/runtime. A snapshot audit of 270 core declarations (2026-11-20) classified 182 as foundational and 88 as \texttt{native\_decide}-based (predating current modules and excluding bridge files).
+}
 
 \clearpage
 
