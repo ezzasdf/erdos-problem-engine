@@ -463,12 +463,8 @@ Summing over all $u \in A_n$, each word yields at least one extension and exactl
 \begin{theorem}[Universal Periodic Obstruction]\label{thm:periodic_obstruction}
 Let $a \ge 2$ and $b - a \ge 2$ be coprime.
 \begin{enumerate}
-    \item \textbf{Admissibility and Primitivity:} The SFT $\Sigma_{(a, b)}$ admits an explicit universal periodic orbit of length $2b$,
-    \begin{equation}
-    w_* = (0^b 1^b)^\infty,
-    \end{equation}
-    contained in a primitive recurrent component $\mathcal{C}_*$ containing both $0^b$ and $1^b$.
-    \item \textbf{Cylinder Measure Positivity:} For any ergodic measure of maximal entropy supported on $\mathcal{C}_*$, the cylinder weight satisfies $\epsilon(a, b) = \mu_{\mathcal{C}_*}([w_*]) > 0$.
+    \item \textbf{Admissibility and Primitivity:} The SFT $\Sigma_{(a, b)}$ admits an explicit universal periodic orbit of length $2b$, $w_* = (W_*)^\infty = (0^b 1^b)^\infty$ with fundamental block $W_* = 0^b 1^b$, contained in a primitive recurrent component $\mathcal{C}_*$ containing both $0^b$ and $1^b$.
+    \item \textbf{Cylinder Measure Positivity:} For the cylinder $[W_*]$ of sequences beginning with the finite block $W_* = 0^b 1^b$, the unique measure of maximal entropy $\mu_{\mathcal{C}_*}$ on $\mathcal{C}_*$ satisfies $\epsilon(a, b) = \mu_{\mathcal{C}_*}([W_*]) > 0$.
     \item \textbf{Component Branching Deficit:} Within $\mathcal{C}_*$, path counts satisfy $N_{\mathcal{C}_*}(n) = c_* \lambda_*^n + o(\lambda_*^n)$ ($c_* > 0$), where $\lambda_*$ is the spectral radius of $\mathcal{C}_*$. Whenever $\mathcal{C}_*$ uniquely dominates the full shift (meaning $\rho(\mathcal{C}') < \lambda_* = \lambda(a, b)$ for all other strongly connected components $\mathcal{C}' \ne \mathcal{C}_*$, ensuring $N(n) = c \lambda(a, b)^n + o(\lambda(a, b)^n)$ with $c > 0$ and precluding oscillations or polynomial factors, whence $N(n+1)/N(n) \to \lambda(a, b)$), the asymptotic branching deficit converges to:
     \begin{equation}
     \lim_{n \to \infty} \frac{N(n-1) - B(n)}{N(n-1)} = 1 + \lambda(a,b) - \lambda(a,b)^2 .
@@ -483,18 +479,10 @@ We establish the three structural assertions:
     \begin{equation}
     z_i - z_{i-a} + z_{i-b} = z_i - z_{i-a} + (1 - z_i) = 1 - z_{i-a} \in \{0, 1\} \quad \text{for all } i \in \Z.
     \end{equation}
-    Hence $w_* = (0^b 1^b)^\infty$ is an exact admissible trajectory of $\Sigma_{(a, b)}$ of period $2b$.
+    Hence $w_* = (0^b 1^b)^\infty$ is an exact admissible trajectory of $\Sigma_{(a, b)}$ of period $2b$, with fundamental periodic block $W_* = 0^b 1^b$.
     In the transfer graph $\mathcal{G}(a, b)$, the states $0^b$ and $1^b$ have self-loops $0^b \to 0^b$ and $1^b \to 1^b$. Furthermore, $0^b$ reaches $1^b$ in $b$ steps via the sequence $(0^{b-k} 1^k)_{k=0}^b$, and $1^b$ reaches $0^b$ in $b$ steps via $(1^{b-k} 0^k)_{k=0}^b$ (formalized in \texttt{PeriodicOrbit.lean}). Thus $0^b$ and $1^b$ belong to a common strongly connected component $\mathcal{C}_*$. Since $0^b$ admits a self-loop (a cycle of length $1$), the period of $\mathcal{C}_*$ is $\gcd(1, 2b) = 1$, proving $\mathcal{C}_*$ is primitive.
-    \item \emph{Parry measure positivity:} On the primitive component $\mathcal{C}_*$ with Perron root $\lambda_*$, the transfer matrix $A_{\mathcal{C}_*}$ is primitive ($A_{\mathcal{C}_*}^m > 0$ for sufficiently large $m$). By the Perron--Frobenius theorem, its unique measure of maximal entropy $\mu_{\mathcal{C}_*}$ is the Parry Markov measure defined by strictly positive Perron eigenvectors $u, v > 0$. Because every vertex in $\mathcal{C}_*$ carries strictly positive weight, every admissible cylinder in $\mathcal{C}_*$ has strictly positive measure: $\epsilon(a, b) = \mu_{\mathcal{C}_*}([w_*]) > 0$.
-    \item \emph{Asymptotic ratio limit and branching deficit:} Within the primitive component $\mathcal{C}_*$, Perron--Frobenius spectral projection gives $A_{\mathcal{C}_*}^n = \lambda_*^n v u^T + O(\rho_2^n)$ with $\rho_2 < \lambda_*$, guaranteeing that word counts satisfy $N_{\mathcal{C}_*}(n) = c_* \lambda_*^n + o(\lambda_*^n)$ with $c_* > 0$. If $\mathcal{C}_*$ uniquely dominates the full transition graph (that is, every other strongly connected component $\mathcal{C}' \ne \mathcal{C}_*$ satisfies $\rho(\mathcal{C}') < \lambda_* = \lambda(a, b)$), then the condensation graph contains no chains of maximal components (precluding polynomial factors $n^k \lambda_*^n$) and no competing maximal components with different periods (precluding oscillations). Consequently, the global word counts satisfy $N(n) = c \lambda(a, b)^n + o(\lambda(a, b)^n)$ with $c \ge c_* > 0$, guaranteeing the consecutive ratio convergence:
-    \begin{equation}
-    \lim_{n \to \infty} \frac{N(n+1)}{N(n)} = \lambda(a, b).
-    \end{equation}
-    From Lemma~\ref{lem:branching_step}, $N(n+1) = N(n) + B(n)$, whence $B(n)/N(n) = N(n+1)/N(n) - 1 \to \lambda(a, b) - 1$. Consequently,
-    \begin{equation}
-    \frac{B(n)}{N(n-1)} = \frac{B(n)}{N(n)} \cdot \frac{N(n)}{N(n-1)} \longrightarrow (\lambda(a, b) - 1)\lambda(a, b) = \lambda(a, b)^2 - \lambda(a, b).
-    \end{equation}
-    Subtracting this from $1$ yields the asserted asymptotic limit:
+    \item \emph{Parry measure positivity:} On the primitive component $\mathcal{C}_*$ with Perron root $\lambda_*$, the transfer matrix $A_{\mathcal{C}_*}$ is primitive ($A_{\mathcal{C}_*}^m > 0$ for sufficiently large $m$). By the Perron--Frobenius theorem, its unique measure of maximal entropy $\mu_{\mathcal{C}_*}$ is the Parry Markov measure defined by strictly positive Perron eigenvectors $u, v > 0$. Because every vertex and transition in $\mathcal{C}_*$ carries strictly positive weight, every admissible finite cylinder in $\mathcal{C}_*$ has strictly positive measure. In particular, for the finite block $W_* = 0^b 1^b$, the cylinder $[W_*]$ satisfies $\epsilon(a, b) = \mu_{\mathcal{C}_*}([W_*]) > 0$.
+    \item \emph{Asymptotic ratio limit and branching deficit:} Within the primitive component $\mathcal{C}_*$, Perron--Frobenius spectral projection gives $N_{\mathcal{C}_*}(n) = c_* \lambda_*^n + O(\rho_2^n)$ with $c_* > 0$ and $\rho_2 < \lambda_*$. If $\mathcal{C}_*$ uniquely dominates the full transition graph (that is, every other strongly connected component $\mathcal{C}' \ne \mathcal{C}_*$ satisfies $\rho(\mathcal{C}') < \lambda_* = \lambda(a, b)$), then competing maximal periods and Jordan block chains $n^k \lambda_*^n$ in the condensation graph are precluded. Consequently, the global word counts satisfy $N(n) = c \lambda(a, b)^n + o(\lambda(a, b)^n)$ with $c \ge c_* > 0$, guaranteeing the consecutive ratio convergence $\lim_{n \to \infty} N(n+1)/N(n) = \lambda(a, b)$. From Lemma~\ref{lem:branching_step}, $N(n+1) = N(n) + B(n)$, whence $B(n)/N(n) = N(n+1)/N(n) - 1 \to \lambda(a, b) - 1$ and $B(n)/N(n-1) = \frac{B(n)}{N(n)} \frac{N(n)}{N(n-1)} \to \lambda(a, b)^2 - \lambda(a, b)$. Subtracting this from $1$ yields the asserted asymptotic limit:
     \begin{equation}
     \lim_{n \to \infty} \frac{N(n-1) - B(n)}{N(n-1)} = 1 - (\lambda(a, b)^2 - \lambda(a, b)) = 1 + \lambda(a, b) - \lambda(a, b)^2.
     \end{equation}
@@ -503,9 +491,9 @@ This establishes the theorem.
 \end{proof}
 
 \begin{hypothesis}[Parry gap]\label{hyp:parry}
-For every coprime pair $a \ge 2$, $b - a \ge 2$, the primitive component $\mathcal{C}_*$ uniquely dominates the full shift (meaning $\rho(\mathcal{C}') < \lambda_* = \lambda(a, b)$ for all strongly connected components $\mathcal{C}' \ne \mathcal{C}_*$), and the branching slack is bounded below by the Parry cylinder weight:
+For every coprime pair $a \ge 2$, $b - a \ge 2$, the primitive component $\mathcal{C}_*$ uniquely dominates the full shift (meaning $\rho(\mathcal{C}') < \lambda_* = \lambda(a, b)$ for all strongly connected components $\mathcal{C}' \ne \mathcal{C}_*$), and the branching slack is bounded below by the Parry cylinder weight of the finite block $W_* = 0^b 1^b$:
 \begin{equation}
-1 + \lambda(a,b) - \lambda(a,b)^2 \;\ge\; \mu_{\mathcal{C}_*}([w_*]) \;=\; \epsilon(a, b) \;>\; 0 .
+1 + \lambda(a,b) - \lambda(a,b)^2 \;\ge\; \mu_{\mathcal{C}_*}([W_*]) \;=\; \epsilon(a, b) \;>\; 0 .
 \end{equation}
 \end{hypothesis}
 
