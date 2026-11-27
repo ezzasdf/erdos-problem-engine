@@ -70,3 +70,17 @@ for f in certificates/catalog/*.json; do
   python3 scripts/check_certificate.py --check-derivation "$f" || exit 1
 done
 ```
+
+---
+
+## 4. Trust Boundaries & Epistemic Scope
+
+1. **Finite Empirical Scope (Not a Universal Theorem)**:
+   This catalog establishes the exact spectral radius property ($\rho(A) \le 1.60 < \varphi$ or $\rho(A) = \varphi$) **strictly for the explicit finite set of 23 multipliers listed** ($2 \le M \le 35, \gcd(M, 3) = 1$). It does not claim an exhaustive mathematical proof for all infinitely many multipliers $M$. The universal theorem target remains conditional on hypothesis (H) and the analytical Frostman measure bridge.
+
+2. **Level 2 Consistency vs. Independent Modeling**:
+   The Level 2 derivation check (`--check-derivation`) confirms exact consistency between the certificate matrix and metadata against the project's canonical state-space generator (`get_graph_for_M`). It proves that the matrix was not fabricated ad hoc; it does **not** independently re-prove that the graph generator itself correctly models the original arithmetic intersection on the real line (which is a Level 3 analytical obligation).
+
+3. **Decoupled Verification Guarantee**:
+   The primary guarantee provided by these certificates is **Level 1 Zero-Trust Algebraic Verification**: given the explicit matrix $A$, the mathematical property ($\rho(A) \le 8/5$ via Collatz–Wielandt or $\rho(A) = \varphi$ via Sturm root-counting) is independently verified with zero floating-point error, independently of how the matrix was discovered.
+

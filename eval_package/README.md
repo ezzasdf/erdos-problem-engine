@@ -43,6 +43,7 @@ Notice: Checked matrix properties. Run with --verify-derivation to re-derive mat
 ## 2. Package Contents & Dependency Scope
 
 - **`check_certificate.py`**: Standalone mathematical certificate auditor. The Collatz–Wielandt evaluation implemented here operates with **zero external dependencies** on Python 3 standard library (`json`, `hashlib`, `fractions`, `argparse`). *(Note: The full repository version of this script lazily imports SymPy if auditing quadratic-field Sturm sequences, and NumPy if running `--verify-derivation`; neither is required for this M=19 package).*
+- **`CertCheck.lean`**: Standalone Lean 4 certificate validator (core `Init` only; **zero Mathlib dependency**). Formulates the $M=19$ matrix and witness vector and verifies the linear inequality computationally in Lean's trusted kernel by definitional reflexivity (`by rfl`) with zero axioms.
 - **`M19_collatz_wielandt.json`**: Portable certificate (`emve-cert-v1`) for multiplier $M = 19$. Contains the full $6 \times 6$ integer transition matrix $A$, the positive integer witness vector $v = [201563, 139062, 100000, 100000, 139062, 201562]$, and the SHA-256 integrity checksum.
 - **`README.md`**: This guide.
 
