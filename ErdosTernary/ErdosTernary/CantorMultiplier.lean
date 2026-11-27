@@ -31,6 +31,16 @@ Authors: Ezzeldin Ashraf Mohamed Shafey Wahba
   Strict sub-golden growth (dim_growth < log_3 φ) is proved for a = 1, b ≥ 3 via the Perron
   polynomial, and holds for a ≥ 2, b ≠ 2a conditionally on the a ≥ 2 spectral gap.
 
+  Trust boundary (read this before citing the file):
+  `SafeMultiplier` is an inductive type whose three constructors *are* the classification of
+  Theorem 3; the file does not re-derive that classification from Condition (S).
+  `lambda_SFT` is a model constant, not the spectral radius of a concrete transfer matrix
+  (see its docstring). Consequently `safe_class_dimension_upper_bound` and the two
+  `..._attains_log3phi` theorems are arithmetic facts about that model constant, and
+  `safe_class_extremizer_classification` carries an explicit `h_gap` hypothesis standing for
+  Hypothesis (H) of the paper. The genuine content of this file is the algebra: the reduction
+  of Family 2 parameters, the extremizer criterion b = 2a, and the exact φ computations.
+
   References:
   - J. C. Lagarias, "Ternary expansions of powers of 2", J. London Math. Soc. (2009)
   - ErdosTernary.Lemma41
@@ -191,13 +201,14 @@ lemma log3phi_lt_half : log3phi < 1 / 2 := by
     rw [Real.sqrt_eq_rpow, Real.log_rpow (by norm_num)]
   linarith
 
-/-- SFT Perron root bound function for reduced parameters (a, b).
-    Convention: Defined as the SFT growth rate λ_SFT(a, b) := limsup_{n → ∞} N(n)^(1/n),
-    matching Lemma 4.1's conclusion directly.
-    By Lemma 4.1 (`lemma_4_1_chain`), N(n) ≤ C * φ^n for all coprime 1 ≤ a < b,
-    which yields λ_SFT(a, b) ≤ φ.
-    For the extremizer (1, 2), N(n) = fib(n+2) (via `extremizer_exact_fibonacci`),
-    attaining φ identically. -/
+/-- Model value used for the single-column growth rate of the Family 2 shift.
+
+    WARNING: this is *not* the spectral radius of a concrete transfer matrix, and it is
+    not the `limsup N(n)^(1/n)` of the admissible word counts either. It is a closed-form
+    stand-in: `phi` on the extremal ray `(a,b) = (1,2)` and the constant `(1+phi)/2`
+    elsewhere. The inequalities proved below are therefore arithmetic facts about this
+    constant, not Perron--Frobenius statements. The genuine identification
+    `lambda_SFT a b = lambda(a,b)` is Hypothesis (H) of the paper and is not formalized. -/
 noncomputable def lambda_SFT (a b : ℕ) : ℝ :=
   if a = 1 ∧ b = 2 then phi else (1 + phi) / 2
 
