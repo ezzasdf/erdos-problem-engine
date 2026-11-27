@@ -349,10 +349,14 @@ Modulo $8$, powers of $3$ alternate strictly: $3^s \equiv 1 \pmod 8$ for $s$ eve
 \end{proof}
 
 \subsection{The Spectral Contrast: Modular vs. Digit Space}
-The carry automaton on Cantor inputs has transfer matrix $A = \begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}$, with spectral radius $\rho_{\mathrm{digit}} = \phi = (1+\sqrt{5})/2 \approx 1.618 < 2$. Specifically, for the quadrupling carry map $x \mapsto 4x = 3x + x$ (and the affine repunit shift $4x+1$), tracking carry states $(c, p) \in \{0, 1\}^2$ yields a $4$-state automaton whose reachable component from $(0,0)$ comprises exactly $2$ states with transition matrix $A$. This reveals the fundamental contrast:
+The carry automaton on Cantor inputs has transfer matrix $A = \begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}$, with spectral radius $\rho_{\mathrm{digit}} = \phi = (1+\sqrt{5})/2 \approx 1.618 < 2$. Specifically, for the linear quadrupling carry map $x \mapsto 4x = 3x + x$ on Cantor inputs, tracking carry states $(c, p) \in \{0, 1\}^2$ yields a $4$-state automaton whose reachable component from the initial state $(c=0, p=0)$ comprises exactly $2$ states ($s00$ and $s01$) with transition matrix $A$. The admissible inputs correspond to binary sequences containing no two consecutive ones ($11$), yielding exactly $F_{n+2}$ admissible words of length $n$.
+
+For the affine repunit recurrence $T(x) = 4x + 1 = 3x + x + 1$, the lowest digit is $d_0(4x+1) = (x_0 + 1) \bmod 3$. Admissibility $d_0 \in \{0, 1\}$ strictly forces the units digit to be $x_0 = 0$ (since $x_0 = 1 \implies d_0 = 2$). With $x_0 = 0$, the units addition produces output digit $1$ with carry $c_1 = 0$, placing the system in state $(c=0, p=0) = s00$ at index $1$. The remaining $n-1$ input digits are then governed by the identical no-adjacent-ones transition rule, yielding $F_{(n-1)+2} = F_{n+1}$ admissible input words of length $n$. 
+
+Thus both the linear and affine systems exhibit the same sub-exponential spectral growth:
 \begin{itemize}
     \item \textbf{Modular Space (Exponent):} $\rho_{\mathrm{adic}} = 2$. The tree $\Trep$ is a full binary tree forever.
-    \item \textbf{Digit Space (Stream):} $\rho_{\mathrm{digit}} = \phi < 2$. The language grows as $F_{n+2}$, forcing sub-exponential word growth.
+    \item \textbf{Digit Space (Stream):} $\rho_{\mathrm{digit}} = \phi < 2$. The language of valid paths grows as $F_{n+2}$ for linear quadrupling ($F_{n+1}$ for the affine repunit shift), forcing sub-exponential word growth.
 \end{itemize}
 However, because an integer $4^s$ is a single discrete path, $\phi < 2$ alone does not force the path to leave the language. The matrix transfer recurrence $(x, y) \mapsto (x+y, x)$, its Fibonacci population growth $F_{n+2}$, and its characteristic polynomial equivalence to the $M=4$ Perron polynomial are formalized in \texttt{RepunitCarryConnection.lean}. As detailed in the trust boundary, the identification with the full shift-space spectral radius represents an analytical comparison (Hypothesis (H) from the companion paper), whereas the discrete matrix transfer recurrence and Fibonacci identity are fully kernel-verified.
 

@@ -95,7 +95,7 @@ theorem carry_packet_64_non_recurrent {s k : ℕ} (hs : 2 ≤ s) :
 
 /-! ## Part 2: The Quadrupling Carry Automaton on Cantor Inputs -/
 
-/-- Carry states for the ternary self-overlap R_{s+1} = 4R_s + 1 = R_s + 3R_s + 1:
+/-- Carry states for the ternary quadrupling map x ↦ 4x = x + 3x on Cantor inputs:
     (carry, previous input bit). -/
 inductive CarryState : Type
   | s00 : CarryState  -- c = 0, prev = 0
