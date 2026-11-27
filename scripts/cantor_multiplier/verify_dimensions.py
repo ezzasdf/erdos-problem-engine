@@ -198,22 +198,32 @@ def count_roots_strictly_greater_than_phi(P_expr):
 
 
 def find_collatz_wielandt_vector(A_np):
-    """Find a strictly positive integer vector v > 0 such that 5 * (A @ v) <= 8 * v."""
+    """Find a strictly positive integer vector v > 0 such that 5 * (A @ v) <= 8 * v.
+    
+    The numerical solver proposes the candidate vector u > 0, which is scaled and
+    converted to exact Python arbitrary-precision integers v_int. The Collatz-Wielandt
+    inequality is verified using pure Python arbitrary-precision integers, eliminating
+    any possibility of fixed-width integer overflow.
+    """
     n = A_np.shape[0]
     if n == 0:
-        return True, np.zeros(0, dtype=int)
+        return True, []
     try:
-        # Solve (1.60 * I - A) u = 1
+        # Solve (1.60 * I - A) u = 1 to propose candidate Perron eigenvector
         M_mat = 1.60 * np.eye(n) - A_np
         u = np.linalg.solve(M_mat, np.ones(n))
         if np.all(u > 0):
-            scale = 100000.0 / np.min(u)
-            v = np.round(u * scale).astype(int)
-            v[v <= 0] = 1
-            Av = A_np.astype(int) @ v
-            # Exact integer inequality
-            if np.all(5 * Av <= 8 * v):
-                return True, v
+            scale = 100000.0 / float(np.min(u))
+            v_int = [max(1, int(round(float(x) * scale))) for x in u]
+            A_int = [[int(A_np[i, j]) for j in range(n)] for i in range(n)]
+            
+            # Exact arbitrary-precision integer inequality check in pure Python
+            valid = all(
+                5 * sum(A_int[i][j] * v_int[j] for j in range(n)) <= 8 * v_int[i]
+                for i in range(n)
+            )
+            if valid:
+                return True, v_int
     except np.linalg.LinAlgError:
         pass
     return False, None

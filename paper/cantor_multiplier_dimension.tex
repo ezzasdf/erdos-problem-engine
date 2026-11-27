@@ -91,11 +91,7 @@ In Family~1, the residue-class decomposition partitions the coordinates into $k$
 \end{theorem}
 
 \begin{theorem}[Digitwise Factorization and Dimension Bridge]\label{thm:factorization_bridge}
-Let $P(y) = \sum_{q=0}^d c_q y^q \in \Z[y]$ satisfy Condition~(S):
-\begin{equation}
-c_0 = 1, \quad \text{and every subset-sum of } \{c_q : q \ge 0\} \text{ lies in } [-1, 2],
-\end{equation}
-and fix $k \ge 1$ such that $M = P(3^k) > 0$. For any $x = \sum_{m=1}^\infty 2 z_m 3^{-m} \in \Sigma$ with $z_m \in \{0, 1\}$, $x \in C(1, M) = \Sigma \cap M^{-1}\Sigma$ if and only if both of the following hold:
+Let $P(y) = \sum_{q=0}^d c_q y^q \in \Z[y]$ satisfy Condition~(S) with $M = P(3^k) > 1$ (which by the classification of Theorem~\ref{thm:classification} is either Family~1, $P(y) = 1 + y^a$, or Family~2, $P(y) = 1 - y^a + y^b$). For any $x = \sum_{m=1}^\infty 2 z_m 3^{-m} \in \Sigma$ with $z_m \in \{0, 1\}$, $x \in C(1, M) = \Sigma \cap M^{-1}\Sigma$ if and only if both of the following hold:
 \begin{enumerate}
     \item \textbf{Initial Zero-Prefix Condition:} $z_1 = z_2 = \dots = z_{dk} = 0$;
     \item \textbf{Decoupled Recurrence:} for all columns $j \in \{1, \dots, k\}$ and all block indices $\ell \ge 0$,
@@ -155,7 +151,7 @@ The $2$-state carry automaton governing base-$3$ quadrupling ($M = 4$) on Cantor
 
 The combinatorial statements behind Theorems~\ref{thm:time_reversal} and~\ref{thm:connection_lemma} are formalized and verified in Lean~4 without custom axioms; the dimension bridge and the extremal classification are not, and the formal status of each statement is recorded in \S\ref{sec:formalization}.
 
-\section{Classification of the Digitwise-Safe Class}
+\section{Classification of the Digitwise-Safe Class}\label{sec:classification}
 
 We establish Theorem~\ref{thm:classification}, classifying all integer polynomials that satisfy the carry-free Condition~(S).
 
@@ -243,12 +239,13 @@ Y_\ell = \sum_{j=1}^k \left( \sum_{q=0}^d c_q z_{(\ell+q)k+j} \right) 3^{k-j} = 
 \end{equation}
 Because $z_m \in \{0, 1\}$, each $u_{\ell, j}$ is a subset-sum of $\{c_0, \dots, c_d\}$. Condition~(S) guarantees that every such subset-sum lies in $\{-1, 0, 1, 2\}$.
 
-Now we establish the initial zero-prefix condition $z_1 = \dots = z_{dk} = 0$ directly from the requirement $M x \in [0, 1]$.
+Now we establish the initial zero-prefix condition $z_1 = \dots = z_{dk} = 0$ directly from the requirement $M x \in [0, 1)$.
+By the Classification Theorem (Theorem~\ref{thm:classification}, established in \S\ref{sec:classification}), every non-trivial polynomial satisfying Condition~(S) with $P(3^k) > 1$ belongs either to Family~1 ($P(y) = 1 + y^a$) or Family~2 ($P(y) = 1 - y^a + y^b$ with $b > a \ge 1$).
 Recall that any point $x \in \Sigma$ has ternary digits in $\{0, 2\}$. If $x$ is not identically zero on its first $dk$ digits, let $m \in \{1, \dots, dk\}$ be the index of the first non-zero digit. Since the ternary digit at position $m$ must be $2$, we obtain the strict lower bound:
 \begin{equation}
 x \ge 2 \cdot 3^{-m} \ge 2 \cdot 3^{-dk}.
 \end{equation}
-We now examine the two safe families:
+We now verify the contradiction for both classified safe families:
 \begin{enumerate}
     \item \textbf{Family 1:} $M = 3^{ak} + 1$ with degree $d = a$, so $dk = ak$. If any of the first $ak$ digits is non-zero, then
     \begin{equation}
