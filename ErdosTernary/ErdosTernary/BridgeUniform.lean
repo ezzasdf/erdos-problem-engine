@@ -32,6 +32,7 @@ open ErdosTernary.BridgeComputeExtended
 open Narkiewicz
 open ErdosTernary.Bridge
 open ErdosTernary.BridgeMiddle
+open ErdosTernary.BridgeCantorChunkedProofs
 
 namespace ErdosTernary.BridgeUniform
 
