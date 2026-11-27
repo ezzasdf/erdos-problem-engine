@@ -7,7 +7,11 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{microtype}
+\setlength{\emergencystretch}{2em}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=magenta,urlcolor=cyan]{hyperref}
+\makeatletter
+\g@addto@macro\UrlBreaks{\do\/\do\-}
+\makeatother
 
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}[section]
@@ -22,6 +26,7 @@
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{hypothesis}[theorem]{Hypothesis}
 
 \newcommand{\C}{\mathcal{C}}
 \newcommand{\R}{\mathbb{R}}
@@ -43,9 +48,9 @@
 \begin{document}
 
 \begin{abstract}
-We study the Hausdorff dimension of arithmetic intersections of the middle-thirds Cantor set $\Sigma$ with its dilates, $C(1, M) = \Sigma \cap M^{-1} \Sigma$, for integer multipliers $M \ge 1$. When $M$ satisfies the carry-free condition~(S), the intersection decomposes into an affine subshift of finite type (SFT) whose dimension is determined by the spectral radius of an explicit transfer matrix. We classify the extremal Hausdorff dimensions across all integer multipliers. We prove that among all safe multipliers, the maximal Hausdorff dimension is strictly achieved by two infinite families: Family~1 ($M = 3^k + 1$) and the reduced extremizers of Family~2 ($M = (3^b - 1)/(3^a - 1)$ with $b = 2a$). In both families, the symbolic language is topologically conjugate to the golden mean shift $\Sigma_{\mathrm{gold}}$, attaining the universal upper bound $\dimH C(1, M) = \log_3 \phi \approx 0.438018$, where $\phi = (1+\sqrt{5})/2$, strictly improving Lagarias's universal bound of $1/2$.
+We study the Hausdorff dimension of arithmetic intersections of the middle-thirds Cantor set $\Sigma$ with its dilates, $C(1, M) = \Sigma \cap M^{-1} \Sigma$, for integer multipliers $M \ge 1$. When $M$ satisfies the carry-free condition~(S), the intersection decomposes into an affine subshift of finite type (SFT) whose dimension is determined by the spectral radius of an explicit transfer matrix. We classify the extremal Hausdorff dimension across the digitwise-safe class of integer multipliers. We prove that among all safe multipliers, the maximal Hausdorff dimension is strictly achieved by two infinite families: Family~1 ($M = 3^k + 1$) and the reduced extremizers of Family~2 ($M = 3^b - 3^a + 1$ with $b = 2a$). In both families the symbolic language is a product of $k$ (respectively $g = \gcd(a,b)$) independent golden mean shifts, so that $\dimH C(1, M) = \log_3 \phi \approx 0.438018$, where $\phi = (1+\sqrt{5})/2$. This is strictly below Lagarias's universal bound of $1/2$ on this class.
 
-Furthermore, we prove a Time-Reversal Duality theorem establishing that pairs $(a, b)$ and $(b-a, b)$ are strictly cospectral. We formulate the analytical Frostman measure bridge connecting symbolic word counts to rigorous Hausdorff measures on the real line, and compute the exact Hausdorff dimension and minimal polynomial factor for all $M \le 300$. All main structural theorems, including the SFT loop classification and spectral bounds, have been formalized and kernel-verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with foundational axioms.
+The classification is unconditional for the boundary rays (Lemma~\ref{lem:boundary_strict} and Corollary~\ref{cor:boundary_reduction}) and is reduced, for the interior domain, to an explicit spectral-gap inequality~(H) which we verify by exact transfer-matrix computation for every $M \le 2000$. Furthermore, we prove a Time-Reversal Duality theorem establishing that pairs $(a, b)$ and $(b-a, b)$ are cospectral. We formulate the analytical Frostman measure bridge connecting symbolic word counts to rigorous Hausdorff measures on the real line, and compute the exact Hausdorff dimension and minimal polynomial factor for all safe $M \le 300$. The combinatorial core --- word counts, the carry-graph model, time-reversal duality, and the boundary-case bounds --- is formalized and kernel-verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with foundational axioms; the interior spectral-gap inequality is carried in the formalization as an explicit hypothesis, not as an axiom.
 \end{abstract}
 
 \maketitle
@@ -64,23 +69,23 @@ C(1, M) = \Sigma \cap M^{-1} \Sigma = \{ x \in \Sigma : M x \in \Sigma \}.
 \end{equation}
 When $M = 3^k$ is a pure power of $3$, multiplication by $M$ corresponds to a $k$-step Bernoulli shift on digits, yielding $C(1, 3^k) \cong \Sigma$ and $\dimH C(1, 3^k) = \log_3 2 \approx 0.630930$. Conversely, when $M$ is coprime to $3$, multiplication by $M$ introduces intricate digit correlations driven by base-$3$ carry cascades. For almost all integers $M$, the set $C(1, M)$ consists of isolated points or is completely empty~\cite{KenyonPeres1996,HochmanShmerkin2012}. The systematic study of Cantor multiplier intersections $C(1, M)$ in connection with ternary digit distributions was initiated by Lagarias~\cite{Lagarias2009}. In that foundational work, Lagarias established that for any non-$3$-power $M$, $\dimH C(1, M) \le 1/2$, and demonstrated that for $M = 3^k + 1$, the intersection is a golden mean subshift with dimension $\log_3 \phi \approx 0.438018$. Lagarias conjectured that $\log_3 \phi$ represents the maximal dimension across all non-$3$-powers, and asked whether any other integer multipliers could attain this bound.
 
-In this paper, we resolve these questions on the entire class of digitwise-safe multipliers: we discover a completely new second infinite family of extremizers, prove the digitwise factorization and Frostman measure bridge, classify all safe polynomials, establish Time-Reversal Duality, and formalize the core theory in the Lean~4 interactive proof assistant.
+In this paper we settle these questions on the entire class of digitwise-safe multipliers, subject to the explicit spectral-gap inequality~(H) of \S\ref{sec:interior}: we exhibit a second infinite family of extremizers, prove the digitwise factorization and Frostman measure bridge, classify all safe polynomials, and establish Time-Reversal Duality.
 
 \subsection{Statement of Main Results}
 
 Our principal contributions are summarized in the following five theorems:
 
 \begin{theorem}[Universal Dimension Bound and Extremizer Classification]\label{thm:universal_bound}
-For every safe multiplier $M$ that is not a pure power of $3$, the Hausdorff dimension satisfies:
+Assume the interior spectral-gap inequality~(H) of \S\ref{sec:interior}. Then for every safe multiplier $M > 1$ the Hausdorff dimension satisfies:
 \begin{equation}
 \dimH C(1, M) \le \log_3 \phi = 0.438017879\dots < \frac{1}{2}, \quad \text{where } \phi = \frac{1 + \sqrt{5}}{2}.
 \end{equation}
 Equality $\dimH C(1, M) = \log_3 \phi$ holds if and only if $M$ belongs to one of two explicitly classified classes:
 \begin{enumerate}
-    \item \textbf{Family 1:} $M = 3^k + 1$ for any $k \ge 1$;
-    \item \textbf{Family 2 Extremizers:} $M = \frac{3^b - 1}{3^a - 1}$ with $b = 2a$ ($a \ge 1$).
+    \item \textbf{Family 1:} $M = 3^k + 1$ for some $k \ge 1$;
+    \item \textbf{Family 2 Extremizers:} $M = 3^{b} - 3^{a} + 1$ with $b = 2a$ ($a \ge 1$).
 \end{enumerate}
-In both cases, the underlying symbolic system is topologically conjugate to the classical Golden Mean Shift $\Sigma_{\mathrm{gold}}$, with word counts $N(n) = F_{n+2}^k$ for all $n \ge 0$.
+In Family~1 the language is the product of $k$ independent copies of the golden mean shift $\Sigma_{\mathrm{gold}}$, with word counts $N(n) = F_{n/k+2}^{\,k}$ for $n \equiv 0 \pmod{k}$; in Family~2 it is the product of $g = \gcd(a,b) = a$ independent sub-chains with word count $N(n) = (2 F_{n/a+1})^a$ for $n \equiv 0 \pmod{a}$. While Family~1 is topologically conjugate to $\Sigma_{\mathrm{gold}}^k$, each Family~2 factor is a $2$-to-$1$ extension of $\Sigma_{\mathrm{gold}}$ admitting two fixed points ($0^\infty$ and $1^\infty$) rather than one, but sharing identical topological entropy $h_{\mathrm{top}} = \log \phi$ and growth dimension $\log_3 \phi$. Hypothesis~(H) is not needed for the boundary rays and is verified computationally for all $M \le 2000$ (\S\ref{sec:table}).
 \end{theorem}
 
 \begin{theorem}[Digitwise Factorization and Dimension Bridge]\label{thm:factorization_bridge}
@@ -88,9 +93,9 @@ Let $P(y) = \sum_{q=0}^d c_q y^q \in \Z[y]$ satisfy Condition~(S):
 \begin{equation}
 c_0 = 1, \quad \text{and every subset-sum of } \{c_q : q \ge 0\} \text{ lies in } [-1, 2],
 \end{equation}
-and fix $k \ge 1$ such that $M = P(3^k) > 0$. Then:
+and fix $k \ge 1$ such that $M = P(3^k) > 0$. For any $x = \sum_{m=1}^\infty 2 z_m 3^{-m} \in \Sigma$ with $z_m \in \{0, 1\}$:
 \begin{equation}
-x \in C(1, M) \iff \forall r \in \{0, \dots, k-1\}, \, \forall m \ge 0, \quad \sum_q c_q x_{(m-q)k + r} \in \{0, 1\},
+x \in C(1, M) \iff \forall j \in \{1, \dots, k\}, \, \forall \ell \ge 0, \quad \sum_{q=0}^d c_q z_{(\ell+q)k + j} \in \{0, 1\},
 \end{equation}
 and the $k$ column shifts are mutually independent. Consequently,
 \begin{equation}
@@ -129,9 +134,7 @@ The $2$-state carry automaton governing base-$3$ quadrupling ($M = 4$) on Cantor
 \end{enumerate}
 \end{theorem}
 
-All main structural theorems stated above have been formalized and verified in the Lean~4 proof assistant without custom axioms or unproved placeholders.
-
----
+The combinatorial statements behind Theorems~\ref{thm:time_reversal} and~\ref{thm:connection_lemma} are formalized and verified in Lean~4 without custom axioms; the dimension bridge and the extremal classification are not, and the formal status of each statement is recorded in \S\ref{sec:formalization}.
 
 \section{Classification of the Digitwise-Safe Class}
 
@@ -181,9 +184,7 @@ We evaluate $M = P(3^k)$ for $k \ge 1$ across all remaining configurations:
 Therefore, every non-trivial positive integer multiplier in the safe class belongs either to Family~1 ($M = 3^a + 1$) or Family~2 ($M = 3^b - 3^a + 1$ with $b > a \ge 1$).
 \end{proof}
 
----
-
-\section{Digitwise Factorization and the Analytical Dimension Bridge}
+\section{Digitwise Factorization and the Analytical Dimension Bridge}\label{sec:bridge}
 
 We now establish Theorem~\ref{thm:factorization_bridge}, providing the mathematical bridge between symbolic language growth in subshifts of finite type and rigorous Hausdorff dimension on the real line.
 
@@ -200,23 +201,52 @@ Thus $\pi$ is an injective bi-Lipschitz homeomorphism onto $\Sigma \subset \R$. 
 \mathrm{dist}(\pi([w]), \pi([w'])) \ge 3^{-n}.
 \end{equation}
 
-\textbf{Step 2 (Block Representation and Carry Elimination):}
-Decompose the expansion into blocks of length $k$:
+\textbf{Step 2 (Block Representation and Modulo 3 Carry Elimination):}
+For any $x = \pi(z) \in \Sigma$, decompose the digit stream $z = (z_m)_{m=1}^\infty \in \{0, 1\}^\N$ into consecutive blocks of length $k$. For each block index $r \ge 0$, define the block integer:
 \begin{equation}
-X_r = \sum_{j=0}^{k-1} z_{rk+j} 3^j \in \left\{0, \dots, \frac{3^k - 1}{2}\right\}.
+B_r = \sum_{j=1}^k z_{rk+j} 3^{k-j} \in \left\{0, 1, \dots, \sum_{j=0}^{k-1} 3^j\right\} = \left\{0, \dots, \frac{3^k - 1}{2}\right\}.
 \end{equation}
-Under $M = P(3^k) = \sum_q c_q 3^{qk}$, the dilate expands as:
+The fractional Cantor expansion in base $3^k$ is then:
 \begin{equation}
-M x = \sum_r X_r 3^{rk} \sum_q c_q 3^{qk} = \sum_r Y_r 3^{rk}, \quad \text{where } Y_r := \sum_q c_q X_{r-q}.
+x = 2 \sum_{r=0}^\infty B_r 3^{-(r+1)k}.
 \end{equation}
-Because Condition~(S) guarantees that all subset sums of $\{c_q\}$ lie in $[-1, 2]$ and $0 \le X_r \le \frac{3^k - 1}{2}$, each block combination satisfies $|Y_r| \le 3^k - 1$. Every real number $\sum_r Y_r 3^{-rk}$ with $|Y_r| \le 3^k - 1$ has a unique normal form with digitwise $\{0, 1\}$ blocks and no carries across block boundaries. By induction from $r = 0$ upward, $M x \in \Sigma$ if and only if $Y_r$ is digitwise in $\{0, 1\}$ for all $r \ge 0$.
+Under the safe polynomial $P(y) = \sum_{q=0}^d c_q y^q$ with $M = P(3^k) = \sum_{q=0}^d c_q 3^{qk}$, the dilate $M x$ expands as:
+\begin{equation}
+M x = 2 \left( \sum_{q=0}^d c_q 3^{qk} \right) \left( \sum_{r=0}^\infty B_r 3^{-(r+1)k} \right) = 2 \sum_{q=0}^d c_q \sum_{r=0}^\infty B_r 3^{-(r-q+1)k}.
+\end{equation}
+Setting the block index $\ell = r - q$, and extending with the natural boundary condition $B_r = 0$ (and $z_m = 0$) for $r < 0$, we collect terms of order $3^{-(\ell+1)k}$:
+\begin{equation}
+M x = 2 \sum_{\ell = -d}^\infty Y_\ell 3^{-(\ell+1)k}, \quad \text{where } Y_\ell := \sum_{q=0}^d c_q B_{\ell+q}.
+\end{equation}
+Expanding each block $B_{\ell+q}$ into its $k$ ternary digits, the block coefficient decomposes digitwise:
+\begin{equation}
+Y_\ell = \sum_{j=1}^k \left( \sum_{q=0}^d c_q z_{(\ell+q)k+j} \right) 3^{k-j} = \sum_{j=1}^k u_{\ell, j} 3^{k-j}, \quad \text{where } u_{\ell, j} := \sum_{q=0}^d c_q z_{(\ell+q)k+j}.
+\end{equation}
+Because $z_m \in \{0, 1\}$, each $u_{\ell, j}$ is a subset-sum of $\{c_0, \dots, c_d\}$. Condition~(S) guarantees that every such subset-sum lies in $\{-1, 0, 1, 2\}$.
+
+Now we resolve the carry-normalization problem. The dilate $M x$ belongs to the middle-thirds Cantor set $\Sigma \subset [0, 1]$ if and only if $M x \in [0, 1]$ and its base-$3$ expansion consists exclusively of digits in $\{0, 2\}$. Equivalently, the half-dilate $M x / 2$ must coincide with the unique canonical expansion $\sum_{m=1}^\infty d_m 3^{-m}$ with $d_m \in \{0, 1\}$ and integer part zero.
+Writing $m = \ell k + j$ with $j \in \{1, \dots, k\}$, the raw digit series is:
+\begin{equation}
+\frac{M x}{2} = \sum_{m \le 0} u_m 3^{-m} + \sum_{m=1}^\infty u_m 3^{-m}, \quad u_m \in \{-1, 0, 1, 2\}.
+\end{equation}
+For $M x \in [0, 1]$, the integer part must vanish ($\sum_{m \le 0} u_m 3^{-m} = 0$), forcing the initial prefix conditions $z_1 = \dots = z_{dk} = 0$. On the fractional digits $m \ge 1$, let $C_m \in \Z$ denote the carry into position $m$ from position $m+1$. The local base-$3$ carry equation is:
+\begin{equation}
+u_m + C_m = d_m + 3 C_{m-1}, \quad \text{with target } d_m \in \{0, 1\}.
+\end{equation}
+Reducing this equation modulo $3$:
+\begin{equation}
+u_m + C_m \equiv d_m \pmod 3.
+\end{equation}
+Because $d_m \in \{0, 1\}$, the right-hand side is strictly restricted to $\{0, 1\} \pmod 3$. Consider an incoming carry $C_m = 0$:
+\begin{enumerate}
+    \item If $u_m \in \{0, 1\}$, then $u_m \equiv d_m \pmod 3$, giving $d_m = u_m$ and outgoing carry $C_{m-1} = 0$.
+    \item If $u_m = 2$ or $u_m = -1$, then $u_m \equiv 2 \pmod 3$. But $d_m + 3 C_{m-1} \equiv d_m \in \{0, 1\} \pmod 3 \ne 2 \pmod 3$, so no integer carry $C_{m-1}$ can produce an admissible Cantor digit $d_m \in \{0, 1\}$.
+\end{enumerate}
+Thus, no non-zero carry can be spawned from $C_m = 0$. Furthermore, an infinite tail of non-zero carries $C_m = 1$ would require $u_m = 2$ for all sufficiently large $m$, which either forces $x = 1 \notin C(1, M)$ (in Family~1) or requires $z_{m+a} = 0$ and $z_{m+a} = 1$ simultaneously (in Family~2), which is impossible.
+Therefore, all carries vanish identically: $C_m = 0$ for all $m$. Hence $M x \in \Sigma$ if and only if $u_m \in \{0, 1\}$ for all $m \ge 1$, with zero carry across all positions and block boundaries.
 
 \textbf{Step 3 (Independent Column SFTs):}
-Since $Y_r = \sum_q c_q X_{r-q}$ and each $X_r$ is expanded into $k$ ternary digits $z_{rk+j} \in \{0, 1\}$ ($j \in \{0, \dots, k-1\}$), the condition that $Y_r$ is digitwise in $\{0, 1\}$ decomposes identically and independently across each column $j$:
-\begin{equation}
-\sum_q c_q z_{(r-q)k + j} \in \{0, 1\} \quad \text{for all } r \ge 0 \text{ and each } j \in \{0, \dots, k-1\}.
-\end{equation}
-There are no carries between distinct residue classes $j \pmod k$. Hence, the symbolic dynamical system on $\{0, 1\}^\N$ defining $C(1, M)$ is the Cartesian product of $k$ identical, mutually independent 1D shifts of finite type (SFTs), each determined by the polynomial constraint $\sum_q c_q z_{r-q} \in \{0, 1\}$.
+Since $u_{\ell k + j} = \sum_{q=0}^d c_q z_{(\ell+q)k + j} \in \{0, 1\}$ involves only digits whose indices have residue $j \pmod k$, the condition completely decouples across the $k$ residue classes $j \in \{1, \dots, k\}$. There is zero interaction between distinct residue classes. Hence, the symbolic system on $\{0, 1\}^\N$ defining $C(1, M)$ is the Cartesian product of $k$ identical, mutually independent 1D subshifts of finite type (SFTs), each governed by the linear recurrence $\sum_{q=0}^d c_q z_{\ell+q} \in \{0, 1\}$.
 
 \textbf{Step 4 (Analytical Dimension Bridge via Frostman Measure):}
 Let $\lambda = \lambda(P)$ be the spectral radius (Perron root) of the single-column SFT adjacency matrix. By Perron-Frobenius theory for primitive SFTs, let $v > 0$ and $u > 0$ be the left and right eigenvectors associated with $\lambda$, normalized so that $\langle v, u \rangle = 1$. The Parry measure $\mu_{\mathrm{col}}$ on the admissible sequences $\{z_r\}_{r=0}^\infty$ defined on cylinders by:
@@ -241,8 +271,6 @@ Conversely, covering $C(1, M)$ with the $N(n)$ cylinders of length $n$ (where $N
 \end{align*}
 Therefore, $\dimH C(1, M) = \log_3 \lambda(P)$ identically.
 \end{proof}
-
----
 
 \section{The Two Extremal Families and the Golden Mean Shift}
 
@@ -274,17 +302,22 @@ Evaluating the constraint across all local triples $(y_{m-2}, y_{m-1}, y_m) \in 
     \item If $(y_{m-2}, y_{m-1}, y_m) = (1, 0, 1)$, then $y_m - y_{m-1} + y_{m-2} = 1 - 0 + 1 = 2 \notin [0, 1]$ (Forbidden).
     \item All other six binary triples satisfy $0 \le y_m - y_{m-1} + y_{m-2} \le 1$.
 \end{itemize}
-Thus the constraint forbids exactly $010$ and $101$. Equivalently, two consecutive state flips $y_{m-1} \ne y_{m-2}$ and $y_m \ne y_{m-1}$ cannot occur simultaneously: the flip set $S(y)$ cannot contain two consecutive integers. Because a binary sequence $y$ is uniquely determined by its initial symbol $y_0 \in \{0, 1\}$ and its flip set $S(y)$, the number of admissible words of length $L$ is exactly:
+Thus the constraint forbids exactly $010$ and $101$. Equivalently, two consecutive state flips $y_{m-1} \ne y_{m-2}$ and $y_m \ne y_{m-1}$ cannot occur simultaneously: the flip set $S(y)$ cannot contain two consecutive integers.
+A binary word $y = (y_0, \dots, y_{L-1})$ of length $L$ is uniquely determined by its initial symbol $y_0 \in \{0, 1\}$ and its flip indicator sequence $s_m = \mathbf{1}_{\{y_m \ne y_{m-1}\}} \in \{0, 1\}$ for $1 \le m \le L-1$. The condition that $S(y)$ contains no consecutive integers means $(s_1, \dots, s_{L-1})$ is a binary string of length $L-1$ containing no adjacent $1$s.
+The number of such flip strings of length $L-1$ is the Fibonacci number $F_{(L-1)+2} = F_{L+1}$. Accounting for the $2$ independent choices of initial symbol $y_0 \in \{0, 1\}$, the exact number of admissible words of length $L$ is:
 \begin{equation}
-N_{\mathrm{chain}}(L) = F_{L+2}.
+N_{\mathrm{chain}}(L) = 2 F_{L+1}.
 \end{equation}
-Hence each sub-chain is topologically conjugate to the golden mean shift $\Sigma_{\mathrm{gold}}$, with Perron root $\lambda = \phi$. Combining the $a$ sub-chains yields total word count $N(n) = (F_{n/a + 2})^a \sim \phi^n$, establishing:
+(For example, at lengths $L=1, 2, 3$, the exact admissible word counts are $2, 4, 6$, whereas $F_{L+2}$ would yield $2, 3, 5$.)
+We emphasize that each sub-chain is \emph{not} topologically conjugate to the golden mean shift $\Sigma_{\mathrm{gold}}$: the sub-chain possesses two distinct fixed points ($0^\infty$ and $1^\infty$), whereas $\Sigma_{\mathrm{gold}}$ has only one ($0^\infty$). Rather, the sub-chain is a double cover ($2$-to-$1$ extension) of $\Sigma_{\mathrm{gold}}$ on the difference symbols, and possesses identical topological entropy:
+\begin{equation}
+h_{\mathrm{top}} = \lim_{L \to \infty} \frac{1}{L} \log N_{\mathrm{chain}}(L) = \lim_{L \to \infty} \frac{1}{L} \log(2 F_{L+1}) = \log \phi.
+\end{equation}
+Consequently, its transition matrix has Perron root $\lambda = \phi$. Combining the $a$ independent sub-chains yields the total word count $N(n) = (2 F_{n/a + 1})^a \sim (2/\sqrt{5})^a \phi^n$, establishing:
 \begin{equation}
 \dimH C(1, 3^{2a} - 3^a + 1) = \log_3 \phi.
 \end{equation}
 \end{proof}
-
----
 
 \section{Time-Reversal Duality and Boundary Regimes}
 
@@ -314,25 +347,23 @@ For all $b \ge 3$, the Perron root of $\Sigma_{(1, b)}$ satisfies $\lambda(1, b)
 \end{lemma}
 
 \begin{proof}
-For $a = 1$, the characteristic polynomial of the minimal transfer matrix is:
+For $a = 1$, the characteristic polynomial of the minimal transfer matrix is the Perron polynomial
 \begin{align*}
-P_b(t) &= t^b - t^{b-1} - t^{b-2} - \dots - t - 1 + (t^{b-2} - 1) \\
-&= (t^2 - t - 1) t^{b-2} + (t^{b-2} - 1).
+P_b(t) &= t^b - t^{b-1} - 1 \\
+&= (t^2 - t - 1)\, t^{b-2} + (t^{b-2} - 1).
 \end{align*}
-Evaluating $P_b(t)$ at the golden ratio $t = \phi$:
+Evaluating $P_b(t)$ at the golden ratio $t = \phi$, and using $\phi^2 - \phi - 1 = 0$:
 \begin{equation}
 P_b(\phi) = (\phi^2 - \phi - 1) \phi^{b-2} + (\phi^{b-2} - 1) = 0 + (\phi^{b-2} - 1) = \phi^{b-2} - 1.
 \end{equation}
-For $b \ge 3$, $b - 2 \ge 1$, so $\phi^{b-2} - 1 \ge \phi - 1 \approx 0.618 > 0$. Since $P_b(1) < 0$ and $P_b(\phi) > 0$, the dominant real root $\lambda(1, b)$ lies strictly in $(1, \phi)$, proving $\lambda(1, b) < \phi$.
+For $b \ge 3$, $b - 2 \ge 1$, so $\phi^{b-2} - 1 \ge \phi - 1 \approx 0.618 > 0$. Also $P_b(1) = -1 < 0$, and $P_b'(t) = t^{b-2}\bigl(bt - (b-1)\bigr) > 0$ for $t \ge 1$, so $P_b$ is strictly increasing on $[1, \infty)$ and has a unique root there. Since $P_b(1) < 0$ and $P_b(\phi) > 0$, that root --- the Perron root $\lambda(1, b)$ --- lies strictly in $(1, \phi)$, proving $\lambda(1, b) < \phi$.
 \end{proof}
 
 By Corollary~\ref{cor:boundary_reduction}, $\lambda(a, a+1) = \lambda(1, a+1) < \phi$ strictly for all $a \ge 2$, disposing of both boundary rays.
 
----
+\section{The Interior Domain and the Spectral Gap}\label{sec:interior}
 
-\section{The Interior Domain and the Spectral Gap}
-
-For coprime pairs in the interior domain $a \ge 2$ and $b - a \ge 2$, we establish strict sub-golden dimension via the branching recurrence and Parry measure slack.
+For coprime pairs in the interior domain $a \ge 2$ and $b - a \ge 2$, strict sub-golden dimension follows from the branching recurrence together with a Parry-measure slack inequality, which we state below as Hypothesis~(H) and which is the one step of the classification we do not prove in general.
 
 \begin{lemma}[Branching Step Recurrence]\label{lem:branching_step}
 Let $A_n$ denote the set of admissible words of length $n$, and $N(n) = |A_n|$. Appending symbol $z_n \in \{0, 1\}$, the new constraint $0 \le z_n - z_{n-a} + z_{n-b} \le 1$ admits both values of $z_n$ if and only if $z_{n-a} = z_{n-b}$ ($z_n$ is free), and exactly one value otherwise ($z_n$ is forced). Hence:
@@ -343,81 +374,105 @@ Consequently, the Fibonacci bound $B(n) \le N(n-1)$ for all $n \ge a$ implies $\
 \end{lemma}
 
 \begin{theorem}[Universal Periodic Obstruction]\label{thm:periodic_obstruction}
-For all coprime $a \ge 2$ and $b - a \ge 2$, the SFT $\Sigma_{(a, b)}$ admits an explicit universal periodic orbit of length $2b$:
+Let $a \ge 2$ and $b - a \ge 2$ be coprime. The SFT $\Sigma_{(a, b)}$ admits an explicit universal periodic orbit of length $2b$:
 \begin{equation}
 w_* = (0^b 1^b)^\infty.
 \end{equation}
-The Parry measure assigns strictly positive probability $\mu([w_*]) = \epsilon(a, b) > 0$ to cylinders of this orbit. In the asymptotic branching recurrence:
+Write $\epsilon(a, b) = \mu_{\mathrm{Parry}}([w_*]) > 0$ for the Parry measure of a cylinder of this orbit. The branching recurrence gives $N(n+1)/N(n) \to \lambda(a,b)$ and $B(n)/N(n) \to \lambda(a,b) - 1$, hence
 \begin{equation}
-\lim_{n \to \infty} \frac{N(n-1) - B(n)}{N(n-1)} = 1 + \lambda - \lambda^2 \ge \mu([w_*]) = \epsilon(a, b) > 0.
+\lim_{n \to \infty} \frac{N(n-1) - B(n)}{N(n-1)} = 1 + \lambda(a,b) - \lambda(a,b)^2 .
 \end{equation}
-Since $g(x) = 1 + x - x^2$ has $g(\phi) = 0$ and $g'(x) = 1 - 2x < 0$ on $[1, \infty)$, this forces:
-\begin{equation}
-\phi - \lambda(a, b) \ge \frac{\epsilon(a, b)}{\sqrt{5}} > 0.
-\end{equation}
-Thus, every non-extremizer in the interior domain satisfies $\lambda(a, b) < \phi$ with a strictly positive spectral gap.
 \end{theorem}
 
----
+\begin{hypothesis}[Parry gap]\label{hyp:parry}
+For every coprime pair $a \ge 2$, $b - a \ge 2$,
+\begin{equation}
+1 + \lambda(a,b) - \lambda(a,b)^2 \;\ge\; \mu_{\mathrm{Parry}}([w_*]) \;=\; \epsilon(a, b) \;>\; 0 .
+\end{equation}
+\end{hypothesis}
 
-\section{Exact Hausdorff Dimension Table (\texorpdfstring{$M \le 300$}{M <= 300})}
+\begin{corollary}[Interior spectral gap, conditional on the Parry gap]
+Under Hypothesis~\ref{hyp:parry}, every non-extremizer in the interior domain satisfies $\lambda(a, b) < \phi$ with an explicit gap. Indeed $g(x) = 1 + x - x^2$ has $g(\phi) = 0$ and $g'(x) = 1 - 2x < 0$ on $[1, \infty)$, so
+\begin{equation}
+\phi - \lambda(a, b) \;\ge\; \frac{\epsilon(a, b)}{\sqrt{5}} \;>\; 0 .
+\end{equation}
+\end{corollary}
 
-Table~\ref{tab:dimension_table} provides the certified exact Hausdorff dimensions for representative integer multipliers up to $M = 300$, computed via symbolic carry-automaton state space minimization.
+\begin{remark}\label{rem:frontierA}
+Hypothesis~\ref{hyp:parry} is the ``Frontier~A'' obligation of the formalization: in \texttt{CantorMultiplier.lean} the classification is stated with \texttt{h\_gap} as an explicit hypothesis, and no axiom is introduced. Empirically, \ref{hyp:parry} holds for every coprime $M \le 2000$ under exact transfer-matrix computation (\S\ref{sec:table}). A uniform proof for all $a, b$ remains open; the difficulty is that $\epsilon(a,b)$ decays with $b$ while $1+\lambda-\lambda^2$ tends to zero as $\lambda \to \phi$, so the inequality is not immediate from primitivity alone.
+\end{remark}
+
+\section{Exact Hausdorff Dimension Table (\texorpdfstring{$M \le 300$}{M <= 300})}\label{sec:table}
+
+Table~\ref{tab:dimension_table} lists exact Hausdorff dimensions for representative multipliers $M \le 300$, computed from the carry graph of \S\ref{sec:interior}. The ``carry states'' column is the number of carries reachable from $0$ in the normalized-digit automaton; the Perron factor is the irreducible factor of the characteristic polynomial carrying $\lambda$.
 
 \begin{table}[htbp]
 \centering
-\caption{Exact Hausdorff dimensions of $C(1, M)$ for representative multipliers $M \le 300$. All minimal polynomial factors are exact algebraic factors.}\label{tab:dimension_table}
+\caption{Exact Hausdorff dimensions of $C(1, M)$ for representative multipliers $M \le 300$. All reported polynomials are exact integer characteristic-polynomial factors; no numerical identification is used. Rows marked $\dagger$ are not digitwise-safe and are included only to record a cospectral coincidence.}\label{tab:dimension_table}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{rccll}
 \toprule
-$M$ & Exact $\dimH C(1, M)$ & States & Minimal Factor & Classification \& Duality \\
+$M$ & Exact $\dimH C(1, M)$ & Carry states & Perron factor & Classification \& Duality \\
 \midrule
-$1$  & $\log_3 2 \approx 0.630930$ & $1$  & $x - 2$               & Pure $3$-power ($3^0$) \\
-$2$  & $0$                         & $1$  & $x$                   & Null multiplier ($C(1, 2) = \{0\}$) \\
+$1$  & $\log_3 2 \approx 0.630930$ & $1$  & $x - 2$               & $3^0$ \\
+$2^{\dagger}$  & $0$                         & $1$  & $x - 1$               & $C(1, 2)$ finite \\
 $3$  & $\log_3 2 \approx 0.630930$ & $2$  & $x - 2$               & Pure $3$-power ($3^1$) \\
 $4$  & $\log_3 \phi \approx 0.438018$ & $2$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=1$) \\
-$7$  & $\log_3 \phi \approx 0.438018$ & $4$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 2, $(1, 2)$) \\
+$7$  & $\log_3 \phi \approx 0.438018$ & $4$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 2, $(1,2)$) \\
 $10$ & $\log_3 \phi \approx 0.438018$ & $4$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=2$) \\
-$13$ & $\log_3 \lambda_3 \approx 0.347934$ & $3$ & $x^3 - x^2 - 1$  & Non-extremizer (Family 2, $(1, 3)$) \\
-$16$ & $\log_3 \psi \approx 0.255959$ & $5$ & $x^3 - x - 1$            & Non-extremizer ($3^5 - 3^4 + 1$) \\
-$19$ & $\log_3 \lambda_3 \approx 0.347934$ & $4$ & $x^3 - x^2 - 1$  & Non-extremizer (Family 2, $(2, 3)$): Dual to $13$ \\
-$28$ & $\log_3 \phi \approx 0.438018$ & $6$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=3$) \\
-$55$ & $\log_3 \lambda_4 \approx 0.293356$ & $6$ & $x^4 - x^3 - 1$  & Non-extremizer (Family 2, $(3, 4)$): Dual to $79$ \\
-$61$ & $\log_3 \lambda_{61} \approx 0.410672$ & $8$ & $x^5 - x^4 - x^2 - 1$ & \textbf{Max Non-Extremizer} (cospectral to $5905$) \\
-$73$ & $\log_3 \phi \approx 0.438018$ & $16$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 2, $(2, 4)$) \\
-$79$ & $\log_3 \lambda_4 \approx 0.293356$ & $8$ & $x^4 - x^3 - 1$  & Non-extremizer (Family 2, $(1, 4)$): Dual to $55$ \\
-$82$ & $\log_3 \phi \approx 0.438018$ & $8$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=4$) \\
-$217$& $\log_3 \lambda_{235} \approx 0.312255$ & $15$ & degree $15$ factor & Non-extremizer (Family 2, $(3, 5)$): Dual to $235$ \\
-$235$& $\log_3 \lambda_{235} \approx 0.312255$ & $11$ & degree $11$ factor & Non-extremizer (Family 2, $(2, 5)$): Dual to $217$ \\
-$244$& $\log_3 \phi \approx 0.438018$ & $10$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 1, $k=5$) \\
+$19$ & $\log_3 \lambda_3 \approx 0.347934$ & $8$ & $x^3 - x^2 - 1$  & Family 2, $(2,3)$; dual of $25$ \\
+$25$ & $\log_3 \lambda_3 \approx 0.347934$ & $6$ & $x^3 - x^2 - 1$  & Family 2, $(1,3)$; cospectral with $19$ \\
+$28$ & $\log_3 \phi \approx 0.438018$ & $8$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=3$) \\
+$55$ & $\log_3 \lambda_4 \approx 0.293356$ & $16$ & $x^4 - x^3 - 1$  & Family 2, $(3,4)$; dual of $79$ \\
+$61^{\dagger}$ & $\log_3 \lambda_{61} \approx 0.410672$ & $14$ & $x^5 - x^4 - x^2 - 1$ & not safe; cospectral with $5905$ \\
+$73$ & $\log_3 \phi \approx 0.438018$ & $16$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 2, $(2,4)$) \\
+$79$ & $\log_3 \lambda_4 \approx 0.293356$ & $8$  & $x^4 - x^3 - 1$  & Family 2, $(1,4)$; dual of $55$ \\
+$82$ & $\log_3 \phi \approx 0.438018$ & $16$  & $x^2 - x - 1$         & \textbf{Extremizer} (Family 1, $k=4$) \\
+$163$& $\log_3 \psi \approx 0.255959$ & $32$ & $x^3 - x - 1$            & Family 2, $(4,5)$ ($3^5 - 3^4 + 1$) \\
+$217$& $\log_3 \lambda_{235} \approx 0.312255$ & $30$ & degree $10$ factor & Family 2, $(3,5)$; dual of $235$ \\
+$235$& $\log_3 \lambda_{235} \approx 0.312255$ & $22$ & degree $10$ factor & Family 2, $(2,5)$; dual of $217$ \\
+$244$& $\log_3 \phi \approx 0.438018$ & $32$ & $x^2 - x - 1$        & \textbf{Extremizer} (Family 1, $k=5$) \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
-\noindent\textbf{Cospectral Phenomenon and Minimal Polynomial Factors:} All characteristic polynomials and minimal polynomial factors in Table~\ref{tab:dimension_table} are exact algebraic factors computed via symbolic determinant expansion of the minimal carry automaton. In all cases, including higher degrees (e.g., $M = 217, 235$), the irreducible factor carrying the Perron root was certified algebraically via SymPy and integer SAT certificates. No PSLQ identifications are used; all reported polynomials are exact algebraic determinants. 
+\noindent\textbf{Exhaustive verification.} The transfer-matrix construction is deterministic and was run for every $2 \le M \le 2000$ with $\gcd(M,3)=1$. The outcome is:
+\begin{enumerate}
+\item no multiplier exceeds $\log_3 \phi$: $\lambda(M) \le \phi$ for all such $M$;
+\item equality $\lambda(M) = \phi$ holds exactly for the nine multipliers
+\[
+M \in \{4,\, 7,\, 10,\, 28,\, 73,\, 82,\, 244,\, 703,\, 730\},
+\]
+i.e.\ exactly the union of $\{3^k+1\}$ and $\{3^{2a} - 3^a + 1\}$ in that range.
+\end{enumerate}
+This confirms Theorem~\ref{thm:universal_bound} and the conclusion of Hypothesis~\ref{hyp:parry} (namely $\lambda < \phi$ on the interior) computationally in the stated range. The script is \texttt{verify\_dimensions.py} under \texttt{scripts/}.
 
-Furthermore, the dual pairs $(13, 19)$, $(55, 79)$, and $(217, 235)$ explicitly illustrate Time-Reversal Duality ($\lambda(a, b) = \lambda(b-a, b)$). The maximal non-extremizer polynomial $x^5 - x^4 - x^2 - 1$ at $M = 61$ ($\lambda_{61} \approx 1.570147$) also governs the higher multiplier $M = 5905$ ($a=5, b=8$), representing a cospectral coincidence across distinct multiplier orders.
-
----
+\noindent\textbf{Cospectral phenomena.} The dual pairs $(25, 19)$, $(55, 79)$, $(73, 73)$ and $(217, 235)$ illustrate Time-Reversal Duality $\lambda(a,b) = \lambda(b-a,b)$. Two coincidences lie outside that theorem: $\lambda(13) = \lambda(25)$ (both $x^3 - x^2 - 1$) and $\lambda(16) = \lambda(163)$ (both $x^3 - x - 1$), with $13$ and $16$ not digitwise-safe. The polynomial $x^5 - x^4 - x^2 - 1$ at $M = 61$ ($\lambda_{61} \approx 1.570147$) also governs $M = 5905$, a cospectral coincidence across distinct multiplier orders that is not covered by any of the theorems above.
 
 \section{Formalization in Lean 4}\label{sec:formalization}
 
-All major algebraic and dynamical theorems in this paper have been formalized in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8})~\cite{Lean4Community}. The complete machine-checked formalization, proofs, and verification scripts are openly hosted at \url{https://github.com/ezzasdf/erdos-problem-engine}:
+The Lean~4 formalization (version 4.12.0, Mathlib commit \texttt{809c3fb3b})~\cite{Lean4Community} is hosted at the companion repository \href{https://github.com/ezzasdf/erdos-problem-engine}{\texttt{ezzasdf/erdos-problem-engine}}. We separate what is kernel-verified from what is not, because the distinction directly governs Theorem~\ref{thm:universal_bound}.
+
+\textbf{Kernel-verified.}
 \begin{itemize}
-    \item File \texttt{CantorMultiplier.lean}: formalizes Condition~(S), proving $\dimH \le \log_3 \phi$ and its attainment on Family~1 and Family~2.
-    \item \texttt{TimeReversal.lean}: Formalizes the similarity identity $P M_{(a,b)} P = M_{(b-a,b)}^T$ and the characteristic polynomial equality.
-    \item \texttt{PeriodicOrbit.lean}: Verifies the primitivity of the recurrent component and the embedding of the universal $2b$-periodic orbit.
-    \item \texttt{RepunitCarryConnection.lean}: Formalizes Theorem~\ref{thm:connection_lemma}, proving the exact polynomial, spectral, and orbit isomorphism between the carry automaton and the SFT.
-    \item \texttt{Lemma41Finite.lean}: Discharges the 957 finite-window certificate instances across the 7 combinatorial regimes.
+    \item \texttt{TimeReversal.lean}: the transition-matrix identity $P M_{(a,b)} P = M_{(b-a,b)}^{T}$ for the concrete matrices, and the resulting characteristic-polynomial equality (Theorem~\ref{thm:time_reversal}).
+    \item \texttt{PeriodicOrbit.lean}: reachability of $0^b \leftrightarrow 1^b$, primitivity of the recurrent component, and the embedding of the universal $2b$-periodic word $w_*$ (Theorem~\ref{thm:periodic_obstruction}).
+    \item \texttt{RepunitCarryConnection.lean}: for $M = 4$, the carry automaton characteristic polynomial $t^2 - t - 1$, its Perron root $\phi$, and the equality of orbit counts with the golden word counts (Theorem~\ref{thm:connection_lemma}).
+    \item \texttt{Lemma41Finite.lean}: the finite-window certificate instances of Lemma~4.1, discharged by \texttt{decide}/\texttt{native\_decide}.
+    \item \texttt{CantorMultiplier.lean}: Condition~(S) as a predicate, the reduction of Family~2 parameters, the criterion $b = 2a$ for extremizers, and the exact $\phi$-computations of §\ref{sec:interior}.
 \end{itemize}
 
-An exhaustive, automated axiom audit across the entire formalization confirms:
+\textbf{Not kernel-verified.}
 \begin{itemize}
-    \item \textbf{182 of 270 declarations} in the core formalization are pure foundational, depending exclusively on the standard Lean foundation: \texttt{[propext}, \texttt{Classical.choice}, \texttt{Quot.sound]};
-    \item \textbf{88 declarations} rely on computational reflexivity (\texttt{native\_decide} / \texttt{Lean.ofReduceBool}), strictly quarantined to the finite-window combinatorial certificates in \texttt{Lemma41Finite.lean} and small-case decimal checks;
-    \item \textbf{Zero declarations} rely on incomplete proofs or axioms (\texttt{sorryAx} / \texttt{sorry}).
+    \item \emph{Model constants vs transfer spectra:} In \texttt{CantorMultiplier.lean}, \texttt{lambda\_SFT} is assigned as a closed-form model constant ($\phi$ for $(a,b)=(1,2)$ and $(1+\phi)/2$ elsewhere) rather than calculated dynamically as the Perron root of an instantiated transfer matrix or derived from admissible word counts. Consequently, \texttt{safe\_class\_dimension\_upper\_bound} is an algebraic verification on that model assignment rather than a derived spectral theorem.
+    \item \emph{Conditional classification in the interior:} The classification theorem \path{safe_class_extremizer_classification} takes an explicit hypothesis \texttt{h\_gap} asserting strict spectral gap for all non-extremizers (corresponding to Hypothesis~\ref{hyp:parry}). Discharging this hypothesis unconditionally in Lean requires formalizing an SFT ergodic/Birkhoff theorem for cylinder count convergence.
+    \item \emph{External theorems:} In the imported module \path{LagariasHausdorff.lean}, definitions and conjectures from Lagarias~\cite{Lagarias2009} are formalized, but dimension theorems are explicitly recorded as definitions rather than kernel-verified proofs.
+    \item \emph{Frostman dimension bridge:} Theorem~\ref{thm:factorization_bridge} connecting symbolic word counts to Hausdorff measures on the real line is proved analytically in §\ref{sec:bridge}, but its measure-theoretic machinery is not formalized in Mathlib.
 \end{itemize}
+Accordingly, no claim is made that the universal bound or extremizer classification is unconditionally kernel-verified in the interior; their status rests on the analytical proofs and the exhaustive verification of \S\ref{sec:table}.
+
+\textbf{Audit.} The build of the library is green and the built target contains no \texttt{sorry}. Two modules that did contain one \texttt{sorry} each, together with three files whose imports no longer resolve, have been moved to \texttt{ErdosTernary/attic/} with a README recording the restoration conditions; they are outside the Lake target. For the declarations audited here, \texttt{\#print axioms} reports at most \texttt{[propext, Classical.choice, Quot.sound]}; declarations proved by \texttt{native\_decide} additionally depend on \texttt{Lean.ofReduceBool}, extending the trusted base to the Lean compiler and runtime, as is standard for finite certificates. A snapshot audit of 270 declarations in the core modules (2026-11-20) classified 182 as foundational and 88 as \texttt{native\_decide}-based; that snapshot predates the current module set and excludes the bridge modules.
 
 \bibliographystyle{amsplain}
 \bibliography{references}
