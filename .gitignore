@@ -41,3 +41,6 @@ verify_middle/results_m1.csv
 paper/*.zip
 paper/arxiv_upload_cantor/*
 !paper/arxiv_upload_cantor/cantor-multiplier-submission-v2.zip
+
+# External cloned repositories
+contrib/

@@ -40,7 +40,7 @@ All performance metrics are measured under reproducible workloads on standard mo
 - **Workload 2 (Rust Multi-Threaded State Exploration):**
   - *Task:* Exhaustive carry-chain exploration across window size $k=17$ in `verify_middle` (evaluating $2.8 \times 10^7$ candidate state transitions).
   - *Measurement:* High-resolution monotonic timer across 16 threads (`cargo run --release`).
-  - *Result:* **0.32 seconds** execution time ($\approx 8.7 \times 10^7$ state evaluations/second).
+  - *Result:* **0.32 seconds** execution time ($8.75 \times 10^7$ transitions/second $\approx 87.5$ million transitions/second).
 - **Workload 3 (Lean 4 Kernel Check):**
   - *Task:* Full compilation of `BridgeUniform.lean` and dependent modules via `lake build`.
   - *Result:* **2,331 / 2,331 targets built with 0 errors**.
@@ -63,4 +63,4 @@ All performance metrics are measured under reproducible workloads on standard mo
 
 - **Operating Systems:** Linux (Ubuntu 22.04+, Debian 12+, Arch), macOS (Sonoma+, Apple Silicon or Intel).
 - **Software Dependencies:** Python $\ge 3.10$ (`numpy==2.5.3`, `sympy==1.14.0`), Lean 4 (`v4.12.0`), Rust (`stable`).
-- **Independent Verification:** Any recipient can independently run `python3 scripts/test_reproducibility.py` to confirm that all certificates validate in < 0.2 seconds without external network access.
+- **Independent Verification:** Any recipient can independently run `python3 scripts/test_reproducibility.py` or the standalone auditor `python3 scripts/check_certificate.py` to confirm that all certificates validate in < 0.2 seconds without external network access.

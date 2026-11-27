@@ -52,6 +52,11 @@ python3 scripts/cantor_multiplier/verify_dimensions.py
 python3 scripts/test_reproducibility.py
 ```
 
+### Test D: Standalone Independent Certificate Auditor (Zero-Trust Check)
+```bash
+python3 scripts/check_certificate.py
+```
+
 ---
 
 ## 4. Expected Results & Output Report
@@ -73,26 +78,30 @@ Exact Algebraic Scan Summary (2 <= M <= 10, gcd(M,3) = 1):
 ```text
 log_3(phi) = 0.438017879
 
-    M  states       lambda      dim_H  status                   perron factor        certificate
--------------------------------------------------------------------------------------------------------------------
-    1       1  2.000000000   0.630930  EXCEEDS_PHI              x - 2                Sturm sequence: 1 real root(s) > phi
-    2       1  1.000000000   0.000000  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
-    3       2  2.000000000   0.630930  EXCEEDS_PHI              x - 2                Sturm sequence: 1 real root(s) > phi
-    4       2  1.618033989   0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
-    7       4  1.618033989   0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
-   10       2  1.618033989   0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
-   19       6  1.465571232   0.347934  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
-   25       8  1.465571232   0.347934  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
-   28       2  1.618033989   0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
-   55       8  1.380277569   0.293356  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
-   61      14  1.570147312   0.410672  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
-   73      16  1.618033989   0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
-   79      16  1.380277569   0.293356  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
-   82       2  1.618033989   0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
-  163      10  1.324717957   0.255959  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
-  217      22  1.409235235   0.312255  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
-  235      30  1.409235235   0.312255  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
-  244       2  1.618033989   0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
+    M  states       lambda   inferred_dim  status                   perron factor        certificate
+-----------------------------------------------------------------------------------------------------------------------
+    1       1  2.000000000       0.630930  EXCEEDS_PHI              x - 2                Sturm sequence: 1 real root(s) > phi
+    2       1  1.000000000       0.000000  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
+    3       2  2.000000000       0.630930  EXCEEDS_PHI              x - 2                Sturm sequence: 1 real root(s) > phi
+    4       2  1.618033989       0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
+    7       4  1.618033989       0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
+   10       2  1.618033989       0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
+   19       6  1.465571232       0.347934  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
+   25       8  1.465571232       0.347934  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
+   28       2  1.618033989       0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
+   55       8  1.380277569       0.293356  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
+   61      14  1.570147312       0.410672  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
+   73      16  1.618033989       0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
+   79      16  1.380277569       0.293356  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
+   82       2  1.618033989       0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
+  163      10  1.324717957       0.255959  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
+  217      22  1.409235235       0.312255  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
+  235      30  1.409235235       0.312255  EXACT_STRICTLY_LESS_PHI  -                    Collatz-Wielandt integer vector 5*A*v <= 8*v (rho <= 1.60 < phi)
+  244       2  1.618033989       0.438018  EXACT_EQUAL_PHI          x**2 - x - 1         Exact match (x^2 - x - 1) | P(x) with 0 roots > phi; lambda = phi
+
+Note: 'inferred_dim' is log_3(lambda_0), the symbolic growth rate of the zero-reachable forward SFT graph.
+      It equals the true Hausdorff dimension dim_H on R when the reachability correspondence and
+      analytical Frostman bridge hold (proven for extremizers and boundary rays; conditional on Hypothesis (H) in interior).
 ```
 
 ---

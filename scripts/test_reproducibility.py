@@ -58,10 +58,17 @@ def run_test():
     assert res_2['status'] == "EXACT_STRICTLY_LESS_PHI", "M=2 must be strictly less than phi"
     print("  -> TEST 3 PASSED: Boundary cases (M=2, M=4) certified correctly.")
 
+    # Test 4: Independent External Auditor
+    print("\n[Test 4] Running Independent Mathematical Auditor (Zero-Trust Check)...")
+    from scripts.check_certificate import run_standalone_audit
+    audit_res = run_standalone_audit()
+    assert audit_res == 0, "Independent auditor failed"
+    print("  -> TEST 4 PASSED: Independent auditor verified raw mathematical witnesses.")
+
     elapsed = time.time() - start_time
     print("\n" + "=" * 70)
     print(f"ALL TESTS PASSED in {elapsed:.3f} seconds.")
-    print("Guarantees: Zero floating-point error in verification acceptance.")
+    print("Assurance Level: Reproducibility + Independent Mathematical Certificate Audit.")
     print("Trust Boundary: Certifies zero-reachable transition matrix spectral radii.")
     print("=" * 70)
     return 0

@@ -327,16 +327,19 @@ def analyse(M, mode="exact"):
 
 
 def table(rows):
-    print(f"{'M':>5} {'states':>7} {'lambda':>12} {'dim_H':>10}  {'status':<24} {'perron factor':<20} {'certificate'}")
-    print("-" * 115)
+    print(f"{'M':>5} {'states':>7} {'lambda':>12} {'inferred_dim':>14}  {'status':<24} {'perron factor':<20} {'certificate'}")
+    print("-" * 119)
     for M in rows:
         r = analyse(M, mode="exact")
         fwd_str = f"fwd {r['fwd_lag']}" if r['fwd_lag'] else "carry graph"
         pf_str = str(r['perron_factor']) if r['perron_factor'] is not None else "-"
         print(
-            f"{M:>5} {r['states']:>7} {r['lambda']:>12.9f} {r['dim']:>10.6f}  "
+            f"{M:>5} {r['states']:>7} {r['lambda']:>12.9f} {r['dim']:>14.6f}  "
             f"{r['status']:<24} {pf_str:<20} {r['certificate']}"
         )
+    print("\nNote: 'inferred_dim' is log_3(lambda_0), the symbolic growth rate of the zero-reachable forward SFT graph.")
+    print("      It equals the true Hausdorff dimension dim_H on R when the reachability correspondence and")
+    print("      analytical Frostman bridge hold (proven for extremizers and boundary rays; conditional on (H) in interior).")
 
 
 def scan(limit, mode="exact"):
