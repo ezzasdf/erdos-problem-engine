@@ -28,13 +28,18 @@ To eliminate ambiguity, EMVE enforces explicit epistemic boundaries across three
 
 ---
 
-### 4. Measured Performance Benchmarks (AMD Ryzen 9 5950X, Linux 6.8)
-All benchmarks were measured on a reference AMD Ryzen 9 5950X (16C/32T, 3.4 GHz base / 4.9 GHz boost, 64 GB DDR4 RAM, Ubuntu Linux kernel 6.8):
-- **Standalone Auditor (`scripts/check_certificate.py`):** Evaluates $M=19$ ($6 \times 6$ matrix) in **~0.0002 seconds** (mean over 100 runs, stock Python 3.12 standard library, zero external dependencies, SHA-256 payload integrity check).
-- **23-Modulus Verified Catalog:** All 23 multipliers ($2 \le M \le 35, \gcd(M, 3) = 1$) independently audited with 100% pass rate (19 Collatz–Wielandt bounds + 4 Sturm extremizers).
-- **Standalone Lean 4 Module:** Compact Lean 4 file (`CertCheck.lean`, ~130 lines) verified in Lean 4 core (`Init`) without Mathlib, including **six negative regression theorems covering five failure categories** (ragged rows, dimension mismatches, non-positive witness entries, zero multipliers $c$ and $d$, and false inequalities).
-- **Rust Exploration Engine (`verify_middle`):** Single-run timing of **0.32 seconds** across 16 threads (`cargo run --release`, evaluating $2.8 \times 10^7$ candidate transitions across window $k=17$, yielding $\approx 87.5$ million transitions/sec).
-- **Python Sequential Scan (`verify_dimensions.py`):** Single-run timing of **29.1 seconds** sequentially generating graphs and certifying all 1,333 moduli $2 \le M \le 2000$ (`python3 scripts/cantor_multiplier/verify_dimensions.py --scan 2000`, Python 3.12, SymPy 1.14, yielding $\approx 45.8$ certified moduli/sec).
+### 4. Measured Performance Benchmarks & Copy-Pastable Commands
+Benchmarks evaluated on reference hardware (AMD Ryzen 9 5950X, 16C/32T, 64 GB RAM, Linux 6.8). See [`benchmarks/BENCHMARK_EVIDENCE.md`](benchmarks/BENCHMARK_EVIDENCE.md) for raw environment logs:
+- **Standalone Auditor:** `python3 scripts/check_certificate.py eval_package/M19_collatz_wielandt.json`  
+  *Result:* **~0.0002s** mean over 100 runs (Python 3.12 stdlib, zero external dependencies, SHA-256 payload check).
+- **23-Modulus Verified Catalog:** `python3 scripts/check_certificate.py certificates/catalog/M*.json`  
+  *Result:* All 23 moduli ($2 \le M \le 35, \gcd(M, 3) = 1$) audited with 100% pass rate (19 Collatz–Wielandt + 4 Sturm).
+- **Standalone Lean 4 Module:** `lean lean/CertCheck.lean`  
+  *Result:* Compact module (~130 lines) verified in core Lean 4 without Mathlib; includes **six negative regression theorems covering five failure categories** (ragged rows, dimension mismatches, non-positive witness entries, zero multipliers $c$ and $d$, and false inequalities).
+- **Rust Exploration Engine:** `cd verify_middle && cargo run --release -- --verify 100000`  
+  *Result:* Single-run evaluation of $2.8 \times 10^7$ candidate transitions in **0.32s** across 16 threads ($\approx 87.5$M transitions/sec).
+- **Python Sequential Scan:** `python3 scripts/cantor_multiplier/verify_dimensions.py --scan 2000`  
+  *Result:* Single-run certification of 1,333 moduli ($2 \le M \le 2000$) in **29.1s** ($\approx 45.8$ certified moduli/sec).
 
 ---
 

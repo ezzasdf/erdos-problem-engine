@@ -1,0 +1,41 @@
+name: EMVE Verification & Reproducibility Suite
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-audit:
+    name: Audit & Reproducibility Matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy sympy
+
+      - name: Run Standalone M=19 Auditor (Zero-Trust Stdlib Check)
+        run: |
+          python scripts/check_certificate.py eval_package/M19_collatz_wielandt.json
+
+      - name: Run Clean-Room Evaluation Suite (eval_package.zip Unpack & 23 Certs)
+        run: |
+          python scripts/test_clean_environment.py
+
+      - name: Run Full Reproducibility Suite (6 Test Stages)
+        run: |
+          python scripts/test_reproducibility.py
