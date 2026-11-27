@@ -85,9 +85,10 @@
     ]
   },
   "metadata": {
-    "generator": "EMVE verify_dimensions.py v0.9.0",
+    "generator": "EMVE verify_dimensions.py v0.9.1",
     "zenodo_doi": "10.5281/zenodo.24595631",
-    "created_at_utc": "2026-11-27T18:23:07Z"
+    "created_at_utc": "2026-11-27T18:30:48Z",
+    "checksum_type": "sha256_canonical_payload_integrity"
   },
-  "payload_sha256": "49fdbcaac0f47ba27a9653147d1d5df64d4efff5f9f59d69d44dcc454892bfbc"
+  "payload_sha256": "98d2d4949f5d3264f0c290e8730a77d8f07a1f1c27efaf585d5f9521306ab6c0"
 }

@@ -24,7 +24,7 @@ Standard numerical packages rely on floating-point linear algebra, which is susc
 | **C1: Interactive Formal Kernel** | **Lean 4 (Mathlib 4.12.0)** | Foundational, machine-checked proofs with zero `sorry`. Kernel-verified transfer-matrix dualities ($P M P = M^T$), orbit reachability, Parry measure cylinder weight positivity on the primitive component $\mathcal{C}_*$, and boundary-case bounds. |
 | **C2: Exact Algebraic Spectral Engine** | **Python 3 / SymPy** | Dual certification of zero-reachable transition spectra: (1) Arbitrary-precision integer Collatz-Wielandt certificates ($5 A v \le 8 v \in \mathbb{Z}$); (2) Exact Sturm sequences in $\mathbb{Q}(\sqrt{5})$ counting real roots strictly greater than $\phi$ for candidate extremizers. |
 | **C3: High-Throughput Exploration Engines** | **Rust (Edition 2021)** | Parallelized binary automata and carry propagation scanners (`verify_erdos_rs`, `verify_middle`) for large-scale combinatorial state space exploration. |
-| **C4: Portable Exact Certificates** | **JSON (`emve-cert-v1`)** | Standalone, machine-auditable verification certificates with cryptographic SHA-256 digests. Documents exact matrix entries, integer witness vectors, and inequalities independently auditable via `scripts/check_certificate.py` in milliseconds without running search heuristics. |
+| **C4: Portable Exact Certificates** | **JSON (`emve-cert-v1`)** | Standalone, machine-auditable verification certificates with mandatory SHA-256 integrity checksums and strict integer typing (rejecting booleans). Documents exact matrix entries and integer witness vectors independently auditable via `scripts/check_certificate.py` in milliseconds without running search heuristics. |
 
 ---
 

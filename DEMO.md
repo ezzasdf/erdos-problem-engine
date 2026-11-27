@@ -116,27 +116,28 @@ EMVE Independent Certificate Auditor: Auditing Portable Certificates
 Checker: EMVE Independent Certificate Auditor v0.9.0
 ================================================================================
 
-Target File    : certificates/M19_collatz_wielandt.json
-Problem ID     : erdos-cantor-multiplier:M=19:family=2:lag=(1,3)
-Format Version : emve-cert-v1
-Cert Type      : collatz_wielandt
-SHA-256 Digest : 49fdbcaac0f47ba27a9653147d1d5df64d4efff5f9f59d69d44dcc454892bfbc
-Audit Status   : [PASS]
-Proof Details  : Collatz-Wielandt verified: 5*(A@v) <= 8*v holds across all 6 rows. Proves rho(A) <= 8/5 = 1.60 < phi strictly.
-Execution Time : 0.0001s
+Target File        : certificates/M19_collatz_wielandt.json
+Problem ID         : erdos-cantor-multiplier:M=19:family=2:lag=(1,3)
+Format Version     : emve-cert-v1
+Cert Type          : collatz_wielandt
+Integrity Checksum : 98d2d4949f5d3264f0c290e8730a77d8f07a1f1c27efaf585d5f9521306ab6c0
+Audit Status       : [PASS]
+Proof Details      : Collatz-Wielandt verified: 5*(A@v) <= 8*v holds across all 6 rows. Proves rho(A) <= 8/5 = 1.60 < phi strictly.
+Execution Time     : 0.0002s
 
-Target File    : certificates/M7_sturm_extremizer.json
-Problem ID     : erdos-cantor-multiplier:M=7:family=2:lag=(1,2)
-Format Version : emve-cert-v1
-Cert Type      : sturm_root_count
-SHA-256 Digest : 970de11745cd4f47fe42113f8072e918a72076c1fcc30cad2f6ae080cf9d569e
-Audit Status   : [PASS]
-Proof Details  : Sturm sequence verified: (x^2 - x - 1) | P(x) with 0 real roots > phi. Proves rho(A) = phi exactly.
-Execution Time : 0.0689s
+Target File        : certificates/M7_sturm_extremizer.json
+Problem ID         : erdos-cantor-multiplier:M=7:family=2:lag=(1,2)
+Format Version     : emve-cert-v1
+Cert Type          : sturm_root_count
+Integrity Checksum : 2f3827d1eb65615f2b72f4d6078c44f1b6452f13c2626c6367c7d0227c3c5646
+Audit Status       : [PASS]
+Proof Details      : Sturm sequence verified: (x^2 - x - 1) | P(x) with 0 real roots > phi. Proves rho(A) = phi exactly.
+Execution Time     : 0.0050s
 
 ================================================================================
 AUDIT SUMMARY: ALL 2 CERTIFICATES INDEPENDENTLY AUDITED AND PASSED.
-Guarantees: Valid SHA-256 payload digest; exact mathematical inequality satisfied in Z or Q(sqrt5).
+Guarantees: Strict integer typing; verified SHA-256 integrity checksum; exact spectral bound.
+Notice: Checked matrix properties. Run with --verify-derivation to re-derive matrix from M.
 ================================================================================
 ```
 
@@ -147,7 +148,10 @@ Guarantees: Valid SHA-256 payload digest; exact mathematical inequality satisfie
 | Property | Status | Verification Guarantee |
 | :--- | :---: | :--- |
 | **Exact Spectral Radius $\lambda_0(M) = \phi$** | **VERIFIED** | Proved for $M \in \{4, 7, 10, 28, 73, 82, 244\}$ via exact polynomial factorisation $(x^2 - x - 1) \mid P(x)$ and Sturm sign evaluations in $\mathbb{Q}(\sqrt{5})$. |
-| **Strict Upper Bound $\lambda_0(M) \le 1.60 < \phi$** | **VERIFIED** | Proved for tested non-extremizers via pure integer Collatz-Wielandt vectors $5 A v \le 8 v \in \mathbb{Z}$. |
+| **Strict Upper Bound $\lambda_0(M) \le 1.60 < \phi$** | **VERIFIED** | Proved for tested non-extremizers via pure integer Collatz-Wielandt vectors $5 A v \le 8 v \in \mathbb{Z}$ (rejecting booleans). |
+| **Certificate Payload Integrity** | **VERIFIED** | Mandatory 64-character SHA-256 integrity checksum prevents corruption or bit flips (does not prove author identity; provenance tracked via Zenodo / signed releases). |
+| **Matrix-to-Problem Derivation** | **DECOUPLED / OPTIONAL** | Default auditor checks the explicit matrix in JSON. End-to-end derivation from multiplier $M$ can be verified via `python3 scripts/check_certificate.py --verify-derivation`. |
+| **External Algebraic Dependencies** | **CLARIFIED** | Collatz-Wielandt has 0 external deps. Sturm root-counting relies on SymPy for charpoly/chain algebra, with exact root signs in $\mathbb{Q}(\sqrt{5})$. Both are independent of EMVE search heuristics. |
 | **Zero-Reachable State Space** | **VERIFIED** | Constructed by exact breadth-first graph traversal from the canonical zero state $0^b$. |
 | **Infinite Universal Bound ($M \to \infty$)** | **CONDITIONAL** | Analytical proof for the interior domain relies on Hypothesis~(H) (Parry cylinder weight slack inequality). |
 | **Full $2^b$ SFT Graph Decomposition** | **UNVERIFIED** | The script analyzes the zero-reachable forward component $\mathcal{G}_0$, not the full $2^b$ state space. |

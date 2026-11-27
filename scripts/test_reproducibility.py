@@ -71,10 +71,51 @@ def run_test():
     for cfile in ["M19_collatz_wielandt.json", "M7_sturm_extremizer.json", "M4_sturm_extremizer.json"]:
         cpath = cert_dir / cfile
         assert cpath.exists(), f"Certificate file {cfile} not found"
-        ok, msg, rep = verify_certificate_file(cpath)
+        # Test both decoupled and end-to-end derivation check
+        ok, msg, rep = verify_certificate_file(cpath, check_derivation=True)
         assert ok, f"Portable certificate {cfile} failed audit: {msg}"
-        print(f"  - {cfile:<28}: [{rep['status']}] (SHA-256 verified, {rep['elapsed_seconds']:.4f}s)")
+        print(f"  - {cfile:<28}: [{rep['status']}] (SHA-256 & derivation verified, {rep['elapsed_seconds']:.4f}s)")
     print("  -> TEST 5 PASSED: Portable JSON certificates independently validated.")
+
+    # Test 6: Security & Hardening Integrity Validation
+    print("\n[Test 6] Running Auditor Security & Hardening Tests...")
+    from scripts.check_certificate import verify_portable_certificate_dict, compute_payload_sha256
+    dummy_cert = {
+        "format_version": "emve-cert-v1",
+        "certificate_type": "collatz_wielandt",
+        "problem_id": "hardening-test",
+        "witness": {"matrix_dimensions": [1, 1], "matrix": [[1]], "witness_vector": [1]}
+    }
+    dummy_cert["payload_sha256"] = compute_payload_sha256(dummy_cert)
+
+    # 6a. Missing hash must fail
+    bad_no_hash = dict(dummy_cert)
+    del bad_no_hash["payload_sha256"]
+    ok_nh, _ = verify_portable_certificate_dict(bad_no_hash)
+    assert not ok_nh, "Auditor accepted certificate with missing payload_sha256"
+
+    # 6b. Boolean in vector must fail
+    bad_bool_v = {
+        "format_version": "emve-cert-v1",
+        "certificate_type": "collatz_wielandt",
+        "problem_id": "hardening-test",
+        "witness": {"matrix_dimensions": [1, 1], "matrix": [[1]], "witness_vector": [True]}
+    }
+    bad_bool_v["payload_sha256"] = compute_payload_sha256(bad_bool_v)
+    ok_bv, _ = verify_portable_certificate_dict(bad_bool_v)
+    assert not ok_bv, "Auditor accepted boolean True in witness_vector"
+
+    # 6c. Boolean in matrix must fail
+    bad_bool_m = {
+        "format_version": "emve-cert-v1",
+        "certificate_type": "collatz_wielandt",
+        "problem_id": "hardening-test",
+        "witness": {"matrix_dimensions": [1, 1], "matrix": [[True]], "witness_vector": [1]}
+    }
+    bad_bool_m["payload_sha256"] = compute_payload_sha256(bad_bool_m)
+    ok_bm, _ = verify_portable_certificate_dict(bad_bool_m)
+    assert not ok_bm, "Auditor accepted boolean True in matrix"
+    print("  -> TEST 6 PASSED: SHA-256 enforcement and boolean type rejection verified.")
 
     elapsed = time.time() - start_time
     print("\n" + "=" * 70)

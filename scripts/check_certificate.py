@@ -8,11 +8,11 @@ them from first principles:
 
 1. Collatz-Wielandt Certificate Validator:
    Given a nonnegative integer matrix A and a positive integer vector v:
-     Asserts: v[i] > 0 for all i
+     Asserts: v[i] > 0 for all i (strictly integer, rejecting booleans)
      Asserts: 5 * sum(A[i][j] * v[j]) <= 8 * v[i] for all i
    Mathematical Guarantee:
      By Collatz-Wielandt, rho(A) <= max_i ((A @ v)_i / v_i) <= 8/5 = 1.60 < phi.
-     Verified using pure Python arbitrary-precision integers (no floating point).
+     Verified using pure Python arbitrary-precision integers (no floating point, zero external deps).
 
 2. Sturm Root-Count Certificate Validator in Q(sqrt(5)):
    Given a matrix A and target root phi = (1 + sqrt(5))/2:
@@ -25,13 +25,17 @@ them from first principles:
    Mathematical Guarantee:
      Proves rho(A) = phi exactly, without numerical approximation.
 
-3. Portable Certificate Format (emve-cert-v1):
-   - Schema versioning (format_version: emve-cert-v1).
-   - Problem identifier (problem_id).
-   - Unambiguous matrix and witness vector entries.
-   - Exact mathematical inequality / claim checked.
-   - Cryptographic payload digest (SHA-256).
-   - Independent verification result and receipt.
+3. Trust Boundaries & Verification Limits:
+   - Integrity Checksum: The SHA-256 payload digest detects accidental bit flips,
+     transmission errors, or file corruption. It does NOT prove author authenticity
+     or provide non-repudiation (anyone can rehash a modified JSON). Authenticity
+     must be established via signed Git tags or the published Zenodo record.
+   - Matrix-to-Problem Derivation: Standalone mode proves mathematical bounds on the
+     matrix inside the certificate; it does NOT reconstruct the carry automaton from M
+     unless run with the optional `--verify-derivation` flag.
+   - External Dependencies: Collatz-Wielandt has 0 external dependencies. Sturm root-counting
+     uses SymPy for characteristic polynomial and Sturm chain generation, evaluating all
+     signs in exact Q(sqrt(5)) arithmetic. It is independent of EMVE search heuristics.
 """
 
 import sys
@@ -44,9 +48,14 @@ from pathlib import Path
 from fractions import Fraction
 import sympy as sp
 
-CHECKER_VERSION = "EMVE Independent Certificate Auditor v0.9.0"
+CHECKER_VERSION = "EMVE Independent Certificate Auditor v0.9.1"
 SUPPORTED_FORMAT_VERSIONS = {"emve-cert-v1"}
 X = sp.Symbol("x")
+
+
+def is_strict_int(val):
+    """Check if value is an integer and strictly not a boolean."""
+    return isinstance(val, int) and not isinstance(val, bool)
 
 
 class QSqrt5:
@@ -106,7 +115,7 @@ def count_sign_changes(signs):
 
 
 def compute_payload_sha256(cert_dict):
-    """Compute deterministic SHA-256 hash of certificate payload."""
+    """Compute deterministic SHA-256 integrity checksum of certificate payload."""
     payload = {k: v for k, v in cert_dict.items() if k not in ("payload_sha256", "audit_receipt")}
     canonical_json = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canonical_json.encode("utf-8")).hexdigest()
@@ -122,18 +131,18 @@ def verify_collatz_wielandt_witness(A_matrix, v_vector):
     if len(v_vector) != n:
         return False, f"Dimension mismatch: matrix {n}x{n} vs vector length {len(v_vector)}"
     
-    # 1. Vector strictly positive
+    # 1. Vector strictly positive integers (rejecting booleans)
     for i, vi in enumerate(v_vector):
-        if not isinstance(vi, int) or vi <= 0:
-            return False, f"Witness vector v[{i}] = {vi} is not a strictly positive integer"
+        if not is_strict_int(vi) or vi <= 0:
+            return False, f"Witness vector v[{i}] = {vi!r} is not a strictly positive integer"
 
-    # 2. Matrix entries nonnegative integers
+    # 2. Matrix entries nonnegative integers (rejecting booleans)
     for i in range(n):
         if len(A_matrix[i]) != n:
             return False, f"Matrix row {i} length {len(A_matrix[i])} != {n}"
         for j in range(n):
-            if not isinstance(A_matrix[i][j], int) or A_matrix[i][j] < 0:
-                return False, f"Matrix entry A[{i}][{j}] = {A_matrix[i][j]} is not a nonnegative integer"
+            if not is_strict_int(A_matrix[i][j]) or A_matrix[i][j] < 0:
+                return False, f"Matrix entry A[{i}][{j}] = {A_matrix[i][j]!r} is not a nonnegative integer"
 
     # 3. Check 5 * A @ v <= 8 * v in pure arbitrary-precision integers
     for i in range(n):
@@ -156,8 +165,8 @@ def verify_sturm_extremizer_witness(A_matrix):
         if len(A_matrix[i]) != n:
             return False, f"Matrix row {i} length {len(A_matrix[i])} != {n}"
         for j in range(n):
-            if not isinstance(A_matrix[i][j], int) or A_matrix[i][j] < 0:
-                return False, f"Matrix entry A[{i}][{j}] = {A_matrix[i][j]} is not a nonnegative integer"
+            if not is_strict_int(A_matrix[i][j]) or A_matrix[i][j] < 0:
+                return False, f"Matrix entry A[{i}][{j}] = {A_matrix[i][j]!r} is not a nonnegative integer"
 
     M_sp = sp.Matrix(A_matrix)
     cp = M_sp.charpoly(X)
@@ -193,18 +202,45 @@ def verify_sturm_extremizer_witness(A_matrix):
     return True, f"Sturm sequence verified: (x^2 - x - 1) | P(x) with 0 real roots > phi. Proves rho(A) = phi exactly."
 
 
-def verify_portable_certificate_dict(cert_data):
+def verify_matrix_derivation(cert_data):
+    """Verify that the matrix inside the certificate matches the canonical automaton for M."""
+    try:
+        root_dir = Path(__file__).resolve().parent.parent
+        sys.path.insert(0, str(root_dir))
+        from scripts.cantor_multiplier.verify_dimensions import get_graph_for_M
+        import numpy as np
+
+        m_ctx = cert_data.get("mathematical_context", {})
+        M = m_ctx.get("multiplier_M")
+        if M is None:
+            return False, "Cannot verify derivation: missing 'multiplier_M' in mathematical_context"
+
+        states, A_derived, fam, params, fwd_lag = get_graph_for_M(M)
+        A_cert = np.array(cert_data["witness"]["matrix"], dtype=int)
+
+        if not np.array_equal(A_derived, A_cert):
+            return False, f"Matrix derivation mismatch: derived {A_derived.shape} matrix != certificate matrix"
+
+        return True, f"Matrix derivation verified: canonical zero-reachable graph for M={M} matches certificate matrix exactly."
+    except Exception as e:
+        return False, f"Matrix derivation verification error: {e}"
+
+
+def verify_portable_certificate_dict(cert_data, check_derivation=False):
     """Verify a portable certificate dictionary against the emve-cert-v1 specification."""
     # 1. Format version
     fmt = cert_data.get("format_version")
     if fmt not in SUPPORTED_FORMAT_VERSIONS:
         return False, f"Unsupported certificate format version: '{fmt}' (supported: {SUPPORTED_FORMAT_VERSIONS})"
 
-    # 2. Cryptographic payload digest check
+    # 2. Strict SHA-256 integrity checksum check (cannot be bypassed)
     claimed_sha = cert_data.get("payload_sha256")
+    if not isinstance(claimed_sha, str) or len(claimed_sha) != 64 or not all(c in "0123456789abcdefABCDEF" for c in claimed_sha):
+        return False, f"Missing or invalid payload_sha256 integrity checksum: expected 64-character hex string, got {claimed_sha!r}"
+
     actual_sha = compute_payload_sha256(cert_data)
-    if claimed_sha and claimed_sha != actual_sha:
-        return False, f"SHA-256 digest mismatch: claimed {claimed_sha} != computed {actual_sha}"
+    if claimed_sha.lower() != actual_sha.lower():
+        return False, f"SHA-256 integrity checksum mismatch: claimed {claimed_sha} != computed {actual_sha}"
 
     # 3. Required sections
     cert_type = cert_data.get("certificate_type")
@@ -217,7 +253,13 @@ def verify_portable_certificate_dict(cert_data):
     if dims != [len(matrix), len(matrix[0]) if matrix else 0]:
         return False, f"matrix_dimensions {dims} does not match actual matrix dimensions [{len(matrix)}, {len(matrix[0]) if matrix else 0}]"
 
-    # 4. Certificate type specific checks
+    # 4. Optional end-to-end matrix derivation verification
+    if check_derivation:
+        d_ok, d_msg = verify_matrix_derivation(cert_data)
+        if not d_ok:
+            return False, d_msg
+
+    # 5. Certificate type specific checks
     if cert_type == "collatz_wielandt":
         vector = witness.get("witness_vector")
         if not vector or not isinstance(vector, list):
@@ -233,7 +275,7 @@ def verify_portable_certificate_dict(cert_data):
         return False, f"Unknown certificate_type: '{cert_type}'"
 
 
-def verify_certificate_file(file_path):
+def verify_certificate_file(file_path, check_derivation=False):
     """Load and audit a single portable certificate file."""
     path = Path(file_path)
     if not path.is_file():
@@ -246,7 +288,7 @@ def verify_certificate_file(file_path):
         return False, f"Failed to parse JSON: {e}", None
 
     start_t = time.time()
-    ok, msg = verify_portable_certificate_dict(data)
+    ok, msg = verify_portable_certificate_dict(data, check_derivation=check_derivation)
     elapsed = time.time() - start_t
 
     report = {
@@ -257,6 +299,7 @@ def verify_certificate_file(file_path):
         "payload_sha256": data.get("payload_sha256", "none"),
         "status": "PASS" if ok else "FAIL",
         "proof_summary": msg,
+        "derivation_checked": check_derivation,
         "elapsed_seconds": elapsed,
         "checker_version": CHECKER_VERSION
     }
@@ -284,9 +327,10 @@ def create_portable_collatz_wielandt_cert(problem_id, math_context, A_matrix, v_
             "witness_vector": v_vector
         },
         "metadata": metadata or {
-            "generator": "EMVE verify_dimensions.py v0.9.0",
+            "generator": "EMVE verify_dimensions.py v0.9.1",
             "zenodo_doi": "10.5281/zenodo.24595631",
-            "created_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+            "created_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "checksum_type": "sha256_canonical_payload_integrity"
         }
     }
     cert["payload_sha256"] = compute_payload_sha256(cert)
@@ -313,9 +357,10 @@ def create_portable_sturm_cert(problem_id, math_context, A_matrix, metadata=None
             "matrix": A_matrix
         },
         "metadata": metadata or {
-            "generator": "EMVE verify_dimensions.py v0.9.0",
+            "generator": "EMVE verify_dimensions.py v0.9.1",
             "zenodo_doi": "10.5281/zenodo.24595631",
-            "created_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+            "created_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "checksum_type": "sha256_canonical_payload_integrity"
         }
     }
     cert["payload_sha256"] = compute_payload_sha256(cert)
@@ -323,7 +368,7 @@ def create_portable_sturm_cert(problem_id, math_context, A_matrix, metadata=None
 
 
 def export_sample_certificates(output_dir):
-    """Generate canonical portable JSON certificates for M=19 and M=7."""
+    """Generate canonical portable JSON certificates for M=19, M=7, and M=4."""
     out_path = Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
 
@@ -398,6 +443,7 @@ def run_standalone_audit():
     print("=" * 75)
     print("EMVE Independent Mathematical Certificate Checker (Auditor)")
     print(f"Version: {CHECKER_VERSION}")
+    print("Trust Boundary: Certifies spectral properties of explicit matrix A.")
     print("=" * 75)
 
     # Example 1: Non-extremizer M = 19 (6 states)
@@ -432,7 +478,7 @@ def run_standalone_audit():
 
     print("\n" + "=" * 75)
     print("INDEPENDENT AUDIT COMPLETE: 2/2 RAW MATHEMATICAL WITNESSES VERIFIED.")
-    print("No heuristic search trusted. All proofs certified via exact integer arithmetic and Q(sqrt5).")
+    print("Guarantees: Strict integer validation (booleans rejected), pure Z arithmetic & Q(sqrt5).")
     print("=" * 75)
     return 0
 
@@ -449,6 +495,9 @@ def main():
     )
     parser.add_argument(
         "--export-samples", metavar="DIR", help="Export canonical sample portable certificate JSONs to DIR"
+    )
+    parser.add_argument(
+        "--verify-derivation", action="store_true", help="Also verify that matrix A matches canonical derivation from M"
     )
     args = parser.parse_args()
 
@@ -467,26 +516,29 @@ def main():
     print("=" * 80)
     print("EMVE Independent Certificate Auditor: Auditing Portable Certificates")
     print(f"Checker: {CHECKER_VERSION}")
+    print(f"Derivation Check: {'ENABLED (re-derives graph from M)' if args.verify_derivation else 'DISABLED (decoupled matrix-only check)'}")
     print("=" * 80)
 
     for fpath in args.files:
-        ok, msg, report = verify_certificate_file(fpath)
+        ok, msg, report = verify_certificate_file(fpath, check_derivation=args.verify_derivation)
         status_str = "\033[92mPASS\033[0m" if ok else "\033[91mFAIL\033[0m"
-        print(f"\nTarget File    : {fpath}")
-        print(f"Problem ID     : {report.get('problem_id')}")
-        print(f"Format Version : {report.get('format_version')}")
-        print(f"Cert Type      : {report.get('certificate_type')}")
-        print(f"SHA-256 Digest : {report.get('payload_sha256')}")
-        print(f"Audit Status   : [{status_str}]")
-        print(f"Proof Details  : {msg}")
-        print(f"Execution Time : {report.get('elapsed_seconds', 0.0):.4f}s")
+        print(f"\nTarget File        : {fpath}")
+        print(f"Problem ID         : {report.get('problem_id')}")
+        print(f"Format Version     : {report.get('format_version')}")
+        print(f"Cert Type          : {report.get('certificate_type')}")
+        print(f"Integrity Checksum : {report.get('payload_sha256')}")
+        print(f"Audit Status       : [{status_str}]")
+        print(f"Proof Details      : {msg}")
+        print(f"Execution Time     : {report.get('elapsed_seconds', 0.0):.4f}s")
         if not ok:
             all_passed = False
 
     print("\n" + "=" * 80)
     if all_passed:
         print(f"AUDIT SUMMARY: ALL {len(args.files)} CERTIFICATES INDEPENDENTLY AUDITED AND PASSED.")
-        print("Guarantees: Valid SHA-256 payload digest; exact mathematical inequality satisfied in Z or Q(sqrt5).")
+        print("Guarantees: Strict integer typing; verified SHA-256 integrity checksum; exact spectral bound.")
+        if not args.verify_derivation:
+            print("Notice: Checked matrix properties. Run with --verify-derivation to re-derive matrix from M.")
         print("=" * 80)
         return 0
     else:
