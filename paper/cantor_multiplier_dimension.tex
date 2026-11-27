@@ -461,27 +461,36 @@ Summing over all $u \in A_n$, each word yields at least one extension and exactl
 \end{proof}
 
 \begin{theorem}[Universal Periodic Obstruction]\label{thm:periodic_obstruction}
-Let $a \ge 2$ and $b - a \ge 2$ be coprime. The SFT $\Sigma_{(a, b)}$ admits an explicit universal periodic orbit of length $2b$:
-\begin{equation}
-w_* = (0^b 1^b)^\infty.
-\end{equation}
-The orbit $w_*$ is contained in a primitive recurrent component $\mathcal{C}_*$ containing both $0^b$ and $1^b$. For any Parry measure supported on $\mathcal{C}_*$, its cylinder weight satisfies $\epsilon(a, b) = \mu_{\mathrm{Parry}}([w_*]) > 0$. Furthermore, the asymptotic branching deficit satisfies:
-\begin{equation}
-\lim_{n \to \infty} \frac{N(n-1) - B(n)}{N(n-1)} = 1 + \lambda(a,b) - \lambda(a,b)^2 .
-\end{equation}
+Let $a \ge 2$ and $b - a \ge 2$ be coprime.
+\begin{enumerate}
+    \item \textbf{Admissibility and Primitivity:} The SFT $\Sigma_{(a, b)}$ admits an explicit universal periodic orbit of length $2b$,
+    \begin{equation}
+    w_* = (0^b 1^b)^\infty,
+    \end{equation}
+    contained in a primitive recurrent component $\mathcal{C}_*$ containing both $0^b$ and $1^b$.
+    \item \textbf{Cylinder Measure Positivity:} For any ergodic measure of maximal entropy supported on $\mathcal{C}_*$, the cylinder weight satisfies $\epsilon(a, b) = \mu_{\mathcal{C}_*}([w_*]) > 0$.
+    \item \textbf{Component Branching Deficit:} Within $\mathcal{C}_*$, path counts satisfy $N_{\mathcal{C}_*}(n) = c_* \lambda_*^n + o(\lambda_*^n)$ ($c_* > 0$), where $\lambda_*$ is the spectral radius of $\mathcal{C}_*$. Whenever $\mathcal{C}_*$ dominates the full shift (so $\lambda_* = \lambda(a, b)$ and $N(n+1)/N(n) \to \lambda(a, b)$), the asymptotic branching deficit converges to:
+    \begin{equation}
+    \lim_{n \to \infty} \frac{N(n-1) - B(n)}{N(n-1)} = 1 + \lambda(a,b) - \lambda(a,b)^2 .
+    \end{equation}
+\end{enumerate}
 \end{theorem}
 
 \begin{proof}[Proof of Theorem~\ref{thm:periodic_obstruction}]
-We establish the structural claims:
+We establish the three structural assertions:
 \begin{enumerate}\setlength{\itemsep}{0pt}
-    \item \emph{Admissibility of $w_*$:} Define $z_i \in \{0, 1\}$ for $i \in \Z$ by $z_i = 1$ if $(i \bmod 2b) \ge b$ and $0$ otherwise. Shifting by $b$ inverts the symbol: $z_{i-b} = 1 - z_i$. Then for any lag $a \in \{1, \dots, b-1\}$,
+    \item \emph{Admissibility and primitivity of $\mathcal{C}_*$:} Define $z_i \in \{0, 1\}$ for $i \in \Z$ by $z_i = 1$ if $(i \bmod 2b) \ge b$ and $0$ otherwise. Shifting by $b$ inverts the symbol: $z_{i-b} = 1 - z_i$. Then for any lag $a \in \{1, \dots, b-1\}$,
     \begin{equation}
     z_i - z_{i-a} + z_{i-b} = z_i - z_{i-a} + (1 - z_i) = 1 - z_{i-a} \in \{0, 1\} \quad \text{for all } i \in \Z.
     \end{equation}
     Hence $w_* = (0^b 1^b)^\infty$ is an exact admissible trajectory of $\Sigma_{(a, b)}$ of period $2b$.
-    \item \emph{Component primitivity:} The states $0^b$ and $1^b$ have self-loops $0^b \to 0^b$ and $1^b \to 1^b$ in the transfer graph. Furthermore, $0^b$ reaches $1^b$ in $b$ steps via the sequence $(0^{b-k} 1^k)_{k=0}^b$, and $1^b$ reaches $0^b$ in $b$ steps via $(1^{b-k} 0^k)_{k=0}^b$ (formalized in \texttt{PeriodicOrbit.lean}). Thus $0^b$ and $1^b$ belong to a common strongly connected component $\mathcal{C}_*$. Since $0^b$ admits a self-loop (a cycle of length $1$), the period of $\mathcal{C}_*$ is $\gcd(1, 2b) = 1$, proving $\mathcal{C}_*$ is primitive.
-    \item \emph{Parry measure positivity:} On any primitive component $\mathcal{C}$ with Perron root $\lambda_{\mathcal{C}}$, the unique measure of maximal entropy $\mu_{\mathcal{C}}$ is the Parry Markov measure defined by strictly positive Perron eigenvectors $u, v > 0$. Because every vertex in $\mathcal{C}$ carries strictly positive weight, every admissible cylinder in $\mathcal{C}$ has strictly positive measure. In particular, for $w_* \subset \mathcal{C}_*$, its cylinder weight $\epsilon(a, b) = \mu_{\mathrm{Parry}}([w_*]) > 0$ is strictly positive.
-    \item \emph{Branching slack limit:} From Lemma~\ref{lem:branching_step}, $N(n+1) = N(n) + B(n)$. Since $N(n+1)/N(n) \to \lambda(a, b)$, we have $B(n)/N(n) = N(n+1)/N(n) - 1 \to \lambda(a, b) - 1$. Consequently,
+    In the transfer graph $\mathcal{G}(a, b)$, the states $0^b$ and $1^b$ have self-loops $0^b \to 0^b$ and $1^b \to 1^b$. Furthermore, $0^b$ reaches $1^b$ in $b$ steps via the sequence $(0^{b-k} 1^k)_{k=0}^b$, and $1^b$ reaches $0^b$ in $b$ steps via $(1^{b-k} 0^k)_{k=0}^b$ (formalized in \texttt{PeriodicOrbit.lean}). Thus $0^b$ and $1^b$ belong to a common strongly connected component $\mathcal{C}_*$. Since $0^b$ admits a self-loop (a cycle of length $1$), the period of $\mathcal{C}_*$ is $\gcd(1, 2b) = 1$, proving $\mathcal{C}_*$ is primitive.
+    \item \emph{Parry measure positivity:} On the primitive component $\mathcal{C}_*$ with Perron root $\lambda_*$, the transfer matrix $A_{\mathcal{C}_*}$ is primitive ($A_{\mathcal{C}_*}^m > 0$ for sufficiently large $m$). By the Perron--Frobenius theorem, its unique measure of maximal entropy $\mu_{\mathcal{C}_*}$ is the Parry Markov measure defined by strictly positive Perron eigenvectors $u, v > 0$. Because every vertex in $\mathcal{C}_*$ carries strictly positive weight, every admissible cylinder in $\mathcal{C}_*$ has strictly positive measure: $\epsilon(a, b) = \mu_{\mathcal{C}_*}([w_*]) > 0$.
+    \item \emph{Asymptotic ratio limit and branching deficit:} Within the primitive component $\mathcal{C}_*$, Perron--Frobenius spectral projection gives $A_{\mathcal{C}_*}^n = \lambda_*^n v u^T + O(\rho_2^n)$ with $\rho_2 < \lambda_*$, guaranteeing that word counts satisfy $N_{\mathcal{C}_*}(n) = c_* \lambda_*^n + o(\lambda_*^n)$ with $c_* > 0$. Under the hypothesis that $\mathcal{C}_*$ is the dominant component of $\Sigma_{(a, b)}$ (so $\lambda_* = \lambda(a, b)$ and the total counts satisfy $N(n) = c \lambda(a, b)^n + o(\lambda(a, b)^n)$), the consecutive ratio converges:
+    \begin{equation}
+    \lim_{n \to \infty} \frac{N(n+1)}{N(n)} = \lambda(a, b).
+    \end{equation}
+    From Lemma~\ref{lem:branching_step}, $N(n+1) = N(n) + B(n)$, whence $B(n)/N(n) = N(n+1)/N(n) - 1 \to \lambda(a, b) - 1$. Consequently,
     \begin{equation}
     \frac{B(n)}{N(n-1)} = \frac{B(n)}{N(n)} \cdot \frac{N(n)}{N(n-1)} \longrightarrow (\lambda(a, b) - 1)\lambda(a, b) = \lambda(a, b)^2 - \lambda(a, b).
     \end{equation}
@@ -494,7 +503,7 @@ This establishes the theorem.
 \end{proof}
 
 \begin{hypothesis}[Parry gap]\label{hyp:parry}
-For every coprime pair $a \ge 2$, $b - a \ge 2$,
+For every coprime pair $a \ge 2$, $b - a \ge 2$, the primitive component $\mathcal{C}_*$ dominates the full shift ($\lambda_* = \lambda(a, b)$), and the branching slack is bounded below by the Parry cylinder weight:
 \begin{equation}
 1 + \lambda(a,b) - \lambda(a,b)^2 \;\ge\; \mu_{\mathrm{Parry}}([w_*]) \;=\; \epsilon(a, b) \;>\; 0 .
 \end{equation}
@@ -508,7 +517,7 @@ Under Hypothesis~\ref{hyp:parry}, every non-extremizer in the interior domain sa
 \end{corollary}
 
 \begin{remark}\label{rem:frontierA}
-Hypothesis~\ref{hyp:parry} is the ``Frontier~A'' obligation of the formalization: in \texttt{CantorMultiplier.lean} the classification is stated with \texttt{h\_gap} as an explicit hypothesis, and no axiom is introduced. Empirically, \ref{hyp:parry} holds for every coprime $M \le 2000$ under exact transfer-matrix computation (\S\ref{sec:table}). A uniform proof for all $a, b$ remains open; the difficulty is that $\epsilon(a,b)$ decays with $b$ while $1+\lambda-\lambda^2$ tends to zero as $\lambda \to \phi$, so the inequality is not immediate from primitivity alone.
+Hypothesis~\ref{hyp:parry} is the ``Frontier~A'' obligation of the formalization: in \texttt{CantorMultiplier.lean} the classification is stated with \texttt{h\_gap} as an explicit hypothesis, and no axiom is introduced. Hypothesis~\ref{hyp:parry} encapsulates both the spectral dominance of the primitive component $\mathcal{C}_*$ containing the all-zero state (guaranteeing ratio convergence $N(n+1)/N(n) \to \lambda$) and the quantitative slack inequality $1+\lambda-\lambda^2 \ge \epsilon(a, b) > 0$. Empirically, both dominance and the gap inequality hold for every coprime pair with $M \le 2000$ under exact transfer-matrix computation (\S\ref{sec:table}). A uniform proof for all $a, b$ remains open; the difficulty is that $\epsilon(a,b)$ decays with $b$ while $1+\lambda-\lambda^2$ tends to zero as $\lambda \to \phi$.
 \end{remark}
 
 \section{Exact Hausdorff Dimension Table (\texorpdfstring{$M \le 300$}{M <= 300})}\label{sec:table}
