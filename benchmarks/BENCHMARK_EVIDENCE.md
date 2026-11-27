@@ -1,7 +1,7 @@
 # EMVE Benchmark Evidence & Reproducibility Record
 
 **Release Target:** `emve-cert-v1.0.0`  
-**Git Commit:** `387906cb8798e3b1c97a78370e704db424f6050b` (and subsequent release commits)  
+**Git Commit:** `d3c1c5f` (calibrated benchmark measurements) / `HEAD` (workflow & evidence tracking)  
 **Zenodo DOI:** [10.5281/zenodo.24595631](https://doi.org/10.5281/zenodo.24595631)  
 **Date of Calibration:** November 27, 2026  
 
