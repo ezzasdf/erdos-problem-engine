@@ -1,29 +1,46 @@
-# Intellectual Property and Licensing Notice
+# Licensing
 
-Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba.
 
-Author: Ezzeldin Ashraf Mohamed Shafey Wahba
-Email: ezzeldinashraf.web@gmail.com
-Repository: https://github.com/ezzasdf/erdos-problem-engine
+This repository is not open source. Each part carries its own terms.
 
----
+## Software
 
-## 1. Research Manuscripts and Academic Papers (`paper/`)
+`ErdosTernary/`, `scripts/`, `verify_conjecture.py`, `verify_coverage.py`, and
+all other source code: **PolyForm Strict License 1.0.0**. The full text is in
+[`LICENSE-CODE`](LICENSE-CODE).
 
-All rights reserved. The mathematical manuscripts, preprints, and associated PDF/LaTeX files located in the `paper/` directory and subdirectories are the intellectual property of the author:
+You may read, download, and run this code for noncommercial purposes. You may
+not distribute it, modify it, or make new works based on it.
 
-- "The Extremal Hausdorff Dimension of Cantor Multiplier Intersections and the Golden Mean Shift"
-- "The Erdős Ternary Digit Conjecture: Rooted Repunit Trees, 3-Adic Dynamics, Archimedean Decoupling, and the Negative-Power Duality"
+Commercial use requires a separate paid license. See
+[`COMMERCIAL.md`](COMMERCIAL.md).
 
-No part of these manuscripts may be reproduced, redistributed, copied, modified, or submitted to any journal, conference, or repository under another name or without explicit written permission and proper academic attribution.
+## Paper 1
 
----
+`paper/cantor_multiplier_dimension.tex` and
+`paper/cantor_multiplier_dimension.pdf`: **Creative Commons Attribution 4.0
+International (CC BY 4.0)**, <https://creativecommons.org/licenses/by/4.0/>.
 
-## 2. Software and Interactive Formalizations (`ErdosTernary/`, scripts, certificates)
+## Paper 2 and other manuscripts
 
-The Lean 4 source code, verification scripts, and certificate validation tools in this repository are licensed under the Apache License, Version 2.0 (the "License").
+`paper/erdos_ternary_repunit.tex`, `paper/erdos_ternary_repunit.pdf`, and other
+manuscripts in `paper/`: **all rights reserved**. No reproduction,
+redistribution, modification, or submission elsewhere without written
+permission and proper academic attribution.
 
-You may obtain a copy of the License at:
-http://www.apache.org/licenses/LICENSE-2.0
+## Contributions to other projects
 
-Any redistribution, derivation, or academic/commercial use of the formalization codebase must preserve the copyright notice and provide full credit to the author.
+`contrib/palomar/` — published at
+<https://github.com/ezzasdf/erdos-ternary-carry-packet> — is released under the
+**Apache License, Version 2.0**, as declared inside that package.
+
+`contrib/formal-conjectures/` is released under the **Apache License, Version
+2.0**, as required by the upstream project it is proposed to.
+
+## Third-party components
+
+Lean 4 and Mathlib are distributed under the Apache License, Version 2.0. They
+are fetched as build dependencies and are not redistributed here.
+
+See [`NOTICE`](NOTICE) for the grants attached to previously released versions.

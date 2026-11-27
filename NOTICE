@@ -1,0 +1,46 @@
+# Notices
+
+## Copyright
+
+Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
+
+## License map
+
+| Path | License |
+| --- | --- |
+| `ErdosTernary/`, `scripts/`, `verify_*.py`, other source code | PolyForm Strict License 1.0.0 (`LICENSE-CODE`) |
+| `paper/cantor_multiplier_dimension.*` (Paper 1) | CC BY 4.0 |
+| `paper/erdos_ternary_repunit.*` (Paper 2) and other manuscripts | All rights reserved |
+| `contrib/palomar/**` | Apache License 2.0, as declared in that package |
+| `contrib/formal-conjectures/**` | Apache License 2.0, as required by the upstream project |
+
+Commercial use of the software is available only under a separate paid
+license; see `COMMERCIAL.md`.
+
+## Previously released versions
+
+The repository up to and including commit
+`6d68a98d8a5bdbbef982cd07b5789094e9800450` (2026-11-27) was released under the
+Apache License, Version 2.0, and every Lean source file in it carried the
+header `Released under Apache 2.0 license as described in the file LICENSE.`
+
+Those grants are irrevocable. Anyone who obtained a copy of the code under
+Apache-2.0 keeps that license for that copy, and may continue to use, modify,
+and redistribute it under Apache-2.0 terms. The archived source-preservation
+copies, including the commit submitted to the Palomar registry as
+`ezzasdf/erdos-ternary-carry-packet`, remain Apache-2.0.
+
+PolyForm Strict License 1.0.0 applies to versions released after that commit.
+It does not withdraw, narrow, or substitute for any earlier Apache-2.0 grant.
+
+## Third-party components
+
+This project depends on Lean 4 and Mathlib, which are distributed under the
+Apache License, Version 2.0. They are fetched as build dependencies and are not
+redistributed here.
+
+Some Lean files follow Mathlib file conventions or reuse small Mathlib idioms.
+To the extent any portion of a file is derived from Mathlib, the Apache License,
+Version 2.0 continues to apply to that portion, and the terms above apply only
+to the author's own contribution. Mathlib's notices and license are unaffected
+by anything in this repository.

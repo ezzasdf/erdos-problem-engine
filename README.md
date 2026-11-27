@@ -2,7 +2,7 @@
 
 [![Lean 4.12.0](https://img.shields.io/badge/Lean-4.12.0-blue.svg)](https://github.com/leanprover/lean4)
 [![Mathlib 4](https://img.shields.io/badge/Mathlib-v4.12.0-green.svg)](https://github.com/leanprover-community/mathlib4/tree/809c3fb3b5c8)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](LICENSE)
+[![License: PolyForm Strict 1.0.0](https://img.shields.io/badge/License-PolyForm%20Strict%201.0.0-orange.svg)](LICENSE-CODE) [![Commercial license](https://img.shields.io/badge/Commercial-license%20required-red.svg)](COMMERCIAL.md)
 
 **Author:** Ezzeldin Ashraf Mohamed Shafey Wahba  
 **Email:** [ezzeldinashraf.web@gmail.com](mailto:ezzeldinashraf.web@gmail.com)  
