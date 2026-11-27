@@ -476,6 +476,8 @@ Accordingly, no claim is made that the universal bound or extremizer classificat
 
 \textbf{Audit.} The build of the library is green and the built target contains no \texttt{sorry}. Two modules that did contain one \texttt{sorry} each, together with three files whose imports no longer resolve, have been moved to \texttt{ErdosTernary/attic/} with a README recording the restoration conditions; they are outside the Lake target. For the declarations audited here, \texttt{\#print axioms} reports at most \texttt{[propext, Classical.choice, Quot.sound]}; declarations proved by \texttt{native\_decide} additionally depend on \texttt{Lean.ofReduceBool}, extending the trusted base to the Lean compiler and runtime, as is standard for finite certificates. A snapshot audit of 270 declarations in the core modules (2026-11-20) classified 182 as foundational and 88 as \texttt{native\_decide}-based; that snapshot predates the current module set and excludes the bridge modules.
 
+\clearpage
+
 \bibliographystyle{amsplain}
 \bibliography{references}
 
