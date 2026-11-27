@@ -95,15 +95,19 @@ Let $P(y) = \sum_{q=0}^d c_q y^q \in \Z[y]$ satisfy Condition~(S):
 \begin{equation}
 c_0 = 1, \quad \text{and every subset-sum of } \{c_q : q \ge 0\} \text{ lies in } [-1, 2],
 \end{equation}
-and fix $k \ge 1$ such that $M = P(3^k) > 0$. For any $x = \sum_{m=1}^\infty 2 z_m 3^{-m} \in \Sigma$ with $z_m \in \{0, 1\}$:
+and fix $k \ge 1$ such that $M = P(3^k) > 0$. For any $x = \sum_{m=1}^\infty 2 z_m 3^{-m} \in \Sigma$ with $z_m \in \{0, 1\}$, $x \in C(1, M) = \Sigma \cap M^{-1}\Sigma$ if and only if both of the following hold:
+\begin{enumerate}
+    \item \textbf{Initial Zero-Prefix Condition:} $z_1 = z_2 = \dots = z_{dk} = 0$;
+    \item \textbf{Decoupled Recurrence:} for all columns $j \in \{1, \dots, k\}$ and all block indices $\ell \ge 0$,
+    \begin{equation}
+    \sum_{q=0}^d c_q z_{(\ell+q)k + j} \in \{0, 1\}.
+    \end{equation}
+\end{enumerate}
+Condition~(1) corresponds to $x \le 1/M$, guaranteeing that $M x \in [0, 1]$ with zero integer part. Under Condition~(1), the unconstrained digit tail decomposes into $k$ mutually independent single-column subshifts. Consequently,
 \begin{equation}
-x \in C(1, M) \iff \forall j \in \{1, \dots, k\}, \, \forall \ell \ge 0, \quad \sum_{q=0}^d c_q z_{(\ell+q)k + j} \in \{0, 1\},
+\dimH C(1, M) = \frac{\log \lambda_0(P)}{\log 3},
 \end{equation}
-and the $k$ column shifts are mutually independent. Consequently,
-\begin{equation}
-\dimH C(1, M) = \frac{\log \lambda(P)}{\log 3},
-\end{equation}
-where $\lambda(P)$ is the spectral radius (Perron root) of the single-column SFT transition matrix.
+where $\lambda_0(P)$ is the spectral radius of the transition matrix restricted to the recurrent components reachable from the initial zero state $0^{dk}$.
 \end{theorem}
 
 \begin{theorem}[Classification of the Safe Class]\label{thm:classification}
@@ -116,16 +120,24 @@ Let $P(y) \in \Z[y]$ satisfy Condition~(S) with $M = P(3^k) > 0$. Then exactly o
 No other integer polynomial of any degree satisfies Condition~(S) with $P(3^k) > 0$.
 \end{theorem}
 
-\begin{theorem}[Time-Reversal Duality]\label{thm:time_reversal}
-Let $1 \le a < b$ with $\gcd(a, b) = 1$. The transfer matrix $M_{(a,b)}$ of the Family~2 shift $\Sigma_{(a,b)}$ and the transfer matrix $M_{(b-a,b)}$ of the dual shift $\Sigma_{(b-a,b)}$ satisfy the explicit similarity:
+\begin{theorem}[Time-Reversal Duality on the Full SFT]\label{thm:time_reversal}
+Let $1 \le a < b$ with $\gcd(a, b) = 1$. The transfer matrix $M_{(a,b)}$ of the bi-infinite Family~2 shift $\Sigma_{(a,b)}$ and the transfer matrix $M_{(b-a,b)}$ of the dual shift $\Sigma_{(b-a,b)}$ satisfy the explicit similarity:
 \begin{equation}
 P \, M_{(a,b)} \, P = M_{(b-a,b)}^T,
 \end{equation}
-where $P$ is an involutive permutation matrix. Consequently, their characteristic polynomials and dominant Perron eigenvalues coincide identically:
+where $P$ is an involutive permutation matrix reversing binary words of length $b$. Consequently, their characteristic polynomials and full Perron eigenvalues coincide identically:
 \begin{equation}
 \det(t I - M_{(a,b)}) = \det(t I - M_{(b-a,b)}), \quad \lambda(a, b) = \lambda(b-a, b).
 \end{equation}
 \end{theorem}
+
+\begin{remark}[Two-Sided Cospectrality versus One-Sided Initial-State Reachability]\label{rem:reachability}
+Theorem~\ref{thm:time_reversal} establishes exact spectral duality for the abstract, two-sided subshift of finite type $\Sigma_{(a, b)}$ on $\Z$. For the arithmetic intersection $C(1, M) \subset [0, 1]$ on the real line, admissible ternary expansions are one-sided sequences on $\N$ that must satisfy the initial prefix condition $z_1 = \dots = z_{dk} = 0$. Admissible paths are thus restricted to the subgraph reachable from the zero state $0^b$.
+Transposing the adjacency matrix ($M_{(b-a,b)} = P M_{(a,b)}^T P$) reverses all directed edges ($u \to v \iff v \to u$). Consequently, reachability from $0^b$ is a directional property that is not preserved under transposition.
+For all small parameters ($b \le 4$, covering all multipliers in Table~\ref{tab:dimension_table}) and all extremizers ($b = 2a$), the maximal strongly connected component remains zero-reachable, so $\lambda_0(a, b) = \lambda(a, b) = \lambda_0(b-a, b)$.
+However, for higher lags such as $(a, b) = (2, 9)$ ($M = 19675$) versus $(7, 9)$ ($M = 17497$), transposition breaks zero-reachability: the dominant SCC of $252$ states ($\lambda \approx 1.386536$) is unreachable from $0^9$ in $(2, 9)$ (yielding $\lambda_0(2, 9) \approx 1.304777$), but is reachable in $(7, 9)$ (yielding $\lambda_0(7, 9) \approx 1.386536$).
+Consequently, time-reversal cospectrality is exact on the full symbolic shift, while one-sided Cantor dimensions satisfy $\dimH C(1, M) = \log_3 \lambda_0(a, b) \le \log_3 \lambda(a, b) \le \log_3 \phi$.
+\end{remark}
 
 \begin{theorem}[The Structural Connection to Carry Automata]\label{thm:connection_lemma}
 The $2$-state carry automaton governing base-$3$ quadrupling ($M = 4$) on Cantor inputs coincides identically with the safe-multiplier SFT $\Sigma_{(1, 2)}$. Specifically:
@@ -244,8 +256,13 @@ Because $d_m \in \{0, 1\}$, the right-hand side is strictly restricted to $\{0, 
     \item If $u_m \in \{0, 1\}$, then $u_m \equiv d_m \pmod 3$, giving $d_m = u_m$ and outgoing carry $C_{m-1} = 0$.
     \item If $u_m = 2$ or $u_m = -1$, then $u_m \equiv 2 \pmod 3$. But $d_m + 3 C_{m-1} \equiv d_m \in \{0, 1\} \pmod 3 \ne 2 \pmod 3$, so no integer carry $C_{m-1}$ can produce an admissible Cantor digit $d_m \in \{0, 1\}$.
 \end{enumerate}
-Thus, no non-zero carry can be spawned from $C_m = 0$. Furthermore, an infinite tail of non-zero carries $C_m = 1$ would require $u_m = 2$ for all sufficiently large $m$, which either forces $x = 1 \notin C(1, M)$ (in Family~1) or requires $z_{m+a} = 0$ and $z_{m+a} = 1$ simultaneously (in Family~2), which is impossible.
-Therefore, all carries vanish identically: $C_m = 0$ for all $m$. Hence $M x \in \Sigma$ if and only if $u_m \in \{0, 1\}$ for all $m \ge 1$, with zero carry across all positions and block boundaries.
+Thus, no non-zero carry can be spawned from $C_m = 0$.
+Furthermore, an infinite tail of non-zero carries is ruled out in both directions:
+\begin{enumerate}
+    \item \emph{Positive carry tail ($C_m = 1$):} A tail $C_m = 1$ for all large $m$ requires $u_m + 1 = d_m + 3$, which forces $u_m = 2$ and $d_m = 0$. In Family~1, $u_m = z_m + z_{m+k} = 2$ forces $z_m = 1$ for all $m$, which yields $x = 1 \notin C(1, M)$ (since $M x = M > 1$). In Family~2, $u_m = z_m - z_{m+a} + z_{m+b} = 2$ forces $z_{m+a} = 0$, but at step $m+a$ the condition $u_{m+a} = 2$ forces $z_{m+a} = 1$, an immediate contradiction.
+    \item \emph{Negative carry tail ($C_m = -1$):} A tail $C_m = -1$ for all large $m$ requires $u_m - 1 = d_m - 3$, or $u_m + 2 = d_m \in \{0, 1\}$. If $d_m = 0$, then $u_m = -2$, which violates Condition~(S) since all subset sums lie in $[-1, 2]$. If $d_m = 1$, then $u_m = -1$. In Family~1, $u_m = z_m + z_{m+k} \ge 0$, so $u_m = -1$ is impossible. In Family~2, $u_m = z_m - z_{m+a} + z_{m+b} = -1$ forces $z_{m+a} = 1$ and $z_m = z_{m+b} = 0$. But then at step $m+a$, $u_{m+a} = z_{m+a} - z_{m+2a} + z_{m+a+b} = 1 - z_{m+2a} + z_{m+a+b} \ge 1 - 1 + 0 = 0 > -1$. Thus $u_{m+a}$ cannot be $-1$, proving that $u_m = -1$ cannot occur at two steps separated by $a$, ruling out any infinite negative carry cascade.
+\end{enumerate}
+Therefore, all carries vanish identically: $C_m = 0$ for all $m$. Hence $M x \in \Sigma$ if and only if $z_1 = \dots = z_{dk} = 0$ and $u_m \in \{0, 1\}$ for all $m \ge 1$, with zero carry across all positions and block boundaries.
 
 \textbf{Step 3 (Independent Column SFTs):}
 Since $u_{\ell k + j} = \sum_{q=0}^d c_q z_{(\ell+q)k + j} \in \{0, 1\}$ involves only digits whose indices have residue $j \pmod k$, the condition completely decouples across the $k$ residue classes $j \in \{1, \dots, k\}$. There is zero interaction between distinct residue classes. Hence, the symbolic system on $\{0, 1\}^\N$ defining $C(1, M)$ is the Cartesian product of $k$ identical, mutually independent 1D subshifts of finite type (SFTs), each governed by the linear recurrence $\sum_{q=0}^d c_q z_{\ell+q} \in \{0, 1\}$.
@@ -334,8 +351,28 @@ Shifting index by $-b$, setting $j = -i + b$, and noting that $b - a$ is the com
 \begin{equation}
 0 \le w_j - w_{j - (b-a)} + w_{j-b} \le 1.
 \end{equation}
-This is identically the defining constraint of $\Sigma_{(b-a, b)}$. In terms of the symbolic transition graphs, the adjacency matrix of the time-reversed shift is the transpose $M_{(a,b)}^T$, up to relabeling of states by the permutation $P$ reversing binary words of length $b$. Thus $P M_{(a,b)} P = M_{(b-a, b)}^T$. Because a matrix and its transpose share the same characteristic polynomial, the eigenvalues and Hausdorff dimensions coincide identically: $\lambda(a, b) = \lambda(b-a, b)$.
+This is identically the defining constraint of $\Sigma_{(b-a, b)}$. In terms of the symbolic transition graphs, the adjacency matrix of the time-reversed shift is the transpose $M_{(a,b)}^T$, up to relabeling of states by the permutation $P$ reversing binary words of length $b$. Thus $P M_{(a,b)} P = M_{(b-a, b)}^T$. Because a matrix and its transpose share the same characteristic polynomial, the eigenvalues and full SFT topological entropies coincide identically: $\lambda(a, b) = \lambda(b-a, b)$.
 \end{proof}
+
+\subsection{One-Sided Initial-State Subshifts and Reachability Asymmetry}
+While Theorem~\ref{thm:time_reversal} proves that the full bi-infinite symbolic shifts $\Sigma_{(a, b)}$ and $\Sigma_{(b-a, b)}$ on $\Z$ are topologically conjugate under time reversal, the arithmetic intersection $C(1, M) \subset [0, 1]$ on the real line is a one-sided system initialized at the zero prefix $z_1 = \dots = z_{dk} = 0$. Admissible paths are thus restricted to the subgraph $\mathcal{G}_0(a, b)$ reachable from the initial state $0^b$.
+
+Transposing the adjacency matrix ($M_{(b-a, b)} = P M_{(a, b)}^T P$) reverses all directed edges ($u \to v \iff v \to u$). Consequently, reachability from the source state $0^b$ in $\mathcal{G}(b-a, b)$ is dual to reachability \emph{to} the sink state $0^b$ in $\mathcal{G}(a, b)$, a directional property that is not preserved under graph transposition.
+\begin{enumerate}
+    \item \textbf{Small parameters and extremizers:} For all parameters $b \le 4$ (covering all safe multipliers $M \le 300$ in Table~\ref{tab:dimension_table}) and all extremizers ($b = 2a$), the maximal strongly connected component remains zero-reachable in both graphs, so $\lambda_0(a, b) = \lambda(a, b) = \lambda_0(b-a, b)$.
+    \item \textbf{Reachability asymmetry at higher lags:} For higher lags, transposition can disconnect the dominant SCC from the initial state $0^b$. For example, at $(a, b) = (2, 9)$ ($M = 19675$) and its dual $(7, 9)$ ($M = 17497$), the full $512$-state graph decomposes into SCCs of sizes $252, 168, 72, 18, 2$, where the dominant $252$-state component has Perron root $\lambda \approx 1.386536$.
+    Starting from $0^9$:
+    \begin{itemize}
+        \item In $(2, 9)$, only $74$ states are reachable; the dominant $252$-state component is completely unreachable, so paths from $0^9$ grow at rate $\lambda_0(2, 9) \approx 1.304777$ (the root of the $72$-state reachable component).
+        \item In $(7, 9)$, $510$ states are reachable, including the entire $252$-state component, yielding growth rate $\lambda_0(7, 9) \approx 1.386536$.
+    \end{itemize}
+    Thus the two-sided shifts are cospectral ($\lambda(2, 9) = \lambda(7, 9) \approx 1.386536$), but the one-sided Cantor dimensions diverge:
+    \begin{align}
+    \dimH C(1, 19675) &\approx \log_3(1.304777) \approx 0.242153 \nonumber \\
+    &< \dimH C(1, 17497) \approx \log_3(1.386536) \approx 0.297474.
+    \end{align}
+\end{enumerate}
+Importantly, because the zero-reachable subgraph is a subgraph of the full SFT, its spectral radius can only decrease or remain equal: $\lambda_0(a, b) \le \lambda(a, b)$. Consequently, the Universal Upper Bound $\dimH C(1, M) \le \log_3 \phi$ and the Extremizer Classification ($\dimH = \log_3 \phi \iff b = 2a$ or $M = 3^k+1$) remain completely unconditional and invariant.
 
 \begin{corollary}[Reduction of Boundary Case 2]\label{cor:boundary_reduction}
 Boundary Case~2 ($b - a = 1, a \ge 2$) reduces via Time-Reversal Duality to Boundary Case~1 ($a = 1, b \ge 3$):
