@@ -1,7 +1,7 @@
 # EMVE Benchmark Evidence & Reproducibility Record
 
 **Release Target:** `emve-cert-v1.0.0`  
-**Git Commit:** `9a97afe4bfeed144efde08acf21d9476578bb130` (and subsequent release commits)  
+**Git Commit:** `387906cb8798e3b1c97a78370e704db424f6050b` (and subsequent release commits)  
 **Zenodo DOI:** [10.5281/zenodo.24595631](https://doi.org/10.5281/zenodo.24595631)  
 **Date of Calibration:** November 27, 2026  
 
@@ -20,24 +20,32 @@
 
 ---
 
-## 2. Benchmark Suites & Exact Copy-Pastable Commands
+## 2. Benchmark Suites & Exact Methodology
 
-### Benchmark 1: Standalone Integer Certificate Auditor (Zero Dependencies)
+### Benchmark 1: Standalone Integer Certificate Auditor (M = 19)
 - **Target:** Multiplier $M = 19$ ($6 \times 6$ matrix, Collatz–Wielandt witness vector $v \in \mathbb{Z}^6$).
-- **Copy-Pastable Command:**
-  ```bash
-  python3 scripts/check_certificate.py eval_package/M19_collatz_wielandt.json
-  ```
-- **Benchmark Methodology:**
-  100 sequential runs evaluated via Python `timeit`:
-  ```bash
-  python3 -c "
-  import timeit, subprocess, sys
-  t = timeit.timeit(lambda: subprocess.run([sys.executable, 'scripts/check_certificate.py', 'eval_package/M19_collatz_wielandt.json'], stdout=subprocess.DEVNULL), number=100)
-  print(f'Average time per run: {t/100:.6f} seconds')
-  "
-  ```
-- **Observed Result:** Mean execution time: **0.0002 seconds** (sub-millisecond verification; pure integer arithmetic in Python standard library).
+- **Measurement Distinction:**
+  - **In-Process Algorithmic Audit (`verify_portable_certificate_dict`):**  
+    Measures pure mathematical validation (SHA-256 canonical hashing + Collatz–Wielandt matrix inequality + strict integer type enforcement) without Python interpreter initialization overhead.
+    - *Methodology:* Evaluated over 1,000 iterations via Python `timeit`:
+      ```bash
+      python3 -c "
+      import timeit, json, sys
+      sys.path.insert(0, 'scripts')
+      from check_certificate import verify_portable_certificate_dict
+      cert = json.load(open('eval_package/M19_collatz_wielandt.json'))
+      t = timeit.timeit(lambda: verify_portable_certificate_dict(cert), number=1000)
+      print(f'Mean in-process verification time: {t/1000:.6f} s ({t:.3f} ms / 1k runs)')
+      "
+      ```
+    - *Observed Result:* **0.000086 seconds (86 microseconds)** per certificate.
+  - **End-to-End CLI Invocation:**  
+    Measures the full command-line execution including CPython 3.12 process startup, standard library module imports (`json`, `hashlib`, `fractions`, `argparse`), and console reporting.
+    - *Copy-Pastable Command:*
+      ```bash
+      time python3 scripts/check_certificate.py eval_package/M19_collatz_wielandt.json
+      ```
+    - *Observed Result:* **~0.10 seconds** wall-clock time.
 
 ---
 
@@ -48,10 +56,10 @@
   python3 scripts/test_clean_environment.py
   ```
 - **Observed Result:** 
-  - Extracted 5 files/directories from `eval_package.zip` in isolation.
+  - Extracted 5 files/directories from `eval_package.zip` in an isolated temporary directory.
   - Audited all 23 extracted catalog certificates: **23/23 PASSED** (0.001s–0.004s per certificate).
   - Evaluated 4 corruption and tampering attacks: all 4 rejected with clean `[FAIL]` and zero uncaught exceptions.
-  - Total elapsed time: **0.11 seconds**.
+  - Total elapsed script time: **0.11 seconds**.
 
 ---
 
@@ -75,22 +83,20 @@
 
 ---
 
-### Benchmark 4: Rust Multi-Threaded Carry Automata Scanner (`verify_middle`)
-- **Target:** Exhaustive carry-chain exploration across window size $k = 17$ ($2.8 \times 10^7$ candidate state transitions).
+### Benchmark 4: Rust Multi-Threaded State Exploration Engine (`verify_erdos_rs`)
+- **Target:** Parallelized two-sided search engine (`verify_erdos_rs`) exploring candidate carry branches across window size $K = 17, k' = 17$ using Rayon across all CPU cores.
 - **Copy-Pastable Command:**
-  ```bash
-  cd verify_middle && cargo run --release -- --verify 100000
-  ```
-- **Alternative Two-Sided Saye Scanner (`verify_erdos_rs`):**
   ```bash
   cd verify_erdos_rs && cargo run --release -- --two-sided 17 17
   ```
 - **Benchmark Methodology:**
-  Compiled with Cargo release profile (`opt-level = 3`, LTO enabled). Executed across 16 CPU threads with high-resolution monotonic timer (`std::time::Instant`).
+  Compiled with Cargo release profile (`opt-level = 3`). Evaluated using high-resolution monotonic timer (`std::time::Instant`).
 - **Observed Result:**
-  - Evaluated Transitions: $2.8 \times 10^7$
-  - Monotonic Elapsed Time: **0.320 seconds**
-  - Throughput: $\mathbf{8.75 \times 10^7}$ transitions per second ($\approx 87.5$ million transitions/sec).
+  - Parallel Depth: 14 (8,192 parallel branches).
+  - Evaluated Branches: 8,192 / 8,192.
+  - Elapsed Time: **34.67 milliseconds (0.035 seconds)**.
+  - Candidates Found: 3 ($n \in \{0, 2, 8\}$).
+  - Throughput: $\approx 2.36 \times 10^5$ branches per second.
 
 ---
 
@@ -99,10 +105,6 @@
 - **Copy-Pastable Command:**
   ```bash
   lean lean/CertCheck.lean
-  ```
-- **Axiom Verification Command:**
-  ```bash
-  lean --run -e "EMVE.verifyCollatzWielandt EMVE.m19_matrix EMVE.m19_witness 5 8"
   ```
 - **Observed Result:**
   - Kernel reduction (`by rfl`): 0.04 seconds compilation & evaluation time.

@@ -22,22 +22,22 @@ EMVE decouples complex, heuristic state-space exploration from formal witness ve
 
 ### 3. Three-Level Verification Hierarchy & Trust Boundaries
 To eliminate ambiguity, EMVE enforces explicit epistemic boundaries across three verification levels:
-1. **Level 1 (Verified Certificate):** Standalone mathematical validation of the explicit matrix $A$. The supplied witness is checked in ~0.0002s via pure Python standard library or inside Lean 4's trusted kernel by definitional reflexivity (`by rfl`) with zero axioms (`[]`).
+1. **Level 1 (Verified Certificate):** Standalone mathematical validation of the explicit matrix $A$. The supplied witness is checked in ~0.0001s in-process via pure Python standard library or inside Lean 4's trusted kernel by definitional reflexivity (`by rfl`) with zero axioms (`[]`).
 2. **Level 2 (Verified Derivation):** Confirms reproducibility from the project's canonical state-space generator (`get_graph_for_M`), verifying that matrix dimensions, family parameters, and lags match canonical derivation.
 3. **Level 3 (Analytical Theorem):** The continuous Frostman measure bridge connecting symbolic growth rates $\log_3 \lambda_0$ to Hausdorff dimension on $\mathbb{R}$ remains an analytical paper proof conditional on Hypothesis (H).
 
 ---
 
 ### 4. Measured Performance Benchmarks & Copy-Pastable Commands
-Benchmarks evaluated on reference hardware (AMD Ryzen 9 5950X, 16C/32T, 64 GB RAM, Linux 6.8). See [`benchmarks/BENCHMARK_EVIDENCE.md`](benchmarks/BENCHMARK_EVIDENCE.md) for raw environment logs:
+Benchmarks evaluated on reference hardware (AMD Ryzen 9 5950X, 16C/32T, 64 GB RAM, Linux 6.8). Full logs in [`benchmarks/BENCHMARK_EVIDENCE.md`](benchmarks/BENCHMARK_EVIDENCE.md):
 - **Standalone Auditor:** `python3 scripts/check_certificate.py eval_package/M19_collatz_wielandt.json`  
-  *Result:* **~0.0002s** mean over 100 runs (Python 3.12 stdlib, zero external dependencies, SHA-256 payload check).
+  *Result:* In-process mathematical audit runs in **~0.0001s (86 µs)** (mean over 1,000 iterations); end-to-end CLI execution is **~0.10s** (including Python 3.12 startup, zero external dependencies).
 - **23-Modulus Verified Catalog:** `python3 scripts/check_certificate.py certificates/catalog/M*.json`  
   *Result:* All 23 moduli ($2 \le M \le 35, \gcd(M, 3) = 1$) audited with 100% pass rate (19 Collatz–Wielandt + 4 Sturm).
 - **Standalone Lean 4 Module:** `lean lean/CertCheck.lean`  
   *Result:* Compact module (~130 lines) verified in core Lean 4 without Mathlib; includes **six negative regression theorems covering five failure categories** (ragged rows, dimension mismatches, non-positive witness entries, zero multipliers $c$ and $d$, and false inequalities).
-- **Rust Exploration Engine:** `cd verify_middle && cargo run --release -- --verify 100000`  
-  *Result:* Single-run evaluation of $2.8 \times 10^7$ candidate transitions in **0.32s** across 16 threads ($\approx 87.5$M transitions/sec).
+- **Rust Exploration Engine:** `cd verify_erdos_rs && cargo run --release -- --two-sided 17 17`  
+  *Result:* Multi-threaded Rayon engine evaluates 8,192 candidate branches across 16 threads in **34.7 milliseconds (0.035s)**.
 - **Python Sequential Scan:** `python3 scripts/cantor_multiplier/verify_dimensions.py --scan 2000`  
   *Result:* Single-run certification of 1,333 moduli ($2 \le M \le 2000$) in **29.1s** ($\approx 45.8$ certified moduli/sec).
 
