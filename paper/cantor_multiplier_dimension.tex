@@ -99,7 +99,7 @@ Let $P(y) = \sum_{q=0}^d c_q y^q \in \Z[y]$ satisfy Condition~(S) with $M = P(3^
     \sum_{q=0}^d c_q z_{(\ell+q)k + j} \in \{0, 1\}.
     \end{equation}
 \end{enumerate}
-Condition~(1) is a necessary condition ensuring that $M x \in [0, 1]$ has vanishing integer part; combined with the recurrence~(2), it ensures $M x \in \Sigma$. Under Condition~(1), the unconstrained digit tail decomposes into $k$ mutually independent single-column subshifts of memory $d = \deg P$, each initialized in the state $0^d$. Consequently,
+Condition~(1) is a necessary condition ensuring that the half-dilate satisfies $M x / 2 \in [0, 1/2]$, guaranteeing a purely fractional base-$3$ expansion with digits in $\{0, 1\}$ and vanishing integer part $\lfloor M x / 2 \rfloor = 0$ (at the endpoint $M x = 1$, $M x / 2 = 1/2 = \sum_{m=1}^\infty 3^{-m}$ has canonical digits $d_m = 1$); combined with the recurrence~(2), it ensures $M x \in \Sigma$. Under Condition~(1), the unconstrained digit tail decomposes into $k$ mutually independent single-column subshifts of memory $d = \deg P$, each initialized in the state $0^d$. Consequently,
 \begin{equation}
 \dimH C(1, M) = \frac{\log \lambda_0(P)}{\log 3},
 \end{equation}
@@ -260,13 +260,13 @@ We now verify the contradiction for both classified safe families:
 \end{enumerate}
 Therefore, $M x \in [0, 1]$ strictly requires $z_1 = \dots = z_{dk} = 0$.
 
-Under this zero-prefix condition, $x \le \sum_{m=dk+1}^\infty 2 \cdot 3^{-m} = 3^{-dk}$. We note that the right endpoint $M x = 1 \in \Sigma$ is represented in the Cantor set by its infinite ternary expansion $1 = \sum_{m=1}^\infty 2 \cdot 3^{-m}$ (half-dilate $1/2 = \sum_{m=1}^\infty 3^{-m}$, canonical digits $d_m = 1$), which has vanishing integer part and falls directly into the fractional carry analysis. (For Family~2, $M x \le M 3^{-bk} = 1 - 3^{-(b-a)k} + 3^{-bk} < 1$, so $M x = 1$ is strictly inaccessible; for Family~1, $M x = 1$ corresponds to the unique periodic point $x = 1/(3^{ak}+1) \in \Sigma$, which is fully admissible under the recurrence.)
+Under this zero-prefix condition, $x \le \sum_{m=dk+1}^\infty 2 \cdot 3^{-m} = 3^{-dk}$. We note that the right endpoint $M x = 1 \in \Sigma$ corresponds to the half-dilate $M x / 2 = 1/2 \in [0, 1/2]$, whose canonical base-$3$ expansion $1/2 = \sum_{m=1}^\infty 1 \cdot 3^{-m}$ has digits $d_m = 1$ and vanishing integer part $\lfloor M x / 2 \rfloor = 0$, falling directly into the fractional carry analysis. (For Family~2, $M x \le M 3^{-bk} = 1 - 3^{-(b-a)k} + 3^{-bk} < 1$, so $M x = 1$ is strictly inaccessible; for Family~1, $M x = 1$ corresponds to the unique periodic point $x = 1/(3^{ak}+1) \in \Sigma$, which is fully admissible under the recurrence.)
 
 Under $z_1 = \dots = z_{dk} = 0$, all non-positive raw digit terms vanish identically: for any $m \le 0$, the index $m + qk \le qk \le dk$, so $z_{m + qk} = 0$ and $u_m = \sum_{q=0}^d c_q z_{m+qk} = 0$. Thus the expansion reduces to the purely fractional series:
 \begin{equation}
 \frac{M x}{2} = \sum_{m=1}^\infty u_m 3^{-m}, \quad u_m \in \{-1, 0, 1, 2\}.
 \end{equation}
-Equivalently, the half-dilate $M x / 2$ must coincide with the unique canonical expansion $\sum_{m=1}^\infty d_m 3^{-m}$ with $d_m \in \{0, 1\}$ and integer part zero. On the fractional digits $m \ge 1$, let $C_m \in \Z$ denote the carry into position $m$ from position $m+1$. The local base-$3$ carry equation is:
+Equivalently, the half-dilate $M x / 2 \in [0, 1/2]$ must coincide with the unique canonical expansion $\sum_{m=1}^\infty d_m 3^{-m}$ with $d_m \in \{0, 1\}$ and integer part $\lfloor M x / 2 \rfloor = 0$. On the fractional digits $m \ge 1$, let $C_m \in \Z$ denote the carry into position $m$ from position $m+1$. The local base-$3$ carry equation is:
 \begin{equation}
 u_m + C_m = d_m + 3 C_{m-1}, \quad \text{with target } d_m \in \{0, 1\}.
 \end{equation}
@@ -451,16 +451,47 @@ N(n+1) = N(n) + B(n), \quad \text{where } B(n) = \# \{ u \in A_n : z_{n-a} = z_{
 Consequently, the Fibonacci bound $B(n) \le N(n-1)$ for all $n \ge a$ implies $\lambda(a, b) \le \phi$.
 \end{lemma}
 
+\begin{proof}[Proof of Lemma~\ref{lem:branching_step}]
+Each admissible word $u = (z_0, \dots, z_{n-1}) \in A_n$ is extended by a symbol $z_n \in \{0, 1\}$. The linear constraint $0 \le z_n - (z_{n-a} - z_{n-b}) \le 1$ restricts $z_n$:
+\begin{itemize}\setlength{\itemsep}{0pt}
+    \item If $z_{n-a} = z_{n-b}$, then $z_{n-a} - z_{n-b} = 0$, so $0 \le z_n \le 1$ holds for both $z_n \in \{0, 1\}$ (the extension $z_n$ is free, contributing $2$ extensions).
+    \item If $z_{n-a} \ne z_{n-b}$, then $z_{n-a} - z_{n-b} \in \{-1, 1\}$, forcing $z_n = 1$ when $(z_{n-a}, z_{n-b}) = (1, 0)$ and $z_n = 0$ when $(z_{n-a}, z_{n-b}) = (0, 1)$ (the extension $z_n$ is uniquely determined, contributing $1$ extension).
+\end{itemize}
+Summing over all $u \in A_n$, each word yields at least one extension and exactly two extensions when $z_{n-a} = z_{n-b}$, establishing $N(n+1) = N(n) + B(n)$.
+\end{proof}
+
 \begin{theorem}[Universal Periodic Obstruction]\label{thm:periodic_obstruction}
 Let $a \ge 2$ and $b - a \ge 2$ be coprime. The SFT $\Sigma_{(a, b)}$ admits an explicit universal periodic orbit of length $2b$:
 \begin{equation}
 w_* = (0^b 1^b)^\infty.
 \end{equation}
-Write $\epsilon(a, b) = \mu_{\mathrm{Parry}}([w_*]) > 0$ for the Parry measure of a cylinder of this orbit. The branching recurrence gives $N(n+1)/N(n) \to \lambda(a,b)$ and $B(n)/N(n) \to \lambda(a,b) - 1$, hence
+The orbit $w_*$ is contained in a primitive recurrent component $\mathcal{C}_*$ containing both $0^b$ and $1^b$. For any Parry measure supported on $\mathcal{C}_*$, its cylinder weight satisfies $\epsilon(a, b) = \mu_{\mathrm{Parry}}([w_*]) > 0$. Furthermore, the asymptotic branching deficit satisfies:
 \begin{equation}
 \lim_{n \to \infty} \frac{N(n-1) - B(n)}{N(n-1)} = 1 + \lambda(a,b) - \lambda(a,b)^2 .
 \end{equation}
 \end{theorem}
+
+\begin{proof}[Proof of Theorem~\ref{thm:periodic_obstruction}]
+We establish the structural claims:
+\begin{enumerate}\setlength{\itemsep}{0pt}
+    \item \emph{Admissibility of $w_*$:} Define $z_i \in \{0, 1\}$ for $i \in \Z$ by $z_i = 1$ if $(i \bmod 2b) \ge b$ and $0$ otherwise. Shifting by $b$ inverts the symbol: $z_{i-b} = 1 - z_i$. Then for any lag $a \in \{1, \dots, b-1\}$,
+    \begin{equation}
+    z_i - z_{i-a} + z_{i-b} = z_i - z_{i-a} + (1 - z_i) = 1 - z_{i-a} \in \{0, 1\} \quad \text{for all } i \in \Z.
+    \end{equation}
+    Hence $w_* = (0^b 1^b)^\infty$ is an exact admissible trajectory of $\Sigma_{(a, b)}$ of period $2b$.
+    \item \emph{Component primitivity:} The states $0^b$ and $1^b$ have self-loops $0^b \to 0^b$ and $1^b \to 1^b$ in the transfer graph. Furthermore, $0^b$ reaches $1^b$ in $b$ steps via the sequence $(0^{b-k} 1^k)_{k=0}^b$, and $1^b$ reaches $0^b$ in $b$ steps via $(1^{b-k} 0^k)_{k=0}^b$ (formalized in \texttt{PeriodicOrbit.lean}). Thus $0^b$ and $1^b$ belong to a common strongly connected component $\mathcal{C}_*$. Since $0^b$ admits a self-loop (a cycle of length $1$), the period of $\mathcal{C}_*$ is $\gcd(1, 2b) = 1$, proving $\mathcal{C}_*$ is primitive.
+    \item \emph{Parry measure positivity:} On any primitive component $\mathcal{C}$ with Perron root $\lambda_{\mathcal{C}}$, the unique measure of maximal entropy $\mu_{\mathcal{C}}$ is the Parry Markov measure defined by strictly positive Perron eigenvectors $u, v > 0$. Because every vertex in $\mathcal{C}$ carries strictly positive weight, every admissible cylinder in $\mathcal{C}$ has strictly positive measure. In particular, for $w_* \subset \mathcal{C}_*$, its cylinder weight $\epsilon(a, b) = \mu_{\mathrm{Parry}}([w_*]) > 0$ is strictly positive.
+    \item \emph{Branching slack limit:} From Lemma~\ref{lem:branching_step}, $N(n+1) = N(n) + B(n)$. Since $N(n+1)/N(n) \to \lambda(a, b)$, we have $B(n)/N(n) = N(n+1)/N(n) - 1 \to \lambda(a, b) - 1$. Consequently,
+    \begin{equation}
+    \frac{B(n)}{N(n-1)} = \frac{B(n)}{N(n)} \cdot \frac{N(n)}{N(n-1)} \longrightarrow (\lambda(a, b) - 1)\lambda(a, b) = \lambda(a, b)^2 - \lambda(a, b).
+    \end{equation}
+    Subtracting this from $1$ yields the asserted asymptotic limit:
+    \begin{equation}
+    \lim_{n \to \infty} \frac{N(n-1) - B(n)}{N(n-1)} = 1 - (\lambda(a, b)^2 - \lambda(a, b)) = 1 + \lambda(a, b) - \lambda(a, b)^2.
+    \end{equation}
+\end{enumerate}
+This establishes the theorem.
+\end{proof}
 
 \begin{hypothesis}[Parry gap]\label{hyp:parry}
 For every coprime pair $a \ge 2$, $b - a \ge 2$,
