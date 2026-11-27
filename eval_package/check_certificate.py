@@ -41,7 +41,8 @@ them from first principles:
    - Integrity Checksum: The SHA-256 payload digest detects accidental bit flips,
      transmission errors, or file corruption. It does NOT prove author authenticity
      or provide non-repudiation (anyone can rehash a modified JSON). Authenticity
-     must be established via signed Git tags or the published Zenodo record.
+     must be established via the official Zenodo archive record or the canonical Git release tag
+     (note: the tag marks the exact source commit, but is not cryptographically GPG-signed).
    - External Dependencies: Collatz-Wielandt has ZERO external dependencies (operates
      on stock Python 3 standard library; SymPy is NOT imported). Sturm root-counting
      lazily imports SymPy for characteristic polynomial and Sturm chain generation,
@@ -287,51 +288,61 @@ def verify_matrix_derivation(cert_data):
 
 def verify_portable_certificate_dict(cert_data, check_derivation=False):
     """Verify a portable certificate dictionary against the emve-cert-v1 specification."""
-    # 1. Format version
-    fmt = cert_data.get("format_version")
-    if fmt not in SUPPORTED_FORMAT_VERSIONS:
-        return False, f"Unsupported certificate format version: '{fmt}' (supported: {SUPPORTED_FORMAT_VERSIONS})"
+    if not isinstance(cert_data, dict):
+        return False, f"Malformed certificate structure: root must be a JSON object, got {type(cert_data).__name__}"
 
-    # 2. Strict SHA-256 integrity checksum check (cannot be bypassed)
-    claimed_sha = cert_data.get("payload_sha256")
-    if not isinstance(claimed_sha, str) or len(claimed_sha) != 64 or not all(c in "0123456789abcdefABCDEF" for c in claimed_sha):
-        return False, f"Missing or invalid payload_sha256 integrity checksum: expected 64-character hex string, got {claimed_sha!r}"
+    try:
+        # 1. Format version
+        fmt = cert_data.get("format_version")
+        if fmt not in SUPPORTED_FORMAT_VERSIONS:
+            return False, f"Unsupported certificate format version: '{fmt}' (supported: {SUPPORTED_FORMAT_VERSIONS})"
 
-    actual_sha = compute_payload_sha256(cert_data)
-    if claimed_sha.lower() != actual_sha.lower():
-        return False, f"SHA-256 integrity checksum mismatch: claimed {claimed_sha} != computed {actual_sha}"
+        # 2. Strict SHA-256 integrity checksum check (cannot be bypassed)
+        claimed_sha = cert_data.get("payload_sha256")
+        if not isinstance(claimed_sha, str) or len(claimed_sha) != 64 or not all(c in "0123456789abcdefABCDEF" for c in claimed_sha):
+            return False, f"Missing or invalid payload_sha256 integrity checksum: expected 64-character hex string, got {claimed_sha!r}"
 
-    # 3. Required sections
-    cert_type = cert_data.get("certificate_type")
-    witness = cert_data.get("witness", {})
-    matrix = witness.get("matrix")
-    if not matrix or not isinstance(matrix, list):
-        return False, "Missing or invalid witness matrix in certificate"
+        actual_sha = compute_payload_sha256(cert_data)
+        if claimed_sha.lower() != actual_sha.lower():
+            return False, f"SHA-256 integrity checksum mismatch: claimed {claimed_sha} != computed {actual_sha}"
 
-    dims = witness.get("matrix_dimensions")
-    if dims != [len(matrix), len(matrix[0]) if matrix else 0]:
-        return False, f"matrix_dimensions {dims} does not match actual matrix dimensions [{len(matrix)}, {len(matrix[0]) if matrix else 0}]"
+        # 3. Required sections
+        cert_type = cert_data.get("certificate_type")
+        witness = cert_data.get("witness")
+        if not isinstance(witness, dict):
+            return False, "Missing or invalid 'witness' section: must be a JSON object"
 
-    # 4. Optional end-to-end matrix derivation verification
-    if check_derivation:
-        d_ok, d_msg = verify_matrix_derivation(cert_data)
-        if not d_ok:
-            return False, d_msg
+        matrix = witness.get("matrix")
+        if not isinstance(matrix, list) or len(matrix) == 0 or not all(isinstance(r, list) for r in matrix):
+            return False, "Missing or invalid witness matrix in certificate: must be a non-empty 2D list"
 
-    # 5. Certificate type specific checks
-    if cert_type == "collatz_wielandt":
-        vector = witness.get("witness_vector")
-        if not vector or not isinstance(vector, list):
-            return False, "Missing or invalid witness_vector for collatz_wielandt certificate"
-        ok, msg = verify_collatz_wielandt_witness(matrix, vector)
-        return ok, msg
+        dims = witness.get("matrix_dimensions")
+        if dims != [len(matrix), len(matrix[0]) if matrix else 0]:
+            return False, f"matrix_dimensions {dims} does not match actual matrix dimensions [{len(matrix)}, {len(matrix[0]) if matrix else 0}]"
 
-    elif cert_type == "sturm_root_count":
-        ok, msg = verify_sturm_extremizer_witness(matrix)
-        return ok, msg
+        # 4. Optional end-to-end matrix derivation verification
+        if check_derivation:
+            d_ok, d_msg = verify_matrix_derivation(cert_data)
+            if not d_ok:
+                return False, d_msg
 
-    else:
-        return False, f"Unknown certificate_type: '{cert_type}'"
+        # 5. Certificate type specific checks
+        if cert_type == "collatz_wielandt":
+            vector = witness.get("witness_vector")
+            if not isinstance(vector, list) or len(vector) == 0:
+                return False, "Missing or invalid witness_vector for collatz_wielandt certificate: must be a non-empty list"
+            ok, msg = verify_collatz_wielandt_witness(matrix, vector)
+            return ok, msg
+
+        elif cert_type == "sturm_root_count":
+            ok, msg = verify_sturm_extremizer_witness(matrix)
+            return ok, msg
+
+        else:
+            return False, f"Unknown certificate_type: '{cert_type}'"
+
+    except Exception as e:
+        return False, f"Malformed certificate structure: {e}"
 
 
 def verify_certificate_file(file_path, check_derivation=False):

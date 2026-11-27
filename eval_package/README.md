@@ -1,18 +1,18 @@
 # EMVE Technical Evaluation Package (v1.0.0)
 
-This self-contained package allows you to independently audit an exact mathematical witness for multiplier $M = 19$ in less than 5 seconds, with **zero external dependencies**.
+This self-contained package allows you to independently audit an exact mathematical witness for multiplier $M = 19$ in seconds, with **zero external dependencies** for the Collatz–Wielandt path.
 
 ---
 
 ## 1. Quick Start: One Command
 
-Run the standalone checker from this directory using stock Python 3:
+Run the standalone checker from this directory using stock Python 3 (pure standard library; no `pip install` required):
 
 ```bash
 python3 check_certificate.py M19_collatz_wielandt.json
 ```
 
-### Expected Output (< 0.001 seconds):
+### Expected Output (observed reference time: ~0.0002s on AMD Ryzen 9 5950X):
 
 ```text
 ================================================================================
@@ -33,14 +33,16 @@ Execution Time     : 0.0002s
 ================================================================================
 AUDIT SUMMARY: ALL 1 CERTIFICATES INDEPENDENTLY AUDITED AND PASSED.
 Guarantees: Strict integer typing; verified SHA-256 integrity checksum; exact spectral bound.
+Notice: Checked matrix properties. Run with --verify-derivation to re-derive matrix from M.
 ================================================================================
 ```
+*(Note: Execution time is an observed benchmark on the reference environment; actual execution time may vary depending on CPU and Python interpreter initialization).*
 
 ---
 
-## 2. Package Contents
+## 2. Package Contents & Dependency Scope
 
-- **`check_certificate.py`**: Standalone mathematical certificate auditor. Runs on pure Python 3 standard library (`json`, `hashlib`, `fractions`, `argparse`).
+- **`check_certificate.py`**: Standalone mathematical certificate auditor. The Collatz–Wielandt evaluation implemented here operates with **zero external dependencies** on Python 3 standard library (`json`, `hashlib`, `fractions`, `argparse`). *(Note: The full repository version of this script lazily imports SymPy if auditing quadratic-field Sturm sequences, and NumPy if running `--verify-derivation`; neither is required for this M=19 package).*
 - **`M19_collatz_wielandt.json`**: Portable certificate (`emve-cert-v1`) for multiplier $M = 19$. Contains the full $6 \times 6$ integer transition matrix $A$, the positive integer witness vector $v = [201563, 139062, 100000, 100000, 139062, 201562]$, and the SHA-256 integrity checksum.
 - **`README.md`**: This guide.
 
@@ -61,6 +63,7 @@ To maintain rigorous scientific standards, we explicitly separate what this cert
 1. **Automaton Derivation:** The auditor verifies properties of the matrix $A$ encoded in the JSON. It does not independently construct the carry graph from $M = 19$ (end-to-end derivation requires the full repository).
 2. **Global Two-Sided Uniqueness:** Proof that the zero-reachable component uniquely dominates the full two-sided shift space across the interior domain relies on an analytical spectral-gap hypothesis (Hypothesis (H)).
 3. **Continuous Measure Bridge:** The Frostman measure bridge connecting symbolic growth rates $\log_3 \lambda_0$ to real-line Hausdorff dimension $\dim_H C(1, 19)$ on $\mathbb{R}$ is an analytical paper proof (§3), not an automated script check.
+4. **Cryptographic Provenance:** The SHA-256 checksum detects corruption; author authenticity should be checked against the official Zenodo archive record or the canonical Git release tag (note: the Git tag identifies the source commit, but is not GPG-signed).
 
 ---
 

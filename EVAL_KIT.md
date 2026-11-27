@@ -13,7 +13,7 @@ You only need Python 3 and the standalone auditor script. Run the following comm
 python3 scripts/check_certificate.py certificates/M19_collatz_wielandt.json
 ```
 
-**Expected terminal output (< 0.001 seconds):**
+**Expected terminal output (observed reference time: ~0.0002s on AMD Ryzen 9 5950X):**
 ```text
 Target File        : certificates/M19_collatz_wielandt.json
 Problem ID         : erdos-cantor-multiplier:M=19:family=2:lag=(1,3)
@@ -24,6 +24,7 @@ Audit Status       : [PASS]
 Proof Details      : Collatz-Wielandt verified: 5*(A@v) <= 8*v holds across all 6 rows. Proves rho(A) <= 8/5 = 1.60 < phi strictly.
 Execution Time     : 0.0002s
 ```
+*(Note: Execution time is an observed benchmark on the reference hardware; actual times depend on local CPU and interpreter startup).*
 
 For the proven extremizer $M=7$ (exact equality to the golden ratio $\phi$):
 ```bash
@@ -84,5 +85,5 @@ flowchart TD
 | **Does certificate verification use floating-point numbers?** | **No.** Integer Collatz-Wielandt evaluation is pure $\mathbb{Z}$; Sturm root evaluation is exact rational field arithmetic $\mathbb{Q}(\sqrt{5})$. |
 | **Can a corrupted or malformed certificate pass?** | **No.** Mandatory 64-character SHA-256 integrity checksums are enforced. Missing, empty, or mismatched checksums fail immediately. |
 | **Can boolean values pass as integers?** | **No.** The auditor strictly rejects boolean values (`True`/`False`) in both matrix entries and witness vectors. |
-| **Does the SHA-256 checksum prove author identity?** | **No.** The checksum is an integrity check against corruption. Authenticity requires out-of-band verification against signed Git release tags or the official Zenodo archive ([DOI: 10.5281/zenodo.24595631](https://zenodo.org/records/24595631)). |
+| **Does the SHA-256 checksum prove author identity?** | **No.** The checksum is an integrity check against corruption. Authenticity requires out-of-band verification against the official Zenodo archive ([DOI: 10.5281/zenodo.24595631](https://zenodo.org/records/24595631)) or canonical Git release tags (note: release tags mark the source commit revision, but are not cryptographically GPG-signed). |
 | **Does the checker rely on heavy external libraries?** | Collatz-Wielandt operates with **zero external dependencies** on stock Python 3. Sturm root-counting lazily imports SymPy for polynomial algebra, evaluating root signs in exact field arithmetic. Both are decoupled from EMVE search heuristics. |
