@@ -4,8 +4,9 @@ The commercial tiers are permissions over a defined thing. This file defines the
 thing, so that an agreement can name it and a customer cannot argue about where
 it stops.
 
-Status: inventory only. The tiers are **not** written yet; the proposed mapping
-at the end is a draft awaiting decisions listed in "Open boundary questions".
+Status: boundary decided, tiers drafted. The tier tables below are the
+permissions the agreement will grant, and Schedule A of the agreement names the
+components and the commit.
 
 ## Definition
 
@@ -17,15 +18,15 @@ in the agreement, excluding C5 and C6.
 | C1 | Core Lean 4 formalization | `ErdosTernary/ErdosTernary/` | 133 files, 88,996 lines | PolyForm Strict 1.0.0 | yes |
 | C2 | Python tools | `ErdosTernary/*.py`, `scripts/`, `verify_middle/`, 5 at root | 118 files, 20,674 lines | PolyForm Strict 1.0.0 | yes |
 | C3 | Rust tools | `verify_erdos_rs/`, `verify_middle/` | 10 files, 2,073 lines, 2 crates | PolyForm Strict 1.0.0 | yes |
-| C4 | Certificates and datasets | `verify_middle/*.csv`, `ErdosTernary/nk*.txt`, JSON manifests | 16 files, 11 MB | PolyForm Strict 1.0.0, to the extent copyright subsists | yes, see Q1 |
+| C4 | Certificates and datasets | `verify_middle/*.csv`, `ErdosTernary/nk*.txt`, JSON manifests | 15 files, ~10 MB | PolyForm Strict 1.0.0, to the extent copyright subsists | yes, as reference outputs |
 | C5 | Dependencies | see below | — | third-party | **no** |
 | C6 | Papers | `paper/` | 2 manuscripts | Paper 1 CC BY 4.0, Paper 2 all rights reserved | **no** |
 
 ### C1 — Core Lean 4 formalization
 
-Toolchain `leanprover/lean4:v4.12.0`, Mathlib pinned at
-`809c3fb3b5c8`, plus `batteries`, `Qq`, `aesop`, `proofwidgets`, `Cli`,
-`importGraph`, `LeanSearchClient`.
+Toolchain `leanprover/lean4:v4.12.0`, Mathlib pinned at `809c3fb3b5c8`, plus
+`batteries`, `Qq`, `aesop`, `proofwidgets`, `Cli`, `importGraph`,
+`LeanSearchClient`.
 
 78 modules at the top level, plus `Archive_3AdicBarrier/` and
 `ContinuedFraction/`.
@@ -41,9 +42,10 @@ Four groups, and they do different jobs:
 | `verify_middle/` | 25 | bridge verification drivers |
 | repository root | 5 | `verify_conjecture.py`, `verify_coverage.py`, `verify_gap.py`, `verify_key_lemma.py`, `verify_large.py` |
 
-Third-party imports: `numpy` and `sympy` (9 files), both BSD-3-Clause, both
-excluded from the offer. There is no requirements file; a customer would need
-one.
+Third-party imports: `numpy` and `sympy` (9 files, all in
+`scripts/cantor_multiplier/`), both BSD-3-Clause. They are excluded from the
+offer and pinned in `requirements.txt`; the customer installs them. See
+`INSTALL.md`.
 
 ### C3 — Rust tools
 
@@ -56,8 +58,12 @@ all excluded from the offer.
 The largest is `verify_middle/bridge_data_K15.csv` at 5.9 MB, followed by
 `bridge_data_K12.csv` (0.7 MB) and the `nk17_*` chunk lists (0.6 MB each).
 
-`ErdosTernary/build_errors.txt` (1.2 MB) is a build log, not an asset. It should
-be removed from the repository and from the product definition.
+These are reference outputs, not deliverables with a warranty. A customer
+receives permission to use them; it does not acquire ownership of them.
+
+The 1.2 MB build log that used to live at `ErdosTernary/build_errors.txt` was
+removed from the repository. It remains in Git history and is not part of the
+product.
 
 ### C5 — Dependencies, excluded
 
@@ -73,41 +79,89 @@ sold. Paper 2 is all rights reserved and unpublished.
 
 ## Out of scope, explicitly
 
-- `ErdosTernary/attic/` — 7 archived files kept for restoration, not built.
+- `ErdosTernary/attic/` — 7 archived files kept for restoration, not built, not
+  covered by any tier.
 - `.worktrees/` — untracked working copies.
 - `contrib/palomar/` — separate repository, Apache-2.0.
-- `contrib/formal-conjectures/` — Apache-2.0 contribution to an upstream project.
+- `contrib/formal-conjectures/` — Apache-2.0 contribution to an upstream
+  project.
 - `.lake/` — build artifacts.
 
-## Open boundary questions
+## Decisions
 
-1. **Are the shipped certificates part of what a customer buys, or only the
-   ability to regenerate them?** Tier 3 depends entirely on this answer.
-2. **Who owns outputs a customer generates?** Proposed: outputs of the
-   customer's own runs are the customer's; the shipped certificates remain
-   licensed. This is the sentence Tier 3 needs, and it is the one most likely to
-   be argued.
-3. **Do the Python tools count as integrable software under Tier 2**, given they
-   depend on `numpy` and `sympy` that the customer must supply?
-4. **Is `attic/` excluded from all tiers?** Recommended: yes, unsupported and
-   unwarranted.
-5. **Does "specified software" in each tier mean all of C1–C4, or a named
-   subset?** The tiers as drafted say "specified", which is only usable if the
-   agreement enumerates the subset.
+| # | Question | Decision |
+| --- | --- | --- |
+| 1 | Are the shipped certificates sold? | Included as reference outputs, with permission to use them. Not transferred as owned property. |
+| 2 | Who owns customer-generated outputs? | The customer owns its deliverable files and output rights, subject to the underlying intellectual property. See the rule below. |
+| 3 | Do `numpy` and `sympy` block integration? | No. The tools are included; the customer supplies the dependencies. |
+| 4 | Is `attic/` in scope? | Excluded from every tier. |
+| 5 | What does "specified software" mean? | The exact components and commit are listed in Schedule A of the agreement. |
 
-## Proposed tier mapping — draft, not in force
+## Output ownership rule
 
-| | C1 Lean | C2 Python | C3 Rust | C4 Certificates |
+This is the drafting basis for clause 10 of the agreement:
+
+> The customer retains ownership of its input data and its own generated output
+> files, subject to any third-party rights and any intellectual-property rights
+> subsisting in the underlying Software or pre-existing materials.
+>
+> No ownership of the Software, its source code, or pre-existing certificates
+> transfers to the customer by virtue of generating or receiving an output.
+
+The rule does not claim that mathematical facts become anyone's exclusive
+property, and it does not claim that every generated file is copyrightable.
+Ownership of a file and ownership of the rights in what it expresses are
+different things, and the agreement keeps them separate.
+
+## Tiers
+
+Cumulative: each tier includes the one below it. Tier 3 does **not** include
+redistribution of source code; that needs its own explicit permission.
+
+### Tier 1 — Research and internal use
+
+For a company using the software for its own commercial research and
+computational workflows.
+
+| Permission | C1 Lean | C2 Python | C3 Rust | C4 Certificates |
 | --- | --- | --- | --- | --- |
-| Tier 1 — Research and internal use | run internally | run internally | run internally | read, not redistribute |
-| Tier 2 — Integration and development | embed, modify per agreement | embed, modify per agreement | embed, modify per agreement | use internally |
-| Tier 3 — Results and deployment | production use | production use | production use | deploy, plus agreed use of generated outputs |
+| Execute internally | yes | yes | yes | — |
+| Analyse computational results | yes | yes | yes | yes |
+| Produce internal research reports | yes | yes | yes | yes |
+| Modify | no | no | no | no |
+| Redistribute | no | no | no | no |
+| Sublicense | no | no | no | no |
 
-Tiers are cumulative: Tier 3 includes Tier 1 and 2 rights unless the agreement
-says otherwise.
+### Tier 2 — Integration and development
 
-## What has to be decided before the tiers are written
+For a company embedding the software in its own systems.
 
-The five questions above. Until Q1 and Q2 are answered, Tier 3 cannot be written
-without contradicting itself, because it would promise deployment of outputs
-whose ownership the agreement has not settled.
+| Permission | C1 Lean | C2 Python | C3 Rust | C4 Certificates |
+| --- | --- | --- | --- | --- |
+| Everything in Tier 1 | yes | yes | yes | yes |
+| Embed in internal and production systems | yes | yes | yes | use internally |
+| Modify, within the scope agreed in writing | yes | yes | yes | no |
+| Distribute components inside the licensee's organization | yes | yes | yes | no |
+| Distribute components to third parties | only as agreed in writing, per component | same | same | no |
+
+### Tier 3 — Commercial results and deployment
+
+For a company generating or verifying mathematical results in commercial
+workflows.
+
+| Permission | C1 Lean | C2 Python | C3 Rust | C4 Certificates |
+| --- | --- | --- | --- | --- |
+| Everything in Tier 1 and Tier 2 | yes | yes | yes | yes |
+| Commercial computational runs at scale | yes | yes | yes | yes |
+| Generate results and certificates | yes | yes | yes | — |
+| Own and use its own generated outputs | per the output rule | per the output rule | per the output rule | — |
+| Deploy to production, with support if purchased | yes | yes | yes | as reference outputs |
+| Redistribute the shipped certificates | — | — | — | only as agreed in writing |
+| Redistribute source code | no | no | no | no |
+
+## What remains
+
+The boundary and the permissions are settled. The agreement is where they become
+enforceable: clause 3 selects a tier, Schedule A names the components and the
+commit, and clause 10 carries the output rule. None of it has been reviewed by a
+lawyer.

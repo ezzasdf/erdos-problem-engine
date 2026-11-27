@@ -43,7 +43,7 @@ incorporates the Software or a Modification.
 3.2 **Who may use it.** Choose one:
 
 - [OPTION A — organization with listed affiliates] The grant covers Licensee and
-  the affiliates listed in Schedule A. Each listed affiliate is bound by this
+  the affiliates listed in Schedule B. Each listed affiliate is bound by this
   agreement as if it were the Licensee. Licensee remains responsible for each
   affiliate's compliance and for payment. Adding an affiliate requires written
   notice to Licensor and Licensor's written acceptance; a subsidiary acquired
@@ -51,12 +51,21 @@ incorporates the Software or a Modification.
 - [OPTION B — single legal entity] The grant covers Licensee only. Parents,
   subsidiaries, sister companies, and other affiliates are separate legal
   persons, are not covered, and must each sign their own agreement or be added
-  to Schedule A.
+  to Schedule B.
 
 3.3 Employees and individual contractors acting on Licensee's behalf and under
 its direction are covered, provided they are bound by confidentiality and use
 restrictions at least as protective as this agreement. A contractor may not use
 the Software for its own purposes or for another client.
+
+3.4 **Tier.** This agreement grants [TIER 1 / TIER 2 / TIER 3]. Tiers are
+cumulative, so the named tier includes every lower tier. Tier 3 does not include
+redistribution of source code; that requires the separate permission in clause
+3.1(c) to be selected and described, per component, in Schedule A.
+
+3.5 The Software covered is only what Schedule A lists, at the commit named
+there. Anything not listed is not licensed, including archived files and build
+artifacts.
 
 **4. Restrictions**
 
@@ -172,10 +181,24 @@ Software or a Modification, Licensor's rights in the Software are unaffected,
 and Licensee's right to distribute the Product depends on clause 3.1(c)
 remaining in force.
 
-10.5 **No implied licenses.** No license is granted by implication, estoppel, or
+10.5 **Customer-generated outputs.** Licensee retains ownership of its input
+data and its own generated output files, subject to any third-party rights and
+to any intellectual-property rights subsisting in the Software or in
+pre-existing materials. No ownership of the Software, its source code, or the
+reference certificates listed in Schedule A transfers to Licensee by virtue of
+generating or receiving an output. This clause does not assert that
+mathematical facts, numerical values, or every generated file are subject to
+copyright, and does not grant either party exclusive rights in them.
+
+10.6 **Reference certificates.** The certificates and datasets named in
+Schedule A are licensed, not sold. Licensee may use them as reference outputs
+for the purposes of the selected tier. It may not redistribute them unless
+clause 3.1(c) is selected for them.
+
+10.7 **No implied licenses.** No license is granted by implication, estoppel, or
 otherwise, except as stated in clause 3.
 
-10.6 Choose one:
+10.8 Choose one:
 
 - [GRANT BACK] Licensee grants Licensor a non-exclusive, perpetual, royalty-free
   right to use any Modification Licensee chooses to contribute back. This does
@@ -224,7 +247,30 @@ Name and title: ______________________
 
 ---
 
-**Schedule A — affiliates covered under clause 3.2, Option A**
+**Schedule A — Covered Software**
+
+Everything not listed here is excluded from the grant.
+
+| | Component | Path | Included | Notes |
+| --- | --- | --- | --- | --- |
+| C1 | Lean 4 formalization | `ErdosTernary/ErdosTernary/` | [YES / NO] | 133 files |
+| C2 | Python tools | `scripts/`, `verify_middle/*.py`, `ErdosTernary/*.py` | [YES / NO] | requires `numpy`, `sympy` supplied by Licensee |
+| C3 | Rust tools | `verify_erdos_rs/`, `verify_middle/` | [YES / NO] | 2 crates |
+| C4 | Reference certificates | `verify_middle/*.csv`, `ErdosTernary/nk*.txt`, JSON manifests | [YES / NO] | reference outputs, licensed not sold |
+
+Source commit: [FULL 40-CHARACTER COMMIT SHA]
+
+Excluded in all cases: `ErdosTernary/attic/`, `.lake/` build artifacts,
+`contrib/`, the papers in `paper/`, and all third-party dependencies.
+
+If clause 3.1(c) is selected, name here exactly which components may be
+redistributed and to whom:
+
+[PER-COMPONENT REDISTRIBUTION GRANT, OR "NONE"]
+
+---
+
+**Schedule B — Affiliates covered under clause 3.2, Option A**
 
 | Legal name | Registration number | Jurisdiction | Date accepted |
 | --- | --- | --- | --- |
@@ -240,15 +286,33 @@ listed entity's compliance and for payment.
 
 | Requirement | Clause |
 | --- | --- |
-| What may they use? | 2, 3.1, 3.2, 3.3 |
-| May they modify? | 3.1(b), 10.3, 10.6 |
-| May they redistribute? | 3.1(c), 4.1 |
+| What may they use? | 2, 3.1, 3.5, Schedule A |
+| Which tier? | 3.4 |
+| May they modify? | 3.1(b), 10.3, 10.8 |
+| May they redistribute? | 3.1(c), 4.1, Schedule A |
 | May they sell products containing it? | 3.1(a), 4.1, 10.4 |
+| Who owns what they generate? | 10.5, 10.6 |
 | One-time or recurring payment? | 5.1 |
 | How long does permission last? | 6.1, 6.2 |
 | What if they stop paying? | 7.2, 7.3, 7.5, 7.6 |
 | What if the project is acquired? | 12.1, 12.2 |
-| Who inside the customer may use it? | 3.2, 3.3, Schedule A |
+| Who inside the customer may use it? | 3.2, 3.3, Schedule B |
+
+## Scenarios this agreement was tested against
+
+Walked through by hand against the clauses, not by a court:
+
+| Scenario | Expected outcome | Clauses relied on |
+| --- | --- | --- |
+| Tier 1 company runs the Lean build and writes an internal report from the results. | Permitted. No redistribution, no modification. | 3.1(a), 10.5 |
+| Tier 1 company patches a Python script and keeps the patch internal. | **Not permitted.** Modification requires Tier 2. | 3.4 |
+| Tier 2 company embeds the Rust verifier in its SaaS product and ships binaries to customers. | Permitted only if 3.1(c) is selected and the component named in Schedule A. Otherwise not. | 3.1(c), 4.1 |
+| Tier 3 company runs a million computational checks and sells the resulting certificates as a service. | Permitted for outputs it generates; the shipped reference certificates are not resold as its own. | 10.5, 10.6 |
+| Tier 3 company republishes the Lean source on its own GitHub. | **Not permitted.** Tier 3 does not include source redistribution. | 3.4, 4.1 |
+| Customer stops paying in year two of a perpetual Tier 2 grant. | Grant ends prospectively; delivered products keep working for end users; accrued fees still owed. | 7.3, 7.4, 7.5 |
+| Parent company buys a subsidiary after signature and moves the team into it. | Not covered until the subsidiary is listed in Schedule B and accepted. | 3.2 |
+| Customer asks for the whole repository as part of a support contract. | Refused: uncatalogued files, `attic/`, and third-party dependencies are outside Schedule A. | 3.5, Schedule A |
+| Customer claims exclusive rights in a certificate it generated. | It owns the file; it does not own the underlying facts or the Software, and no exclusive right in facts is granted or created. | 10.5 |
 
 ## What this template does not do
 

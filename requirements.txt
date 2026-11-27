@@ -1,0 +1,11 @@
+# Python dependencies for the verification tools.
+#
+# Only 9 of the 118 Python files import anything outside the standard library:
+# the eight x2p_* scripts and lemma41_transfer.py, all in
+# scripts/cantor_multiplier/. Everything else runs on the standard library.
+#
+# Verified against Python 3.12.3 on Linux x86_64.
+# Versions below are the ones the examples in INSTALL.md were run with.
+
+numpy==2.5.3
+sympy==1.14.0

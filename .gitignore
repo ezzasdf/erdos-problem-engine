@@ -10,6 +10,9 @@ target/
 __pycache__/
 *.pyc
 
+# Computation caches written by the verification scripts
+scripts/cantor_multiplier/cache/
+
 # OS
 .DS_Store
 Thumbs.db

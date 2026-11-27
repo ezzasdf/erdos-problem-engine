@@ -31,6 +31,24 @@ than to imply otherwise.
 A company that wants the current version for its own commercial use, outside
 those three cases, is who `COMMERCIAL_AGREEMENT_TEMPLATE.md` is for.
 
+## Tiers
+
+Three cumulative tiers. What each one covers is defined component by component
+in `PRODUCT_SCOPE.md`, which also lists what is excluded.
+
+| Tier | For | Grants in outline |
+| --- | --- | --- |
+| 1 — Research and internal use | a company using the software for its own commercial research and computation | execution, analysis of results, internal reports. No modification, no redistribution. |
+| 2 — Integration and development | a company embedding the software in its own systems | everything in Tier 1, plus embedding, modification within an agreed scope, and internal distribution. |
+| 3 — Commercial results and deployment | a company generating or verifying mathematical results in commercial workflows | everything in Tier 2, plus production runs, ownership of its own generated outputs, and deployment with support if purchased. |
+
+Tiers are cumulative. **None of them includes redistribution of source code.**
+That is a separate permission, granted per component and named in Schedule A of
+the agreement.
+
+The declaration of what a customer receives is `PRODUCT_SCOPE.md`; the
+installation path is `INSTALL.md`.
+
 Academics and noncommercial users do not need a license, but PolyForm Strict
 does not permit them to modify the code either. If you are one of those users
 and want to modify it for your own research, write to the address below;
