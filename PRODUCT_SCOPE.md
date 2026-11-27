@@ -20,7 +20,7 @@ in the agreement, excluding C5 and C6.
 | C3 | Rust tools | `verify_erdos_rs/`, `verify_middle/` | 10 files, 2,073 lines, 2 crates | PolyForm Strict 1.0.0 | yes |
 | C4 | Certificates and datasets | `verify_middle/*.csv`, `ErdosTernary/nk*.txt`, JSON manifests | 15 files, ~10 MB | PolyForm Strict 1.0.0, to the extent copyright subsists | yes, as reference outputs |
 | C5 | Dependencies | see below | — | third-party | **no** |
-| C6 | Papers | `paper/` | 2 manuscripts | Paper 1 CC BY 4.0, Paper 2 all rights reserved | **no** |
+| C6 | Papers | `paper/` | 2 manuscripts | Paper 1 and Paper 2: CC BY 4.0 | **no** |
 
 ### C1 — Core Lean 4 formalization
 

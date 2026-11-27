@@ -38,8 +38,10 @@ Contents:
    `LICENSE` file is a per-part map, not a single license.
 3. **Paper 1** (`paper/cantor_multiplier_dimension.*`) is CC BY 4.0, and is
    published at DOI `10.5281/zenodo.24595631` under that license.
-4. **Paper 2** (`paper/erdos_ternary_repunit.*`) is all rights reserved and has
-   not been published or licensed anywhere.
+4. **Paper 2** (`paper/erdos_ternary_repunit.*`) is CC BY 4.0, and is published
+   at DOI `10.5281/zenodo.24609635` under that license. The software it
+   describes has its own record, `10.5281/zenodo.24609575`, under PolyForm
+   Strict 1.0.0.
 5. **Two derived packages are Apache-2.0 by necessity**, not by choice:
    `contrib/palomar/` (a registry submission, published at
    `github.com/ezzasdf/erdos-ternary-carry-packet`, commit
