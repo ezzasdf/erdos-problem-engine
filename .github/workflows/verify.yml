@@ -78,3 +78,25 @@ jobs:
         run: |
           $HOME/.elan/bin/lean lean/CertCheck.lean
           $HOME/.elan/bin/lean eval_package/CertCheck.lean
+
+  paper2-lean-package:
+    name: Paper 2 Lean 4 Package & Bridge Verification
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Lean 4 via elan
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --default-toolchain leanprover/lean4:v4.12.0
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Fetch Mathlib Olean Cache
+        run: |
+          cd ErdosTernary
+          $HOME/.elan/bin/lake exe cache get
+
+      - name: Build ErdosTernary Package (Core Theory & Bridge Suite through K=18)
+        run: |
+          cd ErdosTernary
+          $HOME/.elan/bin/lake build ErdosTernary

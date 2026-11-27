@@ -42,11 +42,11 @@
 \begin{document}
 
 \begin{abstract}
-In 1979, Paul Erd\H{o}s~\cite{Erdos1979} conjectured that $2^0 = 1$, $2^2 = 4$, and $2^8 = 256$ are the only powers of $2$ whose base-$3$ (ternary) expansion contains no digit $2$. \textbf{The Erd\H{o}s conjecture remains open.} In this paper, we do not prove the Erd\H{o}s conjecture; rather, we reduce it to a clean, machine-verified condition: the conjecture is equivalent to the statement that the joint survivor set --- those $s \ge 5$ that survive the $3$-adic tree to depth $s+1$ (with $s$ trailing digits in $\{0, 1\}$) while their leading quotient avoids digit $2$ --- is empty ($\text{Erd\H{o}s} \iff \mathrm{jointSurvivors} = \emptyset$). 
+In 1979, Paul Erd\H{o}s~\cite{Erdos1979} conjectured that $2^0 = 1$, $2^2 = 4$, and $2^8 = 256$ are the only powers of $2$ whose base-$3$ (ternary) expansion contains no digit $2$. \textbf{The Erd\H{o}s conjecture remains open.} In this paper, we do not prove the Erd\H{o}s conjecture; rather, we reduce it to a clean Diophantine condition whose equivalence to the conjecture is machine-verified (the emptiness of the joint survivor set itself remains open): the conjecture is equivalent to the statement that the joint survivor set --- those $s \ge 5$ that survive the $3$-adic tree to depth $s+1$ (with $s$ trailing digits in $\{0, 1\}$) while their leading quotient avoids digit $2$ --- is empty ($\text{Erd\H{o}s} \iff \mathrm{jointSurvivors} = \emptyset$). 
 
 We formulate the problem through base-$4$ repunit coordinates $4^s = 3 R_s(4) + 1$, governed by the $3$-adic dynamical system $R_{s+1} = 4 R_s + 1$, building upon the repunit framework of Idowu (arXiv:2610.03789)~\cite{Idowu2026}. We establish a bounded-representative correspondence between the repunit survivor tree and the classical survivor tree of powers of $2$, and extend it analytically to an isomorphism of their projective quotient trees. We establish the Archimedean--$3$-Adic Decoupling Theorem, which reduces the problem to an exact Diophantine target, and analyze the joint summability heuristic $\sum (2/3)^{1.26s} < \infty$.
 
-In a self-contained analysis of obstructions, we prove why elementary methods fail: we formalize the infinite modular barrier ($|N_K| = 2^{K-1}$), prove the mod-$8$ non-recurrence of carry-absorbing packets ($1 + 3^s \ne 2^k$ for $s \ge 2$), and contrast the positive-power case with the negative-power theorem $2^{-n}$, completely proved here via the mod-$8$ Gap Lemma. The principal results are supported by Lean~4 formalizations (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with pure foundational axioms and zero \texttt{sorry} placeholders, including the bounded-representative survivor correspondence, Archimedean decoupling, mod-$8$ carry-packet non-recurrence, and the negative-power theorem. Supporting number-theoretic arguments (including Saye's multiplicative-order calculation and the binomial repunit-lifting congruence) and structural comparisons (the projective quotient-tree isomorphism and carry-automaton SFT comparison) are proved analytically in the manuscript. The First-Period Bridge Theorem is verified by finite computation in the bridge modules using quarantined \texttt{native\_decide} certificates.
+In a self-contained analysis of obstructions, we establish several concrete obstructions to natural elementary approaches: we formalize the infinite modular barrier ($|N_K| = 2^{K-1}$), prove the mod-$8$ non-recurrence of carry-absorbing packets ($1 + 3^s \ne 2^k$ for $s \ge 2$), and contrast the positive-power case with the negative-power theorem $2^{-n}$, completely proved here via the mod-$8$ Gap Lemma. The principal results are supported by Lean~4 formalizations (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with pure foundational axioms and zero \texttt{sorry} placeholders, including the bounded-representative survivor correspondence, Archimedean decoupling, mod-$8$ carry-packet non-recurrence, and the negative-power theorem. Supporting number-theoretic arguments (including Saye's multiplicative-order calculation and the binomial repunit-lifting congruence) and structural comparisons (the projective quotient-tree isomorphism and carry-automaton SFT comparison) are proved analytically in the manuscript. The First-Period Bridge Theorem is verified by finite computation in the bridge modules using quarantined \texttt{native\_decide} certificates.
 \end{abstract}
 
 \maketitle
@@ -118,16 +118,40 @@ The base-$3$ digit at index $m$ is given by:
 d_m(R_{r + q \cdot 3^m}(4)) = (d_m(R_r(4)) + q) \bmod 3.
 \end{equation}
 As $q$ ranges over $\{0, 1, 2\}$, the output digit visits each element of $\{0, 1, 2\}$ exactly once.
+Furthermore, the reduction commutes with canonical parent projections: $\pi_m(R_s(4) \bmod 3^{m+1}) = R_{\pi_m(s)}(4) \bmod 3^m$, where $\pi_m : \Z / 3^{m+1}\Z \to \Z / 3^m\Z$ is modular reduction.
 \end{lemma}
 
 \begin{proof}
-By the binomial expansion of $(1 + 3)^{3^m}$,
+We first establish the affine lifting congruence for any depth $m \ge 1$. By the binomial expansion of $(1 + 3)^{3^m}$,
 \begin{align}
-4^{3^m} &= 1 + 3^m \cdot 3 + \binom{3^m}{2} 3^2 + \dots \equiv 1 + 3^{m+1} \pmod{3^{m+2}}, \\
+4^{3^m} &= (1 + 3)^{3^m} = 1 + 3^m \cdot 3 + \binom{3^m}{2} 3^2 + \dots \equiv 1 + 3^{m+1} \pmod{3^{m+2}}, \\
 R_{3^m}(4) &= \frac{4^{3^m} - 1}{3} \equiv 3^m \pmod{3^{m+1}}.
 \end{align}
-For any lift $s = r + q \cdot 3^m$, the repunit identity $R_{a+b}(4) = R_a(4) + 4^a R_b(4)$ gives $R_s(4) = R_r(4) + 4^r R_{q \cdot 3^m}(4)$. Since $4 \equiv 1 \pmod 3$, $4^r \equiv 1 \pmod 3$. Furthermore, $R_{q \cdot 3^m}(4) \equiv q R_{3^m}(4) \equiv q \cdot 3^m \pmod{3^{m+1}}$, establishing
-the congruence $R_{r + q \cdot 3^m}(4) \equiv R_r(4) + q \cdot 3^m \pmod{3^{m+1}}$. Dividing by $3^m$ modulo $3$ yields $d_m(R_{r + q \cdot 3^m}(4)) = (d_m(R_r(4)) + q) \bmod 3$. As $q$ ranges over $\{0, 1, 2\}$, this affine shift permutes $\{0, 1, 2\}$ bijectively.
+For any lift $s = r + q \cdot 3^m$, the repunit concatenation identity $R_{a+b}(4) = R_a(4) + 4^a R_b(4)$ gives $R_s(4) = R_r(4) + 4^r R_{q \cdot 3^m}(4)$. Since $4 \equiv 1 \pmod 3$, we have $4^r \equiv 1 \pmod 3$. Furthermore, $R_{q \cdot 3^m}(4) \equiv q R_{3^m}(4) \equiv q \cdot 3^m \pmod{3^{m+1}}$, establishing the fundamental lifting congruence:
+\begin{equation}\label{eq:lifting_cong}
+R_{r + q \cdot 3^m}(4) \equiv R_r(4) + q \cdot 3^m \pmod{3^{m+1}}.
+\end{equation}
+Dividing by $3^m$ modulo $3$ yields $d_m(R_{r + q \cdot 3^m}(4)) = (d_m(R_r(4)) + q) \bmod 3$. As $q$ ranges over $\{0, 1, 2\}$, the affine shift $q \mapsto (d_m(R_r(4)) + q) \bmod 3$ permutes $\{0, 1, 2\}$ bijectively.
+
+Next, reducing~\eqref{eq:lifting_cong} modulo $3^m$ yields $R_{r + q \cdot 3^m}(4) \equiv R_r(4) \pmod{3^m}$, which proves that the map commutes with canonical parent projections:
+\begin{equation}
+\pi_m(R_s(4) \bmod 3^{m+1}) = R_{\pi_m(s)}(4) \bmod 3^m.
+\end{equation}
+
+Finally, we prove by induction on $m \ge 1$ that $s \bmod 3^m \mapsto R_s(4) \bmod 3^m$ is a permutation of $\Z / 3^m \Z$:
+\begin{itemize}
+    \item \textbf{Base case ($m = 1$):} Evaluating the map on the three residues of $\Z / 3\Z$:
+    \begin{equation}
+    R_0(4) = 0 \equiv 0, \quad R_1(4) = 1 \equiv 1, \quad R_2(4) = 5 \equiv 2 \pmod 3.
+    \end{equation}
+    The images are $\{0, 1, 2\}$ modulo $3$, so the map is the identity permutation on $\Z / 3\Z$.
+    \item \textbf{Inductive step:} Assume the map is a permutation on $\Z / 3^m \Z$ for some $m \ge 1$. Any element of $\Z / 3^{m+1}\Z$ can be uniquely written as $s = r + q \cdot 3^m$ with $r \in \Z / 3^m \Z$ and $q \in \{0, 1, 2\}$. Suppose two residues $s_1 = r_1 + q_1 \cdot 3^m$ and $s_2 = r_2 + q_2 \cdot 3^m$ satisfy $R_{s_1}(4) \equiv R_{s_2}(4) \pmod{3^{m+1}}$. Projecting modulo $3^m$ gives $R_{r_1}(4) \equiv R_{r_2}(4) \pmod{3^m}$. By the induction hypothesis, the map at depth $m$ is injective, forcing $r_1 = r_2 = r$. Substituting $r_1 = r_2 = r$ into the congruence modulo $3^{m+1}$ and applying~\eqref{eq:lifting_cong} yields:
+    \begin{equation}
+    R_r(4) + q_1 \cdot 3^m \equiv R_r(4) + q_2 \cdot 3^m \pmod{3^{m+1}}.
+    \end{equation}
+    Subtracting $R_r(4)$ gives $q_1 \cdot 3^m \equiv q_2 \cdot 3^m \pmod{3^{m+1}}$. Dividing by $3^m$ yields $q_1 \equiv q_2 \pmod 3$, so $q_1 = q_2$. Hence $s_1 = s_2$, proving injectivity on $\Z / 3^{m+1}\Z$. Since $\Z / 3^{m+1}\Z$ is finite, the map is a bijection (permutation) of $\Z / 3^{m+1}\Z$.
+\end{itemize}
+This completes the induction.
 \end{proof}
 
 \begin{corollary}[Exact Two-of-Three Branching (Idowu~\cite{Idowu2026}, Saye~\cite{Saye2022})]\label{cor:two_of_three}
@@ -186,7 +210,7 @@ is an exact isomorphism of rooted trees. Specifically:
 \begin{proof}
 By Lemma~\ref{lem:modular_lifting}, $s \bmod 3^{m-1} \mapsto R_s(4) \bmod 3^{m-1}$ is a bijection on $\Z / 3^{m-1} \Z$, yielding $|\Trep(m)| = 2^{m-1}$. By Lemma~\ref{lem:saye_period}, the trailing $m$ ternary digits of $2^n$ depend solely on $n \bmod (2 \cdot 3^{m-1})$. Since $\gcd(2, 3^{m-1}) = 1$, the map $s \bmod 3^{m-1} \mapsto 2s \bmod (2 \cdot 3^{m-1})$ is an isomorphism of abelian groups between $\Z / 3^{m-1} \Z$ and the even residue classes in $\Z / (2 \cdot 3^{m-1} \Z)$.
 
-Under this identification, $2^{2s} = 4^s = 3 R_s(4) + 1$, with lowest digit $d_0(4^s) = 1$ and $d_{j+1}(4^s) = d_j(R_s(4))$ for all $0 \le j < m-1$. Combining this with the bounded-representative bijection of Proposition~\ref{prop:rep_tree_iso}, $\Phi_m$ preserves admissibility, matches branch choices $q \in \{0, 1, 2\}$, and commutes with canonical parent projections $\pi$.
+Under this identification, $2^{2s} = 4^s = 3 R_s(4) + 1$, with lowest digit $d_0(4^s) = 1$ and $d_{j+1}(4^s) = d_j(R_s(4))$ for all $0 \le j < m-1$. Combining this with the bounded-representative bijection of Proposition~\ref{prop:rep_tree_iso}, $\Phi_m$ preserves admissibility and matches branch choices $q \in \{0, 1, 2\}$. Furthermore, $\Phi$ commutes with canonical parent projections: for any lift $s' = s + q \cdot 3^{m-1}$ at depth $m+1$, reduction modulo $2 \cdot 3^{m-1}$ yields $\Phi_{m+1}(s') = 2(s + q \cdot 3^{m-1}) = 2s + q(2 \cdot 3^{m-1}) \equiv 2s = \Phi_m(s) \pmod{2 \cdot 3^{m-1}}$, confirming that $\pi(\Phi_{m+1}(s')) = \Phi_m(\pi(s'))$.
 \end{proof}
 
 \section{Archimedean--3-Adic Decoupling and the Diophantine Target}\label{sec:decoupling}
@@ -248,9 +272,9 @@ The absence of such an effective separation between the Archimedean quotient and
 
 ---
 
-\section{Obstructions and Why Elementary Methods Fail}\label{sec:obstructions}
+\section{Obstructions to Elementary Approaches}\label{sec:obstructions}
 
-In this section, we analyze the specific mathematical barriers that cause elementary approaches to stall.
+In this section, we establish several concrete mathematical obstructions to natural elementary approaches.
 
 \subsection{The Modular Sieve Barrier}
 The classical trailing-digit approach tests whether $2^n \bmod 3^K$ has digits in $\{0, 1\}$. By Theorem~\ref{thm:tree_iso}, the number of surviving residue classes at level $K$ is $|N_K| = 2^{K-1}$. Since $B_K(n)$ is strictly periodic with period $u_K = 2 \cdot 3^{K-1}$, the set of integers satisfying the modular test has positive density in $\N$. For every depth $K$, there exist infinitely many integers $n \ge u_K$ that pass the trailing test. Thus, trailing-digit modular sieving alone \emph{can never establish finiteness}.
@@ -306,11 +330,11 @@ Specifically, for each spurious survivor $n \in [0, u_K) \cap B_K \setminus \{0,
 {\sloppy While Theorem~\ref{thm:bridge} completely eliminates all spurious survivors in the first period $[0, u_K)$, it does not constrain the second period $[u_K, 2 u_K)$. The full proof chain is formalized across the Lean~4 bridge module suite (\texttt{Bridge.lean}, \texttt{BridgeCompute}, \texttt{BridgeMiddle}, \texttt{BridgeCandidates}, \texttt{BridgeK13}--\texttt{BridgeK18}, \texttt{BridgeCantorChunked}, and \texttt{BridgeUniform}).\par}
 
 \subsection{Carry Packets and the Mod-8 Non-Recurrence Lemma}
-An alternative approach tracks carry propagation in the self-overlap addition $R_{s+1} = R_s + 3 R_s + 1$. A localized configuration of digits that absorbs an incoming digit $2$ via carries without emitting an output digit $2$ is called a \emph{carry packet}. The canonical dyadically pure carry configuration considered here occurs at:
+An alternative approach tracks carry propagation in the self-overlap addition $R_{s+1} = 4 R_s + 1 = R_s + 3 R_s + 1$, or in quadrupling powers of two $2^{n+2} = 4 \cdot 2^n = 2^n + 3 \cdot 2^n$. A localized configuration of digits that absorbs an incoming digit $2$ via carries without emitting an output digit $2$ is called a \emph{carry packet}. The canonical dyadically pure carry configuration considered here occurs at:
 \begin{equation}
 2101_3 = 64 \quad (4^3 = 64), \quad \text{yielding} \quad 100111_3 = 256 \quad (4^4 = 256).
 \end{equation}
-Could this configuration recur at higher separated ternary scales $64(1 + 3^s)$? We prove:
+Under multiplication by $4$ ($x \mapsto 4x = 3x + x$), the input $64 = 2101_3$ contains a digit $2$ at index $3$, but its product $256 = 100111_3$ has all ternary digits in $\{0, 1\}$ because the carry absorbed the forbidden digit. (In repunit coordinates, $R_3(4) = 21 = 210_3$ under $T(x) = 4x+1 = 3x+x+1$ yields $R_4(4) = 85 = 10011_3 \in \C_3$, similarly absorbing the initial carry $+1$ and intermediate digits.) Could this configuration recur at higher separated ternary scales $64(1 + 3^s)$? We prove:
 \begin{lemma}[Mod-8 Non-Recurrence of the $64(1+3^s)$ Carry Packet]\label{lem:non_recurrence}
 
 For all integers $s \ge 2$ and all $k \in \N$:
@@ -325,12 +349,12 @@ Modulo $8$, powers of $3$ alternate strictly: $3^s \equiv 1 \pmod 8$ for $s$ eve
 \end{proof}
 
 \subsection{The Spectral Contrast: Modular vs. Digit Space}
-The carry automaton on Cantor inputs has transfer matrix $A = \begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}$, with spectral radius $\rho_{\mathrm{digit}} = \phi = (1+\sqrt{5})/2 \approx 1.618 < 2$. This reveals the fundamental contrast:
+The carry automaton on Cantor inputs has transfer matrix $A = \begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}$, with spectral radius $\rho_{\mathrm{digit}} = \phi = (1+\sqrt{5})/2 \approx 1.618 < 2$. Specifically, for the quadrupling carry map $x \mapsto 4x = 3x + x$ (and the affine repunit shift $4x+1$), tracking carry states $(c, p) \in \{0, 1\}^2$ yields a $4$-state automaton whose reachable component from $(0,0)$ comprises exactly $2$ states with transition matrix $A$. This reveals the fundamental contrast:
 \begin{itemize}
     \item \textbf{Modular Space (Exponent):} $\rho_{\mathrm{adic}} = 2$. The tree $\Trep$ is a full binary tree forever.
     \item \textbf{Digit Space (Stream):} $\rho_{\mathrm{digit}} = \phi < 2$. The language grows as $F_{n+2}$, forcing sub-exponential word growth.
 \end{itemize}
-However, because an integer $4^s$ is a single discrete path, $\phi < 2$ alone does not force the path to leave the language. The matrix transfer system and its Fibonacci growth $F_{n+2}$ are formalized in \texttt{RepunitCarryConnection.lean}; its link to the automaton transitions is an analytical comparison.
+However, because an integer $4^s$ is a single discrete path, $\phi < 2$ alone does not force the path to leave the language. The matrix transfer recurrence $(x, y) \mapsto (x+y, x)$, its Fibonacci population growth $F_{n+2}$, and its characteristic polynomial equivalence to the $M=4$ Perron polynomial are formalized in \texttt{RepunitCarryConnection.lean}. As detailed in the trust boundary, the identification with the full shift-space spectral radius represents an analytical comparison (Hypothesis (H) from the companion paper), whereas the discrete matrix transfer recurrence and Fibonacci identity are fully kernel-verified.
 
 \subsection{Negative-Power Duality and the Discrepancy Obstruction}
 For negative powers $2^{-n} = 1/2^n$, the Erd\H{o}s analogue is completely solved:
@@ -369,7 +393,7 @@ The principal results in this paper are supported by Lean~4 formalizations (vers
     \item \texttt{RepunitDiophantine.lean}: Proves Corollary~\ref{cor:reduction} (Equivalence of Erd\H{o}s to $\mathrm{jointSurvivors} = \emptyset$).
     \item \texttt{RepunitCarryPacket.lean}: Proves Lemma~\ref{lem:non_recurrence} (Mod-8 Non-Recurrence of the $64(1+3^s)$ Carry Packet).
     \item \texttt{NegativePower.lean}: Proves Theorem~\ref{thm:neg_power} (Negative-Power Theorem, LTE 2-adic lift, and Gap Lemma orbit surjectivity).
-    \item \texttt{RepunitCarryConnection.lean}: Formalizes the transfer recurrence $(x,y) \mapsto (x+y,x)$, its Fibonacci identity $F_{n+2}$, and characteristic polynomial equivalence to the $M=4$ Perron polynomial; its interpretation as the valid path count of the carry automaton in \texttt{RepunitCarryPacket.lean} is an analytical comparison presented in Section~\ref{sec:obstructions}.
+    \item \texttt{RepunitCarryConnection.lean}: Formalizes the transfer recurrence $(x,y) \mapsto (x+y,x)$, its Fibonacci identity $F_{n+2}$, and characteristic polynomial equivalence to the $M=4$ Perron polynomial; its interpretation as the valid path count of the carry automaton in \texttt{RepunitCarryPacket.lean} is an analytical comparison presented in Section~\ref{sec:obstructions}. The theorem \texttt{lambda\_SFT\_one\_two\_eq\_carry\_phi} establishes the algebraic connection to the model constant \texttt{lambda\_SFT} from \texttt{CantorMultiplier}; as emphasized in the trust boundary, \texttt{lambda\_SFT} is a closed-form stand-in whose identification with the true shift spectral radius represents Hypothesis (H), so the formal proof verifies the algebraic identity rather than an in-proof Perron--Frobenius theorem.
     \item \texttt{BridgeSuite}: The computational certificate suite for Theorem~\ref{thm:bridge} (First-Period Bridge), comprising modules \texttt{Bridge}, \texttt{BridgeCompute}, \texttt{BridgeMiddle}, \texttt{BridgeCandidates}, \texttt{BridgeK13}--\texttt{BridgeK18}, and \texttt{BridgeUniform}.
 \end{itemize}\par}
 
