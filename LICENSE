@@ -13,8 +13,12 @@ source code: **PolyForm Strict License 1.0.0**. The full text is in
 Python, 10 Rust -- carries a header naming that license.
 
 The certificates and recorded outputs the code produces -- the `*.csv` tables,
-`*.txt` chunk files, and JSON manifests in this repository -- are distributed
-under the same terms.
+`*.txt` chunk files, and JSON manifests in this repository -- are offered under
+the same terms to the extent copyright subsists in them. Numerical results,
+individual values, and mathematical facts are not copyrightable, and nothing
+here claims they are; what this license reaches in those files is their
+selection, arrangement, and any original expression. Where that boundary falls
+is a question for counsel, not something this file settles.
 
 You may read, download, run, and study this code for noncommercial purposes.
 
@@ -28,10 +32,12 @@ The license grants no permission to:
 
 Public access is not a grant. This repository is public so the work can be read,
 checked, and cited; being able to read it does not give you the right to
-republish it. GitHub's Terms of Service permit forking a public repository on
-GitHub itself, and permit the hosting that makes it visible. A fork held under
-those terms is still bound by this license for anything beyond that hosting: it
-may not be distributed elsewhere, modified, or used commercially.
+republish it. Forking a public repository on GitHub is permitted by GitHub's own
+terms, not by this license, and this license cannot withdraw that platform
+permission. What this license states is that it grants no rights over a fork: it
+does not permit distributing that fork elsewhere, modifying it, or using it
+commercially. How the two permissions interact is a question for counsel; this
+file states an intent and does not settle the law.
 
 Use outside the license's noncommercial definition requires a separate paid
 license. See [`COMMERCIAL.md`](COMMERCIAL.md).

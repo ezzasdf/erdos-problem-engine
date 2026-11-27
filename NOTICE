@@ -24,7 +24,14 @@ Lean, 118 Python, and 10 Rust. Every one of them is first-party. None carries a
 third-party or Mathlib copyright line, Mathlib enters only as an imported
 dependency, and the two Rust crates declare `publish = false` with
 `license-file = "../LICENSE-CODE"` rather than an SPDX identifier, because
-PolyForm is not an SPDX license.
+PolyForm is not an SPDX license. That manifest field is an internal reference
+for crates that are never packaged; it is not a statement that either crate is
+ready for independent distribution.
+
+Copyright in the recorded outputs reaches only their selection, arrangement, and
+original expression, if any. Numerical values and mathematical facts are not
+copyrightable and are not claimed here. The terms offered for those files are an
+intent, and should be reviewed with the code terms by counsel.
 
 ## Previously released versions
 
