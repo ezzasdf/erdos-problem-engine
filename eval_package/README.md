@@ -63,7 +63,11 @@ To maintain rigorous scientific standards, we explicitly separate what this cert
 1. **Automaton Derivation:** The auditor verifies properties of the matrix $A$ encoded in the JSON. It does not independently construct the carry graph from $M = 19$ (end-to-end derivation requires the full repository).
 2. **Global Two-Sided Uniqueness:** Proof that the zero-reachable component uniquely dominates the full two-sided shift space across the interior domain relies on an analytical spectral-gap hypothesis (Hypothesis (H)).
 3. **Continuous Measure Bridge:** The Frostman measure bridge connecting symbolic growth rates $\log_3 \lambda_0$ to real-line Hausdorff dimension $\dim_H C(1, 19)$ on $\mathbb{R}$ is an analytical paper proof (§3), not an automated script check.
-4. **Cryptographic Provenance:** The SHA-256 checksum detects corruption; author authenticity should be checked against the official Zenodo archive record or the canonical Git release tag (note: the Git tag identifies the source commit, but is not GPG-signed).
+4. **Provenance & Authenticity Architecture:**
+   - **SHA-256:** Detects whether a file differs from expected contents (detects bit flips, truncation, or accidental corruption).
+   - **Zenodo DOI ([10.5281/zenodo.24595631](https://zenodo.org/records/24595631)):** Provides a persistent, timestamped public archived version against which files can be compared.
+   - **Unsigned Git release tag (`emve-cert-v1.0.0`):** Identifies the canonical source revision, but does not cryptographically authenticate its author.
+   - **Signed Git release tag:** Can provide cryptographic signature verification when the signing key's identity is independently trusted.
 
 ---
 

@@ -47,7 +47,7 @@ To maintain rigorous scientific standards, the auditor enforces explicit trust b
 ### A. Integrity Checksum vs. Authenticity
 - The `payload_sha256` field functions as an **integrity checksum** to detect accidental bit flips, incomplete downloads, or file corruption.
 - It is **strictly enforced**: missing, empty, or mismatched checksums are immediately rejected.
-- **Authenticity Limit:** A SHA-256 hash does *not* prove author identity or prevent deliberate re-hashing of modified files. Authenticity must be verified out-of-band against signed Git release tags or the official Zenodo archive record ([DOI: 10.5281/zenodo.24595631](https://zenodo.org/records/24595631)).
+- **Authenticity Limit:** A SHA-256 hash proves integrity against file modification/corruption, but does not prove author identity. Zenodo provides a persistent, timestamped public archived record ([DOI: 10.5281/zenodo.24595631](https://zenodo.org/records/24595631)) against which files can be compared. The unsigned Git release tag identifies the canonical revision, but does not cryptographically authenticate its creator (which requires a trusted GPG signature).
 
 ### B. The Three-Level Verification Hierarchy
 We distinguish three distinct levels of verification:

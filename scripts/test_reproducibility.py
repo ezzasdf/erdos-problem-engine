@@ -10,7 +10,10 @@ This test runs an automated, self-contained verification check without manual in
 """
 
 import sys
+import os
+import json
 import time
+import tempfile
 from pathlib import Path
 
 # Add project root to sys.path
@@ -197,7 +200,21 @@ def run_test():
     ok_wl, msg_wl = verify_portable_certificate_dict(bad_wrong_lag, check_derivation=True)
     assert not ok_wl and "stated forward_lag [99, 99]" in msg_wl, f"Failed to reject wrong forward_lag: {msg_wl}"
 
-    print("  -> TEST 6 PASSED: SHA-256 enforcement (missing/empty/corrupt), boolean typing (vector/CW/Sturm), and strict derivation metadata checks (family/lag/missing) verified.")
+    # 6j. File-level error handling with non-dict JSON values ([], null, "hello", 123)
+    for bad_val, val_name in [([], "list"), (None, "null"), ("hello", "string"), (123, "int")]:
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as tf:
+            json.dump(bad_val, tf)
+            tpath = tf.name
+        try:
+            ok_f, msg_f, rep_f = verify_certificate_file(tpath)
+            assert not ok_f, f"File wrapper accepted {val_name} as certificate"
+            assert rep_f is not None and rep_f["status"] == "FAIL", f"Expected FAIL status for {val_name}"
+            assert "Malformed certificate structure" in msg_f, f"Unexpected message for {val_name}: {msg_f}"
+        finally:
+            if os.path.exists(tpath):
+                os.unlink(tpath)
+
+    print("  -> TEST 6 PASSED: SHA-256 enforcement, boolean typing, derivation metadata checks, and non-dict file wrapper robustness ([], null, string, int) verified.")
 
     elapsed = time.time() - start_time
     print("\n" + "=" * 70)

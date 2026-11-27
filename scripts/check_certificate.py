@@ -38,11 +38,15 @@ them from first principles:
      but conditional on Hypothesis (H) in the interior domain, with an analytical Frostman bridge.
 
 4. Trust Boundaries & Integrity:
-   - Integrity Checksum: The SHA-256 payload digest detects accidental bit flips,
-     transmission errors, or file corruption. It does NOT prove author authenticity
-     or provide non-repudiation (anyone can rehash a modified JSON). Authenticity
-     must be established via the official Zenodo archive record or the canonical Git release tag
-     (note: the tag marks the exact source commit, but is not cryptographically GPG-signed).
+   - Integrity Checksum: The SHA-256 payload digest detects whether a file differs
+     from expected contents (detecting accidental bit flips, transmission errors,
+     or local corruption). It does NOT prove author authenticity or prevent deliberate
+     re-hashing of modified files.
+   - Provenance Architecture:
+     * SHA-256: Detects whether the file differs from expected contents.
+     * Zenodo DOI (10.5281/zenodo.24595631): Provides a persistent public record against which files can be compared.
+     * Unsigned Git release tag: Identifies a source revision, but does not cryptographically authenticate its creator.
+     * Signed Git release tag: Can provide cryptographic verification when the signing key's identity is independently trusted.
    - External Dependencies: Collatz-Wielandt has ZERO external dependencies (operates
      on stock Python 3 standard library; SymPy is NOT imported). Sturm root-counting
      lazily imports SymPy for characteristic polynomial and Sturm chain generation,
@@ -361,12 +365,13 @@ def verify_certificate_file(file_path, check_derivation=False):
     ok, msg = verify_portable_certificate_dict(data, check_derivation=check_derivation)
     elapsed = time.time() - start_t
 
+    is_dict = isinstance(data, dict)
     report = {
         "file": str(path),
-        "problem_id": data.get("problem_id", "unknown"),
-        "certificate_type": data.get("certificate_type", "unknown"),
-        "format_version": data.get("format_version", "unknown"),
-        "payload_sha256": data.get("payload_sha256", "none"),
+        "problem_id": data.get("problem_id", "unknown") if is_dict else "unknown",
+        "certificate_type": data.get("certificate_type", "unknown") if is_dict else "unknown",
+        "format_version": data.get("format_version", "unknown") if is_dict else "unknown",
+        "payload_sha256": data.get("payload_sha256", "none") if is_dict else "none",
         "status": "PASS" if ok else "FAIL",
         "proof_summary": msg,
         "derivation_checked": check_derivation,
