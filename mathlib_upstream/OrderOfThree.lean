@@ -25,6 +25,7 @@ for $3$, which also has order $2^{n-2}$ for all $n \ge 3$.
 
 * `Nat.multiplicity_two_three_pow_two_pow`: For any $k \ge 1$,
   `multiplicity 2 (3 ^ (2 ^ k) - 1) = k + 2`.
+* `ZMod.unitThree`: The unit $3$ in `(ZMod (2 ^ n))ˣ`.
 * `ZMod.orderOf_unitThree`: For any $n \ge 3$,
   `orderOf (unitThree : (ZMod (2 ^ n))ˣ) = 2 ^ (n - 2)`.
 
@@ -35,7 +36,7 @@ zmod, units, order, orderOf, lifting the exponent, p-adic valuation
 
 namespace Nat
 
-lemma pow3_pow2_succ (m : ℕ) : 3 ^ (2 ^ (m + 2)) = (3 ^ (2 ^ (m + 1))) ^ 2 := by
+private lemma pow3_pow2_succ (m : ℕ) : 3 ^ (2 ^ (m + 2)) = (3 ^ (2 ^ (m + 1))) ^ 2 := by
   have h : 2 ^ (m + 2) = 2 ^ (m + 1) * 2 := by
     rw [Nat.pow_succ, mul_comm]
   rw [h, pow_mul]
@@ -49,9 +50,7 @@ private lemma lte_algebra_step (m c : ℕ) :
   dsimp [P, u, c']
   ring
 
-/-- The 2-adic Lifting-the-Exponent decomposition for powers of 3:
-For all $m \in \mathbb{N}$, $3^{2^{m+1}} = 1 + 2^{m+3} + c \cdot 2^{m+4}$ for some $c \in \mathbb{N}$. -/
-theorem pow3_lte_decomp (m : ℕ) :
+private theorem pow3_lte_decomp (m : ℕ) :
     ∃ c : ℕ, 3 ^ (2 ^ (m + 1)) = 1 + 2 ^ (m + 3) + c * 2 ^ (m + 4) := by
   induction m with
   | zero =>
@@ -74,7 +73,7 @@ theorem pow3_lte_decomp (m : ℕ) :
     rw [hP2, hP4]
     exact lte_algebra_step m c
 
-theorem two_pow_dvd_three_pow_two_pow_sub_one (k : ℕ) (hk : 1 ≤ k) :
+private theorem two_pow_dvd_three_pow_two_pow_sub_one (k : ℕ) (hk : 1 ≤ k) :
     2 ^ (k + 2) ∣ 3 ^ (2 ^ k) - 1 := by
   obtain ⟨m, rfl⟩ : ∃ m, k = m + 1 := Nat.exists_eq_succ_of_ne_zero (by omega)
   obtain ⟨c, hc⟩ := pow3_lte_decomp m
@@ -86,7 +85,7 @@ theorem two_pow_dvd_three_pow_two_pow_sub_one (k : ℕ) (hk : 1 ≤ k) :
   rw [hdecomp]
   exact dvd_mul_right (2 ^ (m + 3)) (1 + 2 * c)
 
-theorem not_two_pow_succ_dvd_three_pow_two_pow_sub_one (k : ℕ) (hk : 1 ≤ k) :
+private theorem not_two_pow_succ_dvd_three_pow_two_pow_sub_one (k : ℕ) (hk : 1 ≤ k) :
     ¬ 2 ^ (k + 3) ∣ 3 ^ (2 ^ k) - 1 := by
   obtain ⟨m, rfl⟩ : ∃ m, k = m + 1 := Nat.exists_eq_succ_of_ne_zero (by omega)
   obtain ⟨c, hc⟩ := pow3_lte_decomp m
@@ -119,7 +118,7 @@ end Nat
 
 namespace ZMod
 
-lemma natCast_sub_one_eq_zero_iff {m : ℕ} (a : ℕ) (ha : 1 ≤ a) :
+private lemma natCast_sub_one_eq_zero_iff {m : ℕ} (a : ℕ) (ha : 1 ≤ a) :
     ((a - 1 : ℕ) : ZMod m) = 0 ↔ (a : ZMod m) = 1 := by
   rw [Nat.cast_sub ha, Nat.cast_one, sub_eq_zero]
 
@@ -135,8 +134,7 @@ theorem unitThree_pow (n k : ℕ) :
   push_cast
   rw [coe_unitThree]
 
-/-- The unit 3 raised to the power $2^{n-2}$ is the identity in `(ZMod (2 ^ n))ˣ` for $n \ge 3$. -/
-theorem unitThree_pow_two_sub_two_eq_one (n : ℕ) (hn : 3 ≤ n) :
+private theorem unitThree_pow_two_sub_two_eq_one (n : ℕ) (hn : 3 ≤ n) :
     (unitThree : (ZMod (2 ^ n))ˣ) ^ (2 ^ (n - 2)) = 1 := by
   ext
   rw [Units.val_one, unitThree_pow]
@@ -152,8 +150,7 @@ theorem unitThree_pow_two_sub_two_eq_one (n : ℕ) (hn : 3 ≤ n) :
   rw [ZMod.natCast_eq_zero_iff]
   exact hdvd
 
-/-- For $n \ge 3$, the unit 3 raised to $2^{n-3}$ is NOT the identity in `(ZMod (2 ^ n))ˣ`. -/
-theorem unitThree_pow_two_sub_three_ne_one (n : ℕ) (hn : 3 ≤ n) :
+private theorem unitThree_pow_two_sub_three_ne_one (n : ℕ) (hn : 3 ≤ n) :
     (unitThree : (ZMod (2 ^ n))ˣ) ^ (2 ^ (n - 3)) ≠ 1 := by
   intro h
   have hval : (((unitThree : (ZMod (2 ^ n))ˣ) ^ (2 ^ (n - 3)) : (ZMod (2 ^ n))ˣ) : ZMod (2 ^ n)) = 1 := by
