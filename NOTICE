@@ -16,6 +16,7 @@ Copyright (c) 2026 Ezzeldin Ashraf Mohamed Shafey Wahba. All rights reserved.
 | Other manuscripts in `paper/` | All rights reserved |
 | `contrib/palomar/**` | Apache License 2.0, as declared in that package |
 | `contrib/formal-conjectures/**` | Apache License 2.0, as required by the upstream project |
+| `mathlib_upstream/**` | Apache License 2.0, as required by Mathlib |
 
 Commercial use of the software is available only under a separate paid
 license; see `COMMERCIAL.md`.

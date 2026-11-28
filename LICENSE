@@ -69,6 +69,9 @@ permission and proper academic attribution.
 `contrib/formal-conjectures/` is released under the **Apache License, Version
 2.0**, as required by the upstream project it is proposed to.
 
+`mathlib_upstream/` is released under the **Apache License, Version 2.0**,
+because Mathlib requires that license for every file it accepts.
+
 ## Third-party components
 
 Lean 4 and Mathlib are distributed under the Apache License, Version 2.0. They
