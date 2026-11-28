@@ -48,7 +48,7 @@
 \begin{document}
 
 \begin{abstract}
-We study the Hausdorff dimension of arithmetic intersections of the middle-thirds Cantor set $\Sigma$ with its dilates, $C(1, M) = \Sigma \cap M^{-1} \Sigma$, for integer multipliers $M \ge 1$. When $M$ satisfies the carry-free condition~(S), the intersection decomposes into an affine subshift of finite type (SFT) whose dimension is determined by the spectral radius of an explicit transfer matrix. Assuming the interior spectral-gap hypothesis~(H), we prove that among all safe multipliers, the maximal Hausdorff dimension is strictly achieved by two infinite families: Family~1 ($M = 3^k + 1$) and the reduced extremizers of Family~2 ($M = 3^b - 3^a + 1$ with $b = 2a$). In both families the symbolic language is a product of $k$ (respectively $g = \gcd(a,b)$) independent golden mean shifts, so that $\dimH C(1, M) = \log_3 \phi \approx 0.438018$, where $\phi = (1+\sqrt{5})/2$. This is strictly below Lagarias's universal bound of $1/2$ on this class.
+We study the Hausdorff dimension of arithmetic intersections of the middle-thirds Cantor set $\Sigma$ with its dilates, $C(1, M) = \Sigma \cap M^{-1} \Sigma$, for integer multipliers $M \ge 1$. When $M$ satisfies the carry-free condition~(S), the intersection decomposes into an affine subshift of finite type (SFT) whose dimension is determined by the spectral radius of an explicit transfer matrix. Assuming the interior spectral-gap hypothesis~(H), we prove that among all non-$3$-power safe multipliers (or equivalently, every safe multiplier with $\gcd(M, 3) = 1$), the maximal Hausdorff dimension is strictly achieved by two infinite families: Family~1 ($M = 3^k + 1$) and the reduced extremizers of Family~2 ($M = 3^b - 3^a + 1$ with $b = 2a$). In Family~1 the symbolic language is topologically conjugate to $k$ independent copies of the golden mean shift; in Family~2 each of the $a = \gcd(a,b)$ independent sub-chains is a $2$-to-$1$ extension of the golden mean shift on difference symbols sharing identical topological entropy $\log \phi$. Thus $\dimH C(1, M) = \log_3 \phi \approx 0.438018$ in both families, strictly below Lagarias's universal bound of $1/2$ on this class.
 
 The classification is unconditional on the boundary rays (Lemma~\ref{lem:boundary_strict} and Corollary~\ref{cor:boundary_reduction}) and conditional on~(H) in the interior domain; exact transfer-matrix computation certifies the spectral bound $\lambda_0(M) \le \phi$ on reachable subshifts for every safe multiplier $M \le 2000$. Furthermore, we prove a Time-Reversal Duality theorem establishing that pairs $(a, b)$ and $(b-a, b)$ are cospectral. We formulate the analytical Frostman measure bridge connecting symbolic word counts to rigorous Hausdorff measures on the real line, and compute the exact Hausdorff dimension and minimal polynomial factor for all safe $M \le 300$. The combinatorial core --- word counts, the carry-graph model, time-reversal duality, and the boundary-case bounds --- is formalized and kernel-verified in Lean~4 (version 4.12.0, Mathlib commit \texttt{809c3fb3b5c8}) with foundational axioms; the interior spectral-gap inequality is carried in the formalization as an explicit hypothesis, not as an axiom.
 \end{abstract}
@@ -78,7 +78,7 @@ In this paper we settle these questions on the entire class of digitwise-safe mu
 Our principal contributions are summarized in the following five theorems:
 
 \begin{theorem}[Universal Dimension Bound and Extremizer Classification]\label{thm:universal_bound}
-Assume the interior spectral-gap inequality~(H) of \S\ref{sec:interior}. Then for every safe multiplier $M > 1$ the Hausdorff dimension satisfies:
+Assume the interior spectral-gap inequality~(H) of \S\ref{sec:interior}. Then for every safe multiplier $M > 1$ with $\gcd(M, 3) = 1$ (that is, every safe multiplier not a pure power of $3$), the Hausdorff dimension satisfies:
 \begin{equation}
 \dimH C(1, M) \le \log_3 \phi = 0.438017879\dots < \frac{1}{2}, \quad \text{where } \phi = \frac{1 + \sqrt{5}}{2}.
 \end{equation}
@@ -87,7 +87,7 @@ Equality $\dimH C(1, M) = \log_3 \phi$ holds if and only if $M$ belongs to one o
     \item \textbf{Family 1:} $M = 3^k + 1$ for some $k \ge 1$;
     \item \textbf{Family 2 Extremizers:} $M = 3^{b} - 3^{a} + 1$ with $b = 2a$ ($a \ge 1$).
 \end{enumerate}
-In Family~1, the residue-class decomposition partitions the coordinates into $k$ independent copies of the golden mean language; while the $k$-step shift $\sigma^k$ acts as the Cartesian product $\Sigma_{\mathrm{gold}}^{\times k}$, the $1$-step shift $\sigma$ acts by cyclically permuting the columns, yielding topological entropy $\frac{1}{k}\log(\phi^k) = \log \phi$. In Family~2, each of the $a$ sub-chains is a $2$-to-$1$ extension of $\Sigma_{\mathrm{gold}}$ admitting two fixed points ($0^\infty$ and $1^\infty$) rather than one, with identical topological entropy $\log \phi$. In both families, the resulting growth dimension is $\log_3 \phi$. Hypothesis~(H) is not needed for the boundary rays; the sub-golden bound $\lambda_0(M) \le \phi$ on reachable subshifts is verified by exact transfer-matrix computation for all safe $M \le 2000$ (\S\ref{sec:table}).
+In Family~1, the residue-class decomposition partitions the coordinates into $k$ independent copies of the golden mean language; while the $k$-step shift $\sigma^k$ acts as the Cartesian product $\Sigma_{\mathrm{gold}}^{\times k}$, the $1$-step shift $\sigma$ acts by cyclically permuting the columns, yielding topological entropy $\frac{1}{k}\log(\phi^k) = \log \phi$. In Family~2, each of the $a = \gcd(a, b)$ sub-chains is a $2$-to-$1$ extension of $\Sigma_{\mathrm{gold}}$ admitting two fixed points ($0^\infty$ and $1^\infty$) rather than one, with identical topological entropy $\log \phi$. In both families, the resulting growth dimension is $\log_3 \phi$. Hypothesis~(H) is not needed for the boundary rays; the sub-golden bound $\lambda_0(M) \le \phi$ on reachable subshifts is verified by exact transfer-matrix computation for all safe $M \le 2000$ (\S\ref{sec:table}).
 \end{theorem}
 
 \begin{theorem}[Digitwise Factorization and Dimension Bridge]\label{thm:factorization_bridge}
@@ -315,12 +315,12 @@ Thus $\dimH C(1, M) \le \log_3 \lambda_0$.
 
 \textbf{Lower bound via Frostman measure:}
 Let $\mathcal{C}_*$ be a maximal recurrent component of $\mathcal{G}_0$ achieving $\rho(A_{\mathcal{C}_*}) = \lambda_0$. Because $\mathcal{C}_*$ is reachable from $0^d$, fix a finite path $p_0$ in $\mathcal{G}_0$ of length $L_0$ from $0^d$ to an entrance state $v_* \in \mathcal{C}_*$.
-On the subshift of paths in $\mathcal{C}_*$ starting at $v_*$, let $\mu_*$ be the Parry measure associated with the Perron root $\lambda_0$, satisfying $\mu_*([w]) \le C_* \lambda_0^{-L}$ for all cylinders of length $L$.
-Define the single-column probability measure $\mu_{\mathrm{col}}$ on paths starting at $0^d$ by conditioning on the fixed initial prefix $p_0$ and following $\mu_*$ thereafter.
+On the subshift of paths in $\mathcal{C}_*$ starting at $v_*$, let $\mu_*$ be the stationary Parry Markov measure associated with the Perron root $\lambda_0$, which satisfies $\mu_*([w]) \le C_* \lambda_0^{-L}$ for all length-$L$ cylinder blocks $w$ in $\mathcal{C}_*$.
+Define the single-column probability measure $\mu_{\mathrm{col}}$ on path space starting at $0^d$ as the deterministic prefix $p_0$ concatenated with $\mu_*$ on subsequent transitions; any cylinder $[w]$ of length $L \ge L_0$ extending $p_0$ thus satisfies $\mu_{\mathrm{col}}([w]) = \mu_*([w_{L_0 \dots L}]) \le C_* \lambda_0^{-(L - L_0)} = (C_* \lambda_0^{L_0}) \lambda_0^{-L}$, while cylinders incompatible with $p_0$ carry measure zero.
 Taking the product measure $\mu = \mu_{\mathrm{col}}^{\otimes k}$ across the $k$ independent columns and pushing forward by $\pi$ defines a Borel probability measure $\nu = \pi_* \mu$ supported on $C(1, M)$.
-For any metric ball $B(x, r) \subset \R$ with $3^{-(n+1)} \le r < 3^{-n}$, the cylinder separation $\ge 3^{-n}$ from Step~1 ensures that $B(x, r)$ intersects at most $O(1)$ length-$n$ cylinder sets $\pi([w])$. Since the prefix length $k L_0$ is a fixed finite constant, the measure of each intersecting cylinder satisfies:
+For any metric ball $B(x, r) \subset \R$ with $3^{-(n+1)} \le r < 3^{-n}$, the cylinder separation $\ge 3^{-n}$ from Step~1 ensures that $B(x, r)$ intersects at most $2$ length-$n$ cylinder sets $\pi([w])$. Since the total prefix length $k L_0$ is a fixed finite constant, the measure of each intersecting cylinder satisfies:
 \begin{equation}
-\mu([w]) \le \prod_{j=1}^k C_* \lambda_0^{-(n/k - L_0)} = C_*^k \lambda_0^{k L_0} \lambda_0^{-n} \le C' r^{\log_3 \lambda_0}.
+\mu([w]) \le \prod_{j=1}^k C_* \lambda_0^{-(\lfloor n/k \rfloor - L_0)} \le C_*^k \lambda_0^{k (L_0 + 1)} \lambda_0^{-n} \le C' r^{\log_3 \lambda_0}.
 \end{equation}
 Consequently, $\nu(B(x, r)) \le C' r^{\log_3 \lambda_0}$ for all $x \in C(1, M)$ and $r \in (0, 1)$. By Frostman's Lemma (the Mass Distribution Principle), this gives:
 \begin{equation}
@@ -361,16 +361,17 @@ Evaluating the constraint across all local triples $(y_{m-2}, y_{m-1}, y_m) \in 
 \end{itemize}
 Thus the constraint forbids exactly $010$ and $101$. Equivalently, two consecutive state flips $y_{m-1} \ne y_{m-2}$ and $y_m \ne y_{m-1}$ cannot occur simultaneously: the flip set $S(y)$ cannot contain two consecutive integers.
 A binary word $y = (y_0, \dots, y_{L-1})$ of length $L$ is uniquely determined by its initial symbol $y_0 \in \{0, 1\}$ and its flip indicator sequence $s_m = \mathbf{1}_{\{y_m \ne y_{m-1}\}} \in \{0, 1\}$ for $1 \le m \le L-1$. The condition that $S(y)$ contains no consecutive integers means $(s_1, \dots, s_{L-1})$ is a binary string of length $L-1$ containing no adjacent $1$s.
-The number of such flip strings of length $L-1$ is the Fibonacci number $F_{(L-1)+2} = F_{L+1}$. Accounting for the $2$ independent choices of initial symbol $y_0 \in \{0, 1\}$, the exact number of admissible words of length $L$ is:
+The number of such flip strings of length $L-1$ is the Fibonacci number $F_{(L-1)+2} = F_{L+1}$. In the full unconstrained shift, accounting for the $2$ independent choices of initial symbol $y_0 \in \{0, 1\}$, the exact number of admissible words of length $L$ is:
 \begin{equation}
 N_{\mathrm{chain}}(L) = 2 F_{L+1}.
 \end{equation}
 (For example, at lengths $L=1, 2, 3$, the exact admissible word counts are $2, 4, 6$, whereas $F_{L+2}$ would yield $2, 3, 5$.)
+In the one-sided Cantor set $C(1, M)$ initialized at $z_1 = \dots = z_{2a} = 0$, each sub-chain begins in the fixed initial state $(y_0, y_1) = (0, 0)$. This fixes the base symbol $y_0 = 0$ and the first flip indicator $s_1 = 0$, leaving $L - 2$ unconstrained flip choices without adjacent $1$s. Thus, the exact number of zero-reachable admissible words of length $L$ is $F_{(L-2)+2} = F_L$ (for $L \ge 2$), giving zero-initialized total word count $N_0(n) = (F_{n/a})^a$ for $n \equiv 0 \pmod a$.
 We emphasize that each sub-chain is \emph{not} topologically conjugate to the golden mean shift $\Sigma_{\mathrm{gold}}$: the sub-chain possesses two distinct fixed points ($0^\infty$ and $1^\infty$), whereas $\Sigma_{\mathrm{gold}}$ has only one ($0^\infty$). Rather, the sub-chain is a double cover ($2$-to-$1$ extension) of $\Sigma_{\mathrm{gold}}$ on the difference symbols, and possesses identical topological entropy:
 \begin{equation}
-h_{\mathrm{top}} = \lim_{L \to \infty} \frac{1}{L} \log N_{\mathrm{chain}}(L) = \lim_{L \to \infty} \frac{1}{L} \log(2 F_{L+1}) = \log \phi.
+h_{\mathrm{top}} = \lim_{L \to \infty} \frac{1}{L} \log N_{\mathrm{chain}}(L) = \lim_{L \to \infty} \frac{1}{L} \log F_L = \log \phi.
 \end{equation}
-Consequently, its transition matrix has Perron root $\lambda = \phi$. Combining the $a$ independent sub-chains yields the total word count $N(n) = (2 F_{n/a + 1})^a \sim \left(\frac{2\phi}{\sqrt{5}}\right)^a \phi^n$, establishing:
+Consequently, its transition matrix has Perron root $\lambda = \phi$. Combining the $a$ independent sub-chains yields exponential growth rate $\phi^n$, establishing:
 \begin{equation}
 \dimH C(1, 3^{2a} - 3^a + 1) = \log_3 \phi.
 \end{equation}
@@ -510,7 +511,7 @@ Hypothesis~\ref{hyp:parry} is the ``Frontier~A'' obligation of the formalization
 
 \section{Exact Hausdorff Dimension Table (\texorpdfstring{$M \le 300$}{M <= 300})}\label{sec:table}
 
-Table~\ref{tab:dimension_table} lists exact Hausdorff dimensions for representative multipliers $M \le 300$. For digitwise-safe multipliers $M = 3^b - 3^a + 1$, the forward single-column lag pair is $(b-a, b)$; the ``Reachable states'' column reports the number of vertices reachable from $0^b$ in the forward transition graph $\mathcal{G}_0(b-a, b)$. The Perron factor is the irreducible factor of the characteristic polynomial carrying $\lambda$.
+Table~\ref{tab:dimension_table} lists exact Hausdorff dimensions for representative multipliers $M \le 300$. For Family~1 multipliers ($M = 3^k + 1$), the reachable states column reports $2^k$, the state space of the product of $k$ independent $2$-state golden mean column subshifts (each column has $2$ reachable states); for Family~2 multipliers ($M = 3^b - 3^a + 1$), it reports the number of vertices reachable from $0^b$ in the forward single-column transition graph $\mathcal{G}_0(b-a, b)$ with lag pair $(b-a, b)$. The Perron factor is the irreducible factor of the characteristic polynomial carrying $\lambda$.
 
 \begin{table}[htbp]
 \centering
@@ -552,7 +553,7 @@ M \in \{4,\, 7,\, 10,\, 28,\, 73,\, 82,\, 244,\, 703,\, 730\},
 \]
 i.e.\ exactly the union of $\{3^k+1\}$ and $\{3^{2a} - 3^a + 1\}$ in that range.
 \end{enumerate}
-This provides exact algebraic evidence for the dimension bound on all reachable subshifts and confirms the predicted extremizer set for all tested multipliers up to $2000$. (The scan certifies reachable spectra $\lambda_0$, rather than verifying the two global conditions of Hypothesis~\ref{hyp:parry}.) The script is \texttt{verify\_dimensions.py} under \texttt{scripts/}.
+This provides exact algebraic evidence for the dimension bound on all reachable subshifts and confirms the predicted extremizer set for all tested multipliers up to $2000$. (The scan certifies reachable spectra $\lambda_0$, rather than verifying the two global conditions of Hypothesis~\ref{hyp:parry}.) The script is \texttt{verify\_dimensions.py} under \texttt{scripts/cantor\_multiplier/}.
 
 \noindent\textbf{Cospectral phenomena.} The dual pairs $(19, 25)$ (forward lags $(1, 3)$ and $(2, 3)$), $(55, 79)$ (forward lags $(1, 4)$ and $(3, 4)$), $(73, 73)$ (self-dual lag $(2, 4)$), and $(217, 235)$ (forward lags $(2, 5)$ and $(3, 5)$) illustrate Time-Reversal Duality $\lambda(a,b) = \lambda(b-a,b)$. Two coincidences lie outside that theorem: $\lambda(13) = \lambda(25)$ (both $x^3 - x^2 - 1$) and $\lambda(16) = \lambda(163)$ (both $x^3 - x - 1$), with $13$ and $16$ not digitwise-safe. The polynomial $x^5 - x^4 - x^2 - 1$ at $M = 61$ ($\lambda_{61} \approx 1.570147$) also governs $M = 5905$, a cospectral coincidence across distinct multiplier orders that is not covered by any of the theorems above.
 
