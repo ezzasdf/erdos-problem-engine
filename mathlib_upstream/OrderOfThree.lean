@@ -17,15 +17,15 @@ import Mathlib.Tactic.Positivity
 This file establishes the exact 2-adic valuation (Lifting-the-Exponent) of $3^{2^k} - 1$
 and computes the multiplicative order of $3$ in the unit group `(ZMod (2 ^ n))ˣ`.
 
-In `Mathlib.RingTheory.ZMod.UnitsCyclic`, the unit $5$ is formalized as a canonical generator
-of the cyclic subgroup of index 2 in `(ZMod (2 ^ n))ˣ`. This module provides the counterpart
-for $3$, which also has order $2^{n-2}$ for all $n \ge 3$.
+Mathlib already establishes the exact multiplicative order of the unit 5 modulo powers of 2
+in `Mathlib.RingTheory.ZMod.UnitsCyclic` (`ZMod.orderOf_unitFive`). This module establishes
+the corresponding result for the unit 3, showing `orderOf unitThree = 2 ^ (n - 2)` for all $n \ge 3$.
 
 ## Main results
 
 * `Nat.multiplicity_two_three_pow_two_pow`: For any $k \ge 1$,
   `multiplicity 2 (3 ^ (2 ^ k) - 1) = k + 2`.
-* `ZMod.unitThree`: The unit $3$ in `(ZMod (2 ^ n))ˣ`.
+* `ZMod.unitThree`: The unit `3` in `(ZMod (2 ^ n))ˣ`.
 * `ZMod.orderOf_unitThree`: For any $n \ge 3$,
   `orderOf (unitThree : (ZMod (2 ^ n))ˣ) = 2 ^ (n - 2)`.
 
